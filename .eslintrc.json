@@ -1,67 +1,52 @@
 {
-    "env": {
-        "browser": true,
-        "es2021": true,
-        "node": true
-    },
-    "ignorePatterns": [
-        "webpack.dev.config.js",
-        "webpack.config.js"
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "ignorePatterns": ["webpack.config.js"],
+  "extends": ["plugin:prettier/recommended", "prettier", "eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["prettier", "import", "@typescript-eslint"],
+  "rules": {
+    "no-debugger": "off",
+    "no-console": 0,
+    "class-methods-use-this": "off",
+    "@typescript-eslint/no-explicit-any": 2,
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/array-type": [
+      "error",
+      {
+        "default": "array"
+      }
     ],
-    "extends": [
-        "plugin:prettier/recommended",
-        "prettier",
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
+    "@typescript-eslint/explicit-member-accessibility": [
+      "error",
+      {
+        "accessibility": "explicit",
+        "overrides": {
+          "accessors": "explicit",
+          "constructors": "off",
+          "methods": "explicit",
+          "properties": "explicit",
+          "parameterProperties": "explicit"
+        }
+      }
     ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaVersion": "latest",
-        "sourceType": "module"
-    },
-    "plugins": ["prettier", "import", "@typescript-eslint"],
-    "rules": {
-        "no-debugger": "off",
-        "no-console": 0,
-        "class-methods-use-this": "off",
-        "@typescript-eslint/no-explicit-any": 2,
-        "@typescript-eslint/no-inferrable-types": "off",
-        "@typescript-eslint/array-type": [
-            "error",
-            {
-                "default": "array"
-            }
-        ],
-        "@typescript-eslint/explicit-member-accessibility":[
-            "error",
-            {
-                "accessibility": "explicit",
-                "overrides": {
-                    "accessors": "explicit",
-                    "constructors": "off",
-                    "methods": "explicit",
-                    "properties": "explicit",
-                    "parameterProperties": "explicit"
-                }
-            }
-        ],
-        "max-lines-per-function": [
-            "error",
-            40
-        ],
-        "@typescript-eslint/explicit-function-return-type": "error",
-        "@typescript-eslint/no-unnecessary-type-assertion": "error",
-        "@typescript-eslint/no-non-null-assertion": "warn"
-    },
-    "overrides": [
+    "max-lines-per-function": ["error", 40],
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "@typescript-eslint/no-unnecessary-type-assertion": "error",
+    "@typescript-eslint/no-non-null-assertion": "warn"
+  },
+  "overrides": [
     {
-      "files": [
-        "*.ts"
-      ],
+      "files": ["*.ts"],
       "parserOptions": {
-        "project": [
-          "tsconfig.json"
-        ]
+        "project": ["tsconfig.json"]
       }
     }
   ]
