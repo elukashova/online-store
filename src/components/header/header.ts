@@ -9,7 +9,13 @@ export default class Header extends BaseComponent {
 
   public render(): void {
     const container: HTMLElement = rendered('div', this.element, 'header__container');
-    const logoLink: HTMLElement = rendered('a', container, 'header__logo logo');
-    rendered('img', logoLink, 'logo__img', ['src', '../../../assets/icons/logo-placeholder.svg']);
+    const logoLink: HTMLElement = rendered('a', container, 'header__logo logo', {
+      attribute: 'href',
+      content: './index.html',
+    });
+    rendered('img', logoLink, 'logo__img', {
+      attribute: 'src',
+      content: '../../../assets/icons/logo-placeholder.svg',
+    });
   }
 }
