@@ -1,0 +1,86 @@
+.footer {
+  flex: 0 0 auto;
+  height: 20vw;
+  width: 100%;
+  background-color: rgb(170, 170, 170);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  line-height: 120%;
+  color: #000000;
+}
+
+.footer__container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10%;
+  height: 100%;
+  width: 100%;
+}
+
+.footer__contacts-container {
+  margin: 2% 4%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.footer__image {
+  max-width: 40%;
+}
+
+.contacts-container__title {
+  font-weight: 500;
+  font-size: 1.5em;
+  letter-spacing: 0.15em;
+  color: #000000;
+}
+
+.contacts-container {
+}
+
+.contacts-container__info {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 10% 40% 50%;
+  align-content: flex-end;
+}
+
+.contacts-container__info-office,
+.contacts-container__info-phone,
+.contacts-container__info-email {
+  display: inline-block;
+  font-size: 1em;
+  line-height: 120%;
+  color: #868686;
+}
+
+.contacts-container__info-address,
+.contacts-container__info-phone-number {
+  grid-column: span 2;
+}
+
+.contacts-container__social-media {
+  display: flex;
+  gap: 6%;
+  align-items: flex-end;
+}
+
+.contacts-container__instagram {
+}
+
+.contacts-container__facebook {
+}
+
+.contacts-container__twitter {
+}
+
+.contacts-container__instagram-logo,
+.contacts-container__facebook-logo,
+.contacts-container__twitter-logo {
+  max-width: 30px;
+}
