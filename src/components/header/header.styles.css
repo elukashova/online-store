@@ -18,3 +18,47 @@
 .logo__img {
   max-height: 65px;
 }
+
+.header__menu {
+  display: flex;
+  width: 30%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.menu__item {
+  cursor: pointer;
+}
+
+.total-price {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 0.2em;
+}
+
+.total-price__container,
+.cart {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.total-price {
+  pointer-events: none;
+  cursor: none;
+}
+
+.cart__icon {
+  width: 1.3em;
+}
+
+.cart__items-number {
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  background-color: aqua;
+  z-index: 2;
+  text-align: center;
+  transform: translate(-0.3em, -0.3em);
+}
+
