@@ -6,9 +6,9 @@
   },
   "ignorePatterns": ["webpack.config.js"],
   "extends": [
-    "plugin:prettier/recommended", 
-    "prettier", 
-    "eslint:recommended", 
+    "plugin:prettier/recommended",
+    "prettier",
+    "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "airbnb-base",
     "airbnb-typescript/base"

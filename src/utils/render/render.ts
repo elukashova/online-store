@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-
 const rendered = (
   element: string,
   parent: Element,
@@ -16,8 +14,7 @@ const rendered = (
   }
 
   if (attributes) {
-    Object.entries(attributes).forEach((attribute) => {
-      const [key, value] = attribute;
+    Object.entries(attributes).forEach(([key, value]) => {
       // разбиваем объект атрибутов на массив и передаем в элемент
       newElement.setAttribute(key, value);
     });
