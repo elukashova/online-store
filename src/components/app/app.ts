@@ -6,8 +6,8 @@ export default class App {
   constructor(private readonly rootElement: HTMLElement) {}
 
   public init(): void {
-    this.rootElement.classList.add('root'); //добавляю класс к боди для стилей
-    this.rootElement.appendChild(this.header.element); //вешаю хедер
+    this.rootElement.classList.add('root'); // добавляю класс к боди для стилей
+    this.rootElement.appendChild(this.header.element); // вешаю хедер
     this.header.render();
   }
 }
