@@ -10,7 +10,7 @@ export default class Footer extends BaseComponent {
   public render(): void {
     const container: HTMLElement = rendered('div', this.element, 'footer__container');
     const contactsContainer: HTMLElement = rendered('div', container, 'footer__contacts-container contacts-container');
-    rendered('img', container, 'footer__image', '', { src: '../../../assets/images/placeholder-image.jpg' });
+    rendered('img', container, 'footer__image', '', { src: '../../../assets/images/footer_bg.png' });
     rendered('p', contactsContainer, 'contacts-container__title', 'Have some questions?\nContact us');
     const contactsInfo: HTMLElement = rendered('div', contactsContainer, 'contacts-container__info');
     rendered('p', contactsInfo, 'contacts-container__info-office', 'Office ');
@@ -20,24 +20,23 @@ export default class Footer extends BaseComponent {
     rendered('p', contactsInfo, 'contacts-container__info-email', 'Email ');
     rendered('p', contactsInfo, 'contacts-container__info-email-address', 'bestposterever@gmail.com');
     const contactsSocialMedia: HTMLElement = rendered('div', contactsInfo, 'contacts-container__social-media');
-    const socialLinkInstagram: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__instagram', '', {
-      href: '#',
+    const socialGithubL: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__github-first', '', {
+      href: 'https://github.com/elukashova',
     });
-    console.log(socialLinkInstagram);
-    const socialLinkFacebook: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__facebook', '', {
-      href: '#',
+    const socialGithubN: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__github-second', '', {
+      href: 'https://github.com/TrickyPie',
     });
-    const socialLinkTwitter: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__twitter', '', {
-      href: '#',
+    const socialRsschool: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__rsschool', '', {
+      href: 'https://rs.school/js/',
     });
-    rendered('img', socialLinkInstagram, 'contacts-container__instagram-logo', '', {
-      src: '../../../assets/icons/logo-placeholder.svg',
+    rendered('img', socialGithubL, 'contacts-container__github-logo', '', {
+      src: '../../../assets/icons/github.png',
     });
-    rendered('img', socialLinkFacebook, 'contacts-container__facebook-logo', '', {
-      src: '../../../assets/icons/logo-placeholder.svg',
+    rendered('img', socialGithubN, 'contacts-container__github-logo', '', {
+      src: '../../../assets/icons/github.png',
     });
-    rendered('img', socialLinkTwitter, 'contacts-container__twitter-logo', '', {
-      src: '../../../assets/icons/logo-placeholder.svg',
+    rendered('img', socialRsschool, 'contacts-container__rsschool', 'RS School', {
+      src: '../../../assets/icons/rsschool.png',
     });
   }
 }
