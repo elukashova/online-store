@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-// import { Attribute } from './render.types';
 
 const rendered = (
   element: string,
@@ -18,8 +17,9 @@ const rendered = (
 
   if (attributes) {
     Object.entries(attributes).forEach((attribute) => {
+      const [key, value] = attribute;
       // разбиваем объект атрибутов на массив и передаем в элемент
-      newElement.setAttribute(attribute[0], attribute[1]);
+      newElement.setAttribute(key, value);
     });
   }
   return newElement;
