@@ -6,7 +6,7 @@ const rendered = (
   parent: Element,
   classes: string,
   content?: string,
-  attributes?: { [key: string]: string } | undefined
+  attributes?: { [key: string]: string } | undefined,
 ): HTMLElement => {
   const newElement: HTMLElement | null = document.createElement(element);
   parent.append(newElement);
