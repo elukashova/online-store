@@ -7,7 +7,7 @@ const rendered = (element: string, parent: Element, classes: string, attrData?: 
 
   if (attrData) {
     //более чем уверена, что эту функцию придется менять(усложнять) в будущем, т.к. она рассчитана на один аттрибут
-    newElement.setAttribute(attrData[0], attrData[1]);
+    newElement.setAttribute(attrData.attribute, attrData.content);
   }
   return newElement;
 };
