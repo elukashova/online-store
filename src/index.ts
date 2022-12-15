@@ -1,3 +1,4 @@
+import './reset.styles.css';
 import './styles.css';
 import App from './components/app/app';
 
