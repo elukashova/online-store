@@ -23,7 +23,6 @@ export default class Footer extends BaseComponent {
     const socialLinkInstagram: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__instagram', '', {
       href: '#',
     });
-    console.log(socialLinkInstagram);
     const socialLinkFacebook: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__facebook', '', {
       href: '#',
     });
