@@ -14,9 +14,9 @@ export const enum PageIds {
 export default class App {
   private static container: HTMLElement = document.body;
 
-  private header: Header = new Header();
+  private /* readonly */ header: Header = new Header();
 
-  private footer: Footer = new Footer();
+  private /* readonly */ footer: Footer = new Footer();
 
   private mainStore: MainStore = new MainStore('store');
 

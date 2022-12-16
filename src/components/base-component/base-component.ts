@@ -10,6 +10,7 @@ export default class BaseComponent {
     }
     if (id) {
       this.element.setAttribute('id', id);
+      this.element.id = id;
     }
   }
 }
