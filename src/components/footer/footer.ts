@@ -20,6 +20,7 @@ export default class Footer extends BaseComponent {
     rendered('p', contactsInfo, 'contacts-container__info-email', 'Email ');
     rendered('p', contactsInfo, 'contacts-container__info-email-address', 'bestposterever@gmail.com');
     const contactsSocialMedia: HTMLElement = rendered('div', contactsInfo, 'contacts-container__social-media');
+    rendered('span', contactsSocialMedia, 'contacts-container__year', '2022');
     const socialGithubL: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__github-first', '', {
       href: 'https://github.com/elukashova',
     });
