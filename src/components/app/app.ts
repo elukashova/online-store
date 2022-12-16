@@ -14,9 +14,9 @@ export const enum PageIds {
 export default class App {
   private static container: HTMLElement = document.body;
 
-  private /* readonly */ header: Header = new Header();
+  private readonly header: Header = new Header();
 
-  private /* readonly */ footer: Footer = new Footer();
+  private readonly footer: Footer = new Footer();
 
   private mainStore: MainStore = new MainStore('store');
 
@@ -60,11 +60,10 @@ export default class App {
 
   public init(): void {
     this.rootElement.classList.add('root'); // добавляю класс к боди для стилей
-    this.rootElement.append(this.header.element);
+    this.rootElement.append(this.header.element, this.footer.element);
     this.header.render();
     this.renderNewPage('store'); // создаем базовый мейн
     this.changeRoute(); // при клике на элементы смены страницы получаем хэш и заново рендерим
-    this.rootElement.append(this.footer.element);
     this.footer.render();
   }
 }

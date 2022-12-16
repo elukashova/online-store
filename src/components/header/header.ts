@@ -27,6 +27,6 @@ export default class Header extends BaseComponent {
     rendered('img', shoppingCartLink, 'cart__icon', '', {
       src: '../../../assets/icons/cart-placeholder.png',
     });
-    rendered('span', shoppingCartLink, 'cart__items-number', '0');
+    rendered('span', shoppingCart, 'cart__items-number', '0');
   }
 }
