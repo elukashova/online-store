@@ -1,5 +1,6 @@
 import Header from '../header/header';
 import Footer from '../footer/footer';
+import CardsField from '../cards-field/cards-field';
 import MainComponent from '../base-component/main-component';
 import MainStore from '../main.store/main.store';
 import MainCart from '../main.cart/main.cart';
@@ -18,11 +19,14 @@ export default class App {
 
   private readonly footer: Footer = new Footer();
 
+
   private mainStore: MainStore = new MainStore('store');
 
   private mainCart: MainCart = new MainCart('cart');
 
   private mainAbout: MainAbout = new MainAbout('about');
+  
+  private readonly cardsField: CardsField = new CardsField();
 
   public renderNewPage(id: string): void {
     // рендер страницы по полученному id
@@ -60,10 +64,11 @@ export default class App {
 
   public init(): void {
     this.rootElement.classList.add('root'); // добавляю класс к боди для стилей
-    this.rootElement.append(this.header.element, this.footer.element);
+    this.rootElement.append(this.header.element, this.cardsField.element, this.footer.element);
     this.header.render();
     this.renderNewPage('store'); // создаем базовый мейн
     this.changeRoute(); // при клике на элементы смены страницы получаем хэш и заново рендерим
     this.footer.render();
+    this.cardsField.render();
   }
 }
