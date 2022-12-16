@@ -14,7 +14,7 @@ export default class CardsField extends BaseComponent {
     const card: Card = new Card(cardsContainer);
     cardsData.products.forEach((data) => {
       const cardItem = card.render(data);
-      cardsContainer.appendChild(cardItem);
+      cardsContainer.append(cardItem);
     });
   }
 }
