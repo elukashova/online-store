@@ -12,20 +12,6 @@
   row-gap: 1.25rem;
 }
 
-.filters__category {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.category__input-wrapper,
-.rating__input-wrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 .cards__container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
