@@ -76,5 +76,6 @@ export default class App {
     // !!! временно вывела cardsField сюда, надо будет перенести потом
     this.rootElement.append(this.cardsField.element, this.footer.element);
     this.footer.render();
+    this.cardsField.render();
   }
 }
