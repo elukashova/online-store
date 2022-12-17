@@ -10,4 +10,5 @@ html,
   background-image: url('./assets/images/background-temp.png');
   background-size: 100%;
   background-repeat: no-repeat;
+  font-family: 'Inter', sans-serif;
 }
