@@ -22,7 +22,7 @@ export default class Header extends BaseComponent {
     rendered('span', priceWrapper, 'total-price__sum', '150');
     const shoppingCart: HTMLElement = rendered('li', menu, 'menu__item cart');
     rendered('img', shoppingCart, 'cart__icon', '', {
-      src: '../../../assets/icons/cart-placeholder.png',
+      src: '../../../assets/icons/cart.svg',
     });
     rendered('span', shoppingCart, 'cart__items-number', '0');
   }
