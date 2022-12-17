@@ -1,15 +1,11 @@
 import Header from '../header/header';
 import Footer from '../footer/footer';
-import MainComponent from '../base-component/main-component';
-import MainStore from '../main.store/main.store';
-import MainCart from '../main.cart/main.cart';
-import MainAbout from '../main.about/main.about';
-
-export const enum PageIds {
-  StorePage = 'store',
-  CartPage = 'cart',
-  AboutPage = 'about',
-}
+import MainStore from '../main/main.store/main.store';
+import MainCart from '../main/main.cart/main.cart';
+import MainAbout from '../main/main.about/main.about';
+import Pages from './enums';
+import Page from '../main/page-component';
+import CardsField from '../cards-field/cards-field';
 
 export default class App {
   private static container: HTMLElement = document.body;
@@ -18,23 +14,35 @@ export default class App {
 
   private readonly footer: Footer = new Footer();
 
-  private mainStore: MainStore = new MainStore('store');
+  private readonly cardsField: CardsField = new CardsField();
 
-  private mainCart: MainCart = new MainCart('cart');
+  private mainStore: MainStore = new MainStore(Pages.StorePage);
 
-  private mainAbout: MainAbout = new MainAbout('about');
+  private mainCart: MainCart = new MainCart(Pages.CartPage);
+
+  private mainAbout: MainAbout = new MainAbout(Pages.AboutPage);
+
+  constructor(private readonly rootElement: HTMLElement) {}
 
   public renderNewPage(id: string): void {
     // рендер страницы по полученному id
-    let page: MainComponent | null = null;
-
-    if (id === PageIds.StorePage) {
-      // проверяем с каким enum совпадает переданный id
-      page = new MainStore(id);
-    } else if (id === PageIds.CartPage) {
-      page = new MainCart(id);
-    } else if (id === PageIds.AboutPage) {
-      page = new MainAbout(id);
+    // проверяем с каким enum совпадает переданный id
+    let page: Page | null = null;
+    switch (id) {
+      case Pages.StorePage:
+        page = new MainStore(id);
+        page.setContent();
+        break;
+      case Pages.CartPage:
+        page = new MainCart(id);
+        page.setContent();
+        break;
+      case Pages.AboutPage:
+        page = new MainAbout(id);
+        page.setContent();
+        break;
+      default:
+        console.log('Страницы с таким ID нет');
     }
 
     const currentMain: HTMLElement | null = document.querySelector('main');
@@ -48,22 +56,25 @@ export default class App {
     }
   }
 
-  private changeRoute(): void {
+  private getHashEvent(): void {
     // по клику получаем hash и рендерим по нему новый мейн
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.slice(1);
+      if (hash === '') {
+        this.renderNewPage(Pages.StorePage);
+      }
       this.renderNewPage(hash);
     });
   }
 
-  constructor(private readonly rootElement: HTMLElement) {}
-
   public init(): void {
     this.rootElement.classList.add('root'); // добавляю класс к боди для стилей
-    this.rootElement.append(this.header.element, this.footer.element);
+    this.rootElement.append(this.header.element);
     this.header.render();
-    this.renderNewPage('store'); // создаем базовый мейн
-    this.changeRoute(); // при клике на элементы смены страницы получаем хэш и заново рендерим
+    this.renderNewPage(Pages.StorePage); // создаем базовый мейн
+    this.getHashEvent(); // при клике на элементы смены страницы получаем хэш и заново рендерим
+    // !!! временно вывела cardsField сюда, надо будет перенести потом
+    this.rootElement.append(this.cardsField.element, this.footer.element);
     this.footer.render();
   }
 }

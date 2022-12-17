@@ -1,0 +1,27 @@
+.cards__item {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+.card__img {
+  max-width: 100%;
+}
+
+.card__info {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  background-color: aliceblue;
+}
+
+.card__info_wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.card__btns {
+  display: flex;
+  flex-direction: row;
+}

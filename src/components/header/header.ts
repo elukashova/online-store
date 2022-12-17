@@ -16,7 +16,7 @@ export default class Header extends BaseComponent {
     const menu: HTMLElement = rendered('ul', container, 'header__menu menu');
     const storePage: HTMLElement = rendered('li', menu, 'menu__item menu__item_current');
     const aboutPage: HTMLElement = rendered('li', menu, 'menu__item');
-    rendered('a', storePage, 'menu__link store-link', 'Store', { href: '/' });
+    rendered('a', storePage, 'menu__link store-link', 'Store', { href: '#' });
     rendered('a', aboutPage, 'menu__link about-link', 'About us', { href: '#about' });
     const totalPrice: HTMLElement = rendered('li', menu, 'menu__item total-price', 'Total:');
     const priceWrapper: HTMLElement = rendered('div', totalPrice, 'total-price__container');
