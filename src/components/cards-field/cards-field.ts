@@ -18,7 +18,7 @@ export default class CardsField extends BaseComponent {
   public render(): void {
     const contentContainer: HTMLElement = rendered('div', this.element, 'content__container');
     const filtersContainer: HTMLElement = rendered('form', contentContainer, 'filters__container filters');
-    const buttonsContainer: HTMLElement = rendered('button', filtersContainer, 'filters__btn');
+    const buttonsContainer: HTMLElement = rendered('div', filtersContainer, 'filters__btns-wrapper');
     rendered('button', buttonsContainer, 'filters__btn-reset', 'Reset filters');
     rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
     // фильтр по категории

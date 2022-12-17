@@ -12,6 +12,17 @@
   row-gap: 1.25rem;
 }
 
+.filters__btns-wrapper {
+  display: flex;
+  justify-content: space-around;
+}
+
+.filters__btn-reset,
+.filters__btn-copy {
+  background: none;
+  color: #65635F;
+}
+
 .cards__container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
