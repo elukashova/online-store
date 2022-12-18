@@ -1,4 +1,3 @@
-import '../main.css';
 import './main.store.styles.css';
 import Page from '../page-component';
 import rendered from '../../../utils/render/render';
