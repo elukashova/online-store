@@ -16,10 +16,10 @@ export default class Card {
     const cardInfoWrapper: HTMLElement = rendered('div', cardInfo, 'card__info_wrapper');
     rendered('p', cardInfoWrapper, 'card__name', `${data.title}`);
     rendered('p', cardInfoWrapper, 'card__category', `${data.category}`);
-    rendered('p', cardInfoWrapper, 'card__rating', `${data.rating}`);
-    rendered('p', cardInfoWrapper, 'card__stock', `${data.stock}`);
-    rendered('p', cardInfoWrapper, 'card__price', `${data.price}`);
-    rendered('p', cardInfoWrapper, 'card__discount', `${data.discountPercentage}`);
+    rendered('p', cardInfoWrapper, 'card__rating', `Rating: ${data.rating}`);
+    rendered('p', cardInfoWrapper, 'card__stock', `Stock: ${data.stock}`);
+    rendered('p', cardInfoWrapper, 'card__price', `$ ${data.price}`);
+    rendered('p', cardInfoWrapper, 'card__discount', `Discount: ${data.discountPercentage}%`);
     const buttonsWrapper: HTMLElement = rendered('div', cardInfo, 'card__btns');
     rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
       src: '../../assets/icons/button-open-card.svg',

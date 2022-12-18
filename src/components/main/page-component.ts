@@ -1,3 +1,5 @@
+import './main.styles.css';
+
 import rendered from '../../utils/render/render';
 import BaseComponent from '../base-component/base-component';
 
