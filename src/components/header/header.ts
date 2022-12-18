@@ -25,7 +25,7 @@ export default class Header extends BaseComponent {
     const shoppingCart: HTMLElement = rendered('li', menu, 'menu__item cart');
     const shoppingCartLink: HTMLElement = rendered('a', shoppingCart, 'menu__item cart', '', { href: '#cart' });
     rendered('img', shoppingCartLink, 'cart__icon', '', {
-      src: '../../../assets/icons/cart-placeholder.png',
+      src: '../../../assets/icons/cart.svg',
     });
     rendered('span', shoppingCart, 'cart__items-number', '0');
   }
