@@ -7,9 +7,7 @@ import Card from '../card/card';
 import Filter from '../filter/filter';
 
 export default class CardsField extends BaseComponent {
-  private readonly categories: number[] = [1, 2, 3, 4, 5, 6];
-
-  private readonly rating: number[] = [1, 2, 3, 4, 5];
+  private readonly numbers: number[] = [1, 2, 3, 4, 5, 6];
 
   constructor() {
     super('div', 'cards-field cards');
@@ -23,19 +21,19 @@ export default class CardsField extends BaseComponent {
     rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
     // фильтр по категории
     const categoryFilter: Filter = new Filter(filtersContainer, 'Category');
-    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(this.categories, 'category');
+    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(this.numbers, 'category');
     filtersContainer.append(categoryNames);
     // фильтра по рейтингу
     const ratingFilter: Filter = new Filter(filtersContainer, 'Rating');
-    const ratingNames: HTMLElement = ratingFilter.renderCheckbox(this.categories, 'rating');
+    const ratingNames: HTMLElement = ratingFilter.renderCheckbox(this.numbers.slice(0, -1), 'rating');
     filtersContainer.append(ratingNames);
     // фильтр по цене
     const priceFilter: Filter = new Filter(filtersContainer, 'Price');
-    const pricesTitles: HTMLElement = priceFilter.renderInputRange(this.categories, 'price');
+    const pricesTitles: HTMLElement = priceFilter.renderInputRange('price');
     filtersContainer.append(pricesTitles);
     // фильтр по стоку
     const stockFilter: Filter = new Filter(filtersContainer, 'Stock');
-    const stockTitles: HTMLElement = stockFilter.renderInputRange(this.categories, 'stock');
+    const stockTitles: HTMLElement = stockFilter.renderInputRange('stock');
     filtersContainer.append(stockTitles);
 
     const cardsContainer: HTMLElement = rendered('div', contentContainer, 'cards__container');
