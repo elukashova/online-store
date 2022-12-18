@@ -24,6 +24,18 @@ export default class App {
 
   constructor(private readonly rootElement: HTMLElement) {}
 
+  public init(): void {
+    this.rootElement.classList.add('root'); // добавляю класс к боди для стилей
+    this.rootElement.append(this.header.element);
+    this.header.render();
+    this.renderNewPage(Pages.StorePage); // создаем базовый мейн
+    this.getHashEvent(); // при клике на элементы смены страницы получаем хэш и заново рендерим
+    // !!! временно вывела cardsField сюда, надо будет перенести потом
+    this.rootElement.append(this.cardsField.element, this.footer.element);
+    this.footer.render();
+    this.cardsField.render();
+  }
+
   public renderNewPage(id: string): void {
     // рендер страницы по полученному id
     // проверяем с каким enum совпадает переданный id
@@ -65,17 +77,5 @@ export default class App {
       }
       this.renderNewPage(hash);
     });
-  }
-
-  public init(): void {
-    this.rootElement.classList.add('root'); // добавляю класс к боди для стилей
-    this.rootElement.append(this.header.element);
-    this.header.render();
-    this.renderNewPage(Pages.StorePage); // создаем базовый мейн
-    this.getHashEvent(); // при клике на элементы смены страницы получаем хэш и заново рендерим
-    // !!! временно вывела cardsField сюда, надо будет перенести потом
-    this.rootElement.append(this.cardsField.element, this.footer.element);
-    this.footer.render();
-    this.cardsField.render();
   }
 }
