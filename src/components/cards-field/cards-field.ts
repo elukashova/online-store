@@ -12,7 +12,7 @@ export default class CardsField extends BaseComponent {
   private readonly rating: number[] = [1, 2, 3, 4, 5];
 
   constructor() {
-    super('main', 'cards-field cards');
+    super('div', 'cards-field cards');
   }
 
   public render(): void {

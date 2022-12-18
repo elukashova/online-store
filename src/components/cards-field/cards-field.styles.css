@@ -1,7 +1,7 @@
 .content__container {
   display: grid;
-  grid-template-columns: 0.7fr 4fr;
-  column-gap: 1.5rem;
+  grid-template-columns: 20% 75%;
+  column-gap: 5%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -20,12 +20,12 @@
 .filters__btn-reset,
 .filters__btn-copy {
   background: none;
-  color: #65635F;
+  color: #65635f;
 }
 
 .cards__container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem 1.5rem;
-  max-width: 80%;
+  grid-template-rows: repeat(5, 19%);
+  gap: 2%;
 }

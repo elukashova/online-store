@@ -5,7 +5,7 @@ import MainCart from '../main/main.cart/main.cart';
 import MainAbout from '../main/main.about/main.about';
 import Pages from './enums';
 import Page from '../main/page-component';
-import CardsField from '../cards-field/cards-field';
+/* import CardsField from '../cards-field/cards-field'; */
 
 export default class App {
   private static container: HTMLElement = document.body;
@@ -14,7 +14,7 @@ export default class App {
 
   private readonly footer: Footer = new Footer();
 
-  private readonly cardsField: CardsField = new CardsField();
+  /*  private readonly cardsField: CardsField = new CardsField(); */
 
   private mainStore: MainStore = new MainStore(Pages.StorePage);
 
@@ -31,9 +31,8 @@ export default class App {
     this.renderNewPage(Pages.StorePage); // создаем базовый мейн
     this.getHashEvent(); // при клике на элементы смены страницы получаем хэш и заново рендерим
     // !!! временно вывела cardsField сюда, надо будет перенести потом
-    this.rootElement.append(this.cardsField.element, this.footer.element);
+    this.rootElement.append(/* this.cardsField.element,  */ this.footer.element);
     this.footer.render();
-    this.cardsField.render();
   }
 
   public renderNewPage(id: string): void {
