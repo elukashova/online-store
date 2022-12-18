@@ -1,6 +1,31 @@
+.content__container {
+  display: grid;
+  grid-template-columns: 0.7fr 4fr;
+  column-gap: 1.5rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.filters__container {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1.25rem;
+}
+
+.filters__btns-wrapper {
+  display: flex;
+  justify-content: space-around;
+}
+
+.filters__btn-reset,
+.filters__btn-copy {
+  background: none;
+  color: #65635F;
+}
+
 .cards__container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem 1.5rem;
-  width: 1160px;
+  max-width: 80%;
 }
