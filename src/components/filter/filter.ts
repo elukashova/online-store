@@ -25,7 +25,7 @@ export default class Filter {
     return filterWrapper;
   }
 
-  public renderInputRange(data: number[], str: string): HTMLElement {
+  public renderInputRange(str: string): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str}`);
     rendered('legend', filterWrapper, `filters__${str}_legend`, this.name);
     const inputWrapper: HTMLElement = rendered('div', filterWrapper, `filters__${str}_wrapper`);
