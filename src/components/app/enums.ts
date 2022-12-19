@@ -1,5 +1,5 @@
 const enum Pages {
-  StorePage = '',
+  StorePage = 'store',
   CartPage = 'cart',
   AboutPage = 'about',
 }
