@@ -38,7 +38,6 @@ export default class App {
     // рендер страницы по полученному id
     // проверяем с каким enum совпадает переданный id
     let page: Page | null = null;
-    console.log(id);
     switch (id) {
       case Pages.StorePage:
         page = new MainStore(Pages.StorePage);
