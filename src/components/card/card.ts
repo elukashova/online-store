@@ -29,4 +29,38 @@ export default class Card {
     });
     return container;
   }
+
+  public createCartItem(data: DataType): HTMLElement {
+    const itemsContainer: HTMLElement = rendered('div', this.container, 'cart__items_container cart-items');
+    const cartInfoContainer: HTMLElement = rendered('div', itemsContainer, 'cart-items__info');
+    const totalNumWrapper: HTMLElement = rendered('div', cartInfoContainer, 'cart-items__info_items info-items');
+    rendered('span', totalNumWrapper, 'info-items__text', 'Items:');
+    rendered('span', totalNumWrapper, 'info-items__number', '2');
+    const totalPagesWrapper: HTMLElement = rendered('div', cartInfoContainer, 'cart-items__info_pages info-pages');
+    rendered('img', totalPagesWrapper, 'info-pages__btn-left', '', {
+      src: '../../assets/icons/cart-icon__left.svg',
+    });
+    rendered('span', totalPagesWrapper, 'info-pages__pages-total', '1');
+    rendered('img', totalPagesWrapper, 'info-pages__btn-right', '', {
+      src: '../../assets/icons/cart-icon__right.svg',
+    });
+    const firstItem: HTMLElement = rendered('div', itemsContainer, 'cart-items__item cart-item');
+    rendered('span', firstItem, 'cart-item__order', '1');
+    rendered('img', firstItem, 'cart-item__img', '', {
+      src: data.images[0],
+    });
+    const firstItemDescr: HTMLElement = rendered('div', firstItem, 'cart-item__description');
+    rendered('span', firstItemDescr, 'cart-item__description_title', data.brand);
+    rendered('span', firstItemDescr, 'cart-item__description_category', data.category);
+    rendered('span', firstItemDescr, 'cart-item__description_size', 'Size: 20x20');
+    rendered('span', firstItemDescr, 'cart-item__description_rating', `Rating: ${data.rating.toString()}`);
+    rendered(
+      'p',
+      firstItemDescr,
+      'cart-item__description_text',
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nisl sem, hendrerit vitae convallis sed, interdum nec risus.',
+    );
+
+    return itemsContainer;
+  }
 }
