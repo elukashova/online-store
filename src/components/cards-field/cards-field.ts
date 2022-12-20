@@ -19,18 +19,26 @@ export default class CardsField extends BaseComponent {
     const buttonsContainer: HTMLElement = rendered('div', filtersContainer, 'filters__btns-wrapper');
     rendered('button', buttonsContainer, 'filters__btn-reset', 'Reset filters');
     rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
+
     // фильтр по категории
     const categoryFilter: Filter = new Filter(filtersContainer, 'Category');
-    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(this.numbers, 'category');
+    let uniqueCategories = cardsData.products.map((item) => item.category);
+    uniqueCategories = Array.from(new Set(uniqueCategories));
+    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category');
     filtersContainer.append(categoryNames);
-    // фильтра по рейтингу
+
+    // фильтр по размеру
     const ratingFilter: Filter = new Filter(filtersContainer, 'Rating');
-    const ratingNames: HTMLElement = ratingFilter.renderCheckbox(this.numbers.slice(0, -1), 'rating');
+    let uniqueSize = cardsData.products.map((item) => item.size);
+    uniqueSize = Array.from(new Set(uniqueSize));
+    const ratingNames: HTMLElement = ratingFilter.renderCheckbox(uniqueSize, 'rating');
     filtersContainer.append(ratingNames);
+
     // фильтр по цене
     const priceFilter: Filter = new Filter(filtersContainer, 'Price');
     const pricesTitles: HTMLElement = priceFilter.renderInputRange('price');
     filtersContainer.append(pricesTitles);
+
     // фильтр по стоку
     const stockFilter: Filter = new Filter(filtersContainer, 'Stock');
     const stockTitles: HTMLElement = stockFilter.renderInputRange('stock');
@@ -43,4 +51,6 @@ export default class CardsField extends BaseComponent {
       cardsContainer.append(cardItem);
     });
   }
+
+  public filterByCategory(): void {}
 }

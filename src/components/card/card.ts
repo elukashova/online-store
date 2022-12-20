@@ -1,6 +1,4 @@
 import './card.styles.css';
-// import BaseComponent from '../base-component/base-component';
-
 import rendered from '../../utils/render/render';
 import { DataType } from './card.types';
 
@@ -9,6 +7,7 @@ export default class Card {
 
   public render(data: DataType): HTMLElement {
     const container: HTMLElement = rendered('div', this.container, 'cards__item card');
+    container.classList.add(`${data.category}`);
     rendered('img', container, 'card__img', '', {
       src: data.images[0],
     });
@@ -50,9 +49,9 @@ export default class Card {
       src: data.images[0],
     });
     const firstItemDescr: HTMLElement = rendered('div', firstItem, 'cart-item__description');
-    rendered('span', firstItemDescr, 'cart-item__description_title', data.brand);
+    rendered('span', firstItemDescr, 'cart-item__description_title', data.title);
     rendered('span', firstItemDescr, 'cart-item__description_category', data.category);
-    rendered('span', firstItemDescr, 'cart-item__description_size', 'Size: 20x20');
+    rendered('span', firstItemDescr, 'cart-item__description_size', `Size ${data.size}`);
     rendered('span', firstItemDescr, 'cart-item__description_rating', `Rating: ${data.rating.toString()}`);
     rendered(
       'p',

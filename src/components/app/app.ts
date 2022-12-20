@@ -30,8 +30,7 @@ export default class App {
     this.header.render();
     this.renderNewPage(Pages.StorePage); // создаем базовый мейн
     this.getHashEvent(); // при клике на элементы смены страницы получаем хэш и заново рендерим
-    // !!! временно вывела cardsField сюда, надо будет перенести потом
-    this.rootElement.append(/* this.cardsField.element,  */ this.footer.element);
+    this.rootElement.append(this.footer.element);
     this.footer.render();
   }
 
@@ -41,16 +40,13 @@ export default class App {
     let page: Page | null = null;
     switch (id) {
       case Pages.StorePage:
-        page = new MainStore(id);
-        page.setContent();
+        page = new MainStore(Pages.StorePage);
         break;
       case Pages.CartPage:
         page = new MainCart(id);
-        page.setContent();
         break;
       case Pages.AboutPage:
         page = new MainAbout(id);
-        page.setContent();
         break;
       default:
         console.log('Страницы с таким ID нет');
@@ -58,6 +54,7 @@ export default class App {
 
     const currentMain: HTMLElement | null = document.querySelector('main');
     if (page) {
+      page.setContent();
       const pageMain = page.render();
       if (currentMain) {
         currentMain.replaceWith(pageMain); // если мейн уже есть - заменяем его

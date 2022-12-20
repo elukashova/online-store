@@ -5,9 +5,8 @@ export type DataType = {
   price: number;
   discountPercentage: number;
   rating: number;
+  size: string;
   stock: number;
-  brand: string;
   category: string;
-  thumbnail: string;
   images: string[];
 };
