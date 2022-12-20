@@ -49,9 +49,9 @@ export default class Card {
       src: data.images[0],
     });
     const firstItemDescr: HTMLElement = rendered('div', firstItem, 'cart-item__description');
-    rendered('span', firstItemDescr, 'cart-item__description_title', data.brand);
+    rendered('span', firstItemDescr, 'cart-item__description_title', data.title);
     rendered('span', firstItemDescr, 'cart-item__description_category', data.category);
-    rendered('span', firstItemDescr, 'cart-item__description_size', 'Size: 20x20');
+    rendered('span', firstItemDescr, 'cart-item__description_size', `Size ${data.size}`);
     rendered('span', firstItemDescr, 'cart-item__description_rating', `Rating: ${data.rating.toString()}`);
     rendered(
       'p',
