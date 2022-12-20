@@ -1,6 +1,4 @@
 import './card.styles.css';
-// import BaseComponent from '../base-component/base-component';
-
 import rendered from '../../utils/render/render';
 import { DataType } from './card.types';
 
@@ -9,6 +7,7 @@ export default class Card {
 
   public render(data: DataType): HTMLElement {
     const container: HTMLElement = rendered('div', this.container, 'cards__item card');
+    container.classList.add(`${data.category}`);
     rendered('img', container, 'card__img', '', {
       src: data.images[0],
     });
