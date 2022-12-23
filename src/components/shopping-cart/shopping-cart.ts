@@ -2,8 +2,8 @@
 import './shopping-cart.styles.css';
 import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
-import { DataType } from '../card/card.types';
-import Card from '../card/card';
+import { CardData } from '../card/card.types';
+import CartCard from '../card/card-cart';
 // import cardsData from '../../assets/json/data';
 // import Filter from '../filter/filter';
 
@@ -12,11 +12,10 @@ export default class Cart extends BaseComponent {
     super('div', 'cart-container cart');
   }
 
-  public render(data: DataType): void {
+  public render(data: CardData): void {
     // item
-    const card = new Card(this.element);
-    const cartItem = card.createCartItem(data);
-    this.element.append(cartItem);
+    const card = new CartCard(data);
+    this.element.append(card.element);
 
     // number
     const amountContainer: HTMLElement = rendered('div', this.element, 'cart__amount_container cart-amount');
