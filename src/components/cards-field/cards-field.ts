@@ -5,16 +5,16 @@ import rendered from '../../utils/render/render';
 import cardsData from '../../assets/json/data';
 import Card from '../card/card';
 import Filter from '../filter/filter';
-import Header from '../header/header';
 
 export default class CardsField extends BaseComponent {
+  public cardsAll: Card[] = [];
+
   constructor() {
-    super('div', 'cards-field cards');
+    super('div', 'content__container');
   }
 
   public render(): void {
-    const contentContainer: HTMLElement = rendered('div', this.element, 'content__container');
-    const filtersContainer: HTMLElement = rendered('form', contentContainer, 'filters__container filters');
+    const filtersContainer: HTMLElement = rendered('form', this.element, 'filters__container filters');
     const buttonsContainer: HTMLElement = rendered('div', filtersContainer, 'filters__btns-wrapper');
     rendered('button', buttonsContainer, 'filters__btn-reset', 'Reset filters');
     rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
@@ -43,13 +43,12 @@ export default class CardsField extends BaseComponent {
     const stockTitles: HTMLElement = stockFilter.renderInputRange('stock');
     filtersContainer.append(stockTitles);
 
-    const cardsContainer: HTMLElement = rendered('div', contentContainer, 'cards__container');
-    const card: Card = new Card(cardsContainer);
-    const header: Header = new Header();
-    card.attachObserver(header);
+    const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container');
     cardsData.products.forEach((data) => {
-      const cardItem = card.render(data);
-      cardsContainer.append(cardItem);
+      const card: Card = new Card(data);
+      this.cardsAll.push(card);
+      // card.attachObserver(header);
+      cardsContainer.append(card.element);
     });
   }
 

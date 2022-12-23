@@ -1,6 +1,5 @@
 import './main.store.styles.css';
 import Page from '../page-component';
-import rendered from '../../../utils/render/render';
 import CardsField from '../../cards-field/cards-field';
 
 export default class MainStore extends Page {
@@ -12,8 +11,7 @@ export default class MainStore extends Page {
   }
 
   public setContent(): void {
-    const container: HTMLElement = rendered('div', this.element, 'main__container');
-    container.append(this.cardsField.element);
+    this.element.append(this.cardsField.element);
     this.cardsField.render();
   }
 }

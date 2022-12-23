@@ -1,4 +1,4 @@
-import { DataType } from '../card/card.types';
+import { DataType } from '../../card/card.types';
 
 // получаем минимальные и максимальные значения из data.ts
 
