@@ -27,7 +27,7 @@ export default class App {
   public init(): void {
     this.rootElement.classList.add('root'); // добавляю класс к боди для стилей
     this.rootElement.append(this.header.element);
-    this.header.render();
+    // this.header.render();
     this.renderNewPage(Pages.StorePage); // создаем базовый мейн
     this.getHashEvent(); // при клике на элементы смены страницы получаем хэш и заново рендерим
     this.rootElement.append(this.footer.element);

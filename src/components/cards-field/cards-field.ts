@@ -5,10 +5,9 @@ import rendered from '../../utils/render/render';
 import cardsData from '../../assets/json/data';
 import Card from '../card/card';
 import Filter from '../filter/filter';
+import Header from '../header/header';
 
 export default class CardsField extends BaseComponent {
-  private readonly numbers: number[] = [1, 2, 3, 4, 5, 6];
-
   constructor() {
     super('div', 'cards-field cards');
   }
@@ -46,6 +45,8 @@ export default class CardsField extends BaseComponent {
 
     const cardsContainer: HTMLElement = rendered('div', contentContainer, 'cards__container');
     const card: Card = new Card(cardsContainer);
+    const header: Header = new Header();
+    card.attachObserver(header);
     cardsData.products.forEach((data) => {
       const cardItem = card.render(data);
       cardsContainer.append(cardItem);

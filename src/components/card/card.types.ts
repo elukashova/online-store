@@ -10,3 +10,13 @@ export type DataType = {
   category: string;
   images: string[];
 };
+
+export interface Subject {
+  attachObserver(observer: Observer): void;
+  removeObserver(observer: Observer): void;
+  notifyObserver(): void;
+}
+
+export interface Observer {
+  update(subject: Subject): void;
+}

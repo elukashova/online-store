@@ -1,9 +1,46 @@
 import './card.styles.css';
 import rendered from '../../utils/render/render';
-import { DataType } from './card.types';
+import { DataType, Observer, Subject } from './card.types';
+// import Header from '../header/header';
 
-export default class Card {
+export default class Card implements Subject {
+  public buyButton: HTMLElement | null = null;
+
+  public totalPrice: number = 0;
+
+  public cartItems: number = 0;
+
+  private observers: Observer[] = [];
+
+  // private header = new Header();
+
   constructor(private readonly container: HTMLElement) {}
+
+  public attachObserver(observer: Observer): void {
+    const isExist = this.observers.includes(observer);
+    if (isExist) {
+      console.log('Subject: Observer has been attached already.');
+    }
+    console.log('Subject: Attached an observer.');
+    this.observers.push(observer);
+  }
+
+  public removeObserver(observer: Observer): void {
+    const observerIndex = this.observers.indexOf(observer);
+    if (observerIndex === -1) {
+      console.log('Subject: Nonexistent observer.');
+    }
+
+    this.observers.splice(observerIndex, 1);
+    console.log('Subject: Detached an observer.');
+  }
+
+  public notifyObserver(): void {
+    console.log('Subject: Notifying observers...');
+    for (let i: number = 0; i < this.observers.length; i += 1) {
+      this.observers[i].update(this);
+    }
+  }
 
   public render(data: DataType): HTMLElement {
     const container: HTMLElement = rendered('div', this.container, 'cards__item card');
@@ -23,8 +60,13 @@ export default class Card {
     rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
       src: '../../assets/icons/button-open-card.svg',
     });
-    rendered('img', buttonsWrapper, 'card__btn_buy', '', {
+    this.buyButton = rendered('img', buttonsWrapper, 'card__btn_buy', '', {
       src: '../../assets/icons/button-buy.svg',
+    });
+    this.buyButton.addEventListener('click', () => {
+      this.cartItems += 1;
+      this.totalPrice += data.price;
+      this.notifyObserver();
     });
     return container;
   }
@@ -53,12 +95,7 @@ export default class Card {
     rendered('span', firstItemDescr, 'cart-item__description_category', data.category);
     rendered('span', firstItemDescr, 'cart-item__description_size', `Size ${data.size}`);
     rendered('span', firstItemDescr, 'cart-item__description_rating', `Rating: ${data.rating.toString()}`);
-    rendered(
-      'p',
-      firstItemDescr,
-      'cart-item__description_text',
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nisl sem, hendrerit vitae convallis sed, interdum nec risus.',
-    );
+    rendered('p', firstItemDescr, 'cart-item__description_text', data.description);
 
     return itemsContainer;
   }
