@@ -44,6 +44,12 @@ export default class CardsField extends BaseComponent {
     filtersContainer.append(stockTitles);
 
     const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container');
+    /* =======
+    const cardsContainer: HTMLElement = rendered('div', contentContainer, 'cards__container', '', {
+      id: 'cards__container',
+    });
+    const card: Card = new Card(cardsContainer);
+>>>>>>> Stashed changes */
     cardsData.products.forEach((data) => {
       const card: Card = new Card(data);
       this.cardsAll.push(card);
