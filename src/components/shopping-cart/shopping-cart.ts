@@ -15,7 +15,11 @@ export default class Cart extends BaseComponent {
 
   constructor(public readonly header: Header) {
     super('div', 'cart-container cart');
-    this.render();
+    if (this.storageInfo !== null) {
+      this.render();
+    } else {
+      this.showEmptyCart();
+    }
   }
 
   public render(): void {
@@ -91,5 +95,17 @@ export default class Cart extends BaseComponent {
     });
     rendered('div', summaryContainer, 'cart-total-sum__line');
     rendered('button', summaryContainer, 'cart-total-sum__buy-btn', 'buy now');
+  }
+
+  private showEmptyCart(): void {
+    // меняю стили контейнера с грида на флекс
+    this.element.style.display = 'flex';
+    this.element.style.flexDirection = 'column';
+
+    rendered('img', this.element, 'cart__empty_img', '', {
+      src: '../../assets/images/empty-cart.png',
+    });
+    rendered('span', this.element, 'cart__empty_title', 'Your cart is empty!');
+    rendered('span', this.element, 'cart__empty_text', 'Looks like you have not added anything to your cart yet.');
   }
 }
