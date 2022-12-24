@@ -1,5 +1,5 @@
 import rendered from '../../utils/render/render';
-import { CardData } from '../card/card.types';
+import { CardDataType } from '../card/card.types';
 import BaseComponent from '../base-component/base-component';
 import Header from '../header/header';
 
@@ -16,7 +16,7 @@ export default class CartCard extends BaseComponent {
 
   public description: string;
 
-  constructor(private data: CardData, private itemsQuantity: number, private header: Header) {
+  constructor(private data: CardDataType, private itemsQuantity: number, private header: Header) {
     super('div', 'cart-items__item cart-item');
     this.title = data.title;
     this.category = data.category;
