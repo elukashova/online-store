@@ -1,12 +1,10 @@
 import './header.styles.css';
-// import BaseComponent from '../base-component/base-component';
+import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
-import { Observer, Subject } from '../card/card.types';
+import { ObservedSubject } from '../card/card.types';
 import Card from '../card/card';
 
-export default class Header implements Observer {
-  public element: HTMLElement;
-
+export default class Header extends BaseComponent {
   public totalPriceElement: HTMLElement | null = null;
 
   public cartItemsElement: HTMLElement | null = null;
@@ -16,10 +14,7 @@ export default class Header implements Observer {
   public totalPrice: number = 0;
 
   constructor() {
-    // super('header', 'header', 'header');
-    this.element = document.createElement('header');
-    this.element.classList.add('header');
-    this.element.setAttribute('id', 'header');
+    super('header', 'header', 'header');
     this.render();
   }
 
@@ -47,15 +42,23 @@ export default class Header implements Observer {
     // this.updateInfo(this.totalPrice, this.cartItems);
   }
 
-  public update(subject: Subject): void {
-    if (subject instanceof Card && subject.totalPrice !== this.totalPrice) {
-      console.log('all ok');
+  public update(subject: ObservedSubject): void {
+    // если это ново-добавленный элемент, добавляю его цену к тотал и увеличиваю кол-во в корзине
+    if (subject instanceof Card && subject.element.classList.contains('added')) {
+      this.totalPrice += subject.price;
+      this.cartItems += 1;
     }
 
-    if (subject instanceof Card && subject.cartItems !== this.cartItems) {
-      if (this.cartItemsElement) {
-        this.cartItemsElement.textContent = `${subject.cartItems}`;
-      }
+    // если нет, наоборот
+    if (subject instanceof Card && !subject.element.classList.contains('added')) {
+      this.totalPrice -= subject.price;
+      this.cartItems -= 1;
+    }
+
+    // обновляю информацию в хедере
+    if (this.totalPriceElement && this.cartItemsElement) {
+      this.totalPriceElement.textContent = `${this.totalPrice}`;
+      this.cartItemsElement.textContent = `${this.cartItems}`;
     }
   }
 }

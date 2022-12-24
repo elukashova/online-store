@@ -11,12 +11,12 @@ export type CardData = {
   images: string[];
 };
 
-export interface Subject {
+export interface ObservedSubject {
   attachObserver(observer: Observer): void;
   removeObserver(observer: Observer): void;
   notifyObserver(): void;
 }
 
 export interface Observer {
-  update(subject: Subject): void;
+  update(subject: ObservedSubject): void;
 }

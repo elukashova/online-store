@@ -5,12 +5,12 @@ import rendered from '../../utils/render/render';
 import cardsData from '../../assets/json/data';
 import Card from '../card/card';
 import Filter from '../filter/filter';
+import Header from '../header/header';
 
 export default class CardsField extends BaseComponent {
-  public cardsAll: Card[] = [];
-
-  constructor() {
+  constructor(public readonly header: Header) {
     super('div', 'content__container');
+    this.render();
   }
 
   public render(): void {
@@ -44,10 +44,10 @@ export default class CardsField extends BaseComponent {
     filtersContainer.append(stockTitles);
 
     const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container');
+
     cardsData.products.forEach((data) => {
       const card: Card = new Card(data);
-      this.cardsAll.push(card);
-      // card.attachObserver(header);
+      card.attachObserver(this.header);
       cardsContainer.append(card.element);
     });
   }
