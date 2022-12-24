@@ -8,6 +8,8 @@ import Filter from '../filter/filter';
 import Header from '../header/header';
 
 export default class CardsField extends BaseComponent {
+  public cardsAll: Card[] = [];
+
   constructor(public readonly header: Header) {
     super('div', 'content__container');
     this.render();
@@ -48,6 +50,7 @@ export default class CardsField extends BaseComponent {
     cardsData.products.forEach((data) => {
       const card: Card = new Card(data);
       card.attachObserver(this.header);
+      this.cardsAll.push(card);
       cardsContainer.append(card.element);
     });
   }
