@@ -2,20 +2,16 @@
 import './shopping-cart.styles.css';
 import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
-// import { CardData } from '../card/card.types';
 import CartCard from './card-cart';
 import Header from '../header/header';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
 import { JsonObj } from '../../utils/localStorage.types';
 import cardsData from '../../assets/json/data';
-// import Filter from '../filter/filter';
 
 export default class Cart extends BaseComponent {
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
 
   private itemsQuantity: number = 0;
-
-  // private readonly data: CardData;
 
   constructor(public readonly header: Header) {
     super('div', 'cart-container cart');
