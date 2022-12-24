@@ -4,47 +4,135 @@ import cardsData from '../../assets/json/data';
 import findMinAndMaxPrice from './utils/find.minmax.price';
 import findMinAndMaxCount from './utils/find.minmax.stock';
 import RangeTypes from './enums.filter';
+import filterCards from './test';
+import Card from '../card/card';
 // import filter from './test';
 
 export default class Filter {
   constructor(private readonly container: HTMLElement, private readonly name: string) {}
 
-  public renderCheckbox<T>(data: T[], str: string): HTMLElement {
+  public renderCheckbox<T>(data: T[], str: string, cards: Card[]): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str} ${str}`);
     rendered('legend', filterWrapper, `${str}__legend-1`, this.name);
+    const checkboxes: HTMLElement[] = [];
     data.forEach((item, ind) => {
       const inputWrapper: HTMLElement = rendered('div', filterWrapper, `${str}__input-wrapper`);
-      const inputCheckbox = rendered('input', inputWrapper, `${str}__input-${ind + 1} ${item}`, '', {
-        id: `${item}`,
-        type: 'checkbox',
-        name: `${str}-${ind + 1}`,
-        'data-filter': `${item}`,
-      });
+      const inputElement: HTMLElement = rendered(
+        'input',
+        inputWrapper,
+        `${str}__input-${ind + 1} ${item} ${str}-item`,
+        '',
+        {
+          id: `${item}`,
+          type: 'checkbox',
+          name: `${str}`,
+          'data-filter': `${item}`,
+        },
+      );
       rendered('label', inputWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${str}-${ind + 1}`,
       });
       rendered('span', inputWrapper, `${str}__out-of-${ind + 1}`, '1/5');
-      this.listenInputCheck(inputCheckbox);
+      checkboxes.push(inputElement);
     });
+    this.listenInputCheck(cards, checkboxes);
     return filterWrapper;
   }
 
-  public listenInputCheck(inputCheckbox: HTMLElement): void {
-    inputCheckbox.addEventListener('click', (e) => {
-      if (e.target && e.target instanceof HTMLInputElement) {
-        if (e.target.checked) {
-          if (e.target.dataset.filter) {
-            const cardsContainer: HTMLCollectionOf<Element> = document.getElementsByClassName(
-              `${e.target.dataset.filter}`,
-            );
-            const arr = Array.prototype.slice.call(cardsContainer);
-            console.log(arr);
-            //  filter(e.target.dataset.filter, cardsContainer[]);
+  public listenInputCheck(cards: Card[], checkboxes: HTMLElement[]): void {
+    cards.forEach((card) => card.element.classList.remove('visible', 'hidden'));
+    const categoriesFilters: string[] = [];
+    const sizeFilters: string[] = [];
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener('click', (e) => {
+        if (checkbox instanceof HTMLInputElement) {
+          if (e.target && e.target instanceof HTMLInputElement) {
+            const filterName = checkbox.dataset.filter;
+            if (filterName) {
+              if (e.target.name === 'category') {
+                if (categoriesFilters.includes(filterName)) {
+                  categoriesFilters.splice(categoriesFilters.indexOf(filterName));
+                }
+                if (checkbox.checked) {
+                  categoriesFilters.push(filterName);
+                }
+              }
+              if (e.target.name === 'size') {
+                if (sizeFilters.includes(filterName)) {
+                  sizeFilters.splice(sizeFilters.indexOf(filterName));
+                }
+                if (checkbox.checked) {
+                  sizeFilters.push(filterName);
+                }
+              }
+            }
           }
         }
-      }
+        filterCards(categoriesFilters, cards);
+        /* if (e.target && e.target instanceof HTMLInputElement) {
+          if (e.target.dataset.filter) {
+            filterCards()
+          }
+        } */
+      });
     });
   }
+
+  /*
+
+  checkbox.addEventListener('click', (e) => {
+        const filters: HTMLElement[] = [];
+
+        console.log(e.target);
+        if (e.target && e.target instanceof HTMLInputElement) {
+          if (e.target.checked) {
+            filters.push(e.target);
+          }  else {
+            filters.filter((elem) => !elem);
+          }
+          if (e.target.dataset.filter) {
+            console.log(e.target.dataset.filter);
+          }
+        }
+        console.log(filters);
+      });
+      */
+  /* if (el instanceof HTMLInputElement) {
+          if (el.checked) {
+            console.log(el);
+          }
+        } */
+  /*
+  /* if (el instanceof HTMLElement) {
+        el.addEventListener('click', (e) => {
+          console.log(e.target);
+        });
+      } */
+  /* if (checkbox instanceof HTMLInputElement) {
+        if (checkbox.checked) {
+          checkbox.addEventListener('click', (e) => {
+            console.log(checkbox, e.target);
+          });
+        }
+      } */
+
+  /* inputCheckbox.addEventListener('click', (e) => {
+      if (e && e.target && e.target instanceof HTMLInputElement) {
+        if (e.target.checked) {
+          console.log(`${e.target} is checked`);
+          if (e.target.dataset.filter) {
+            categoryFilter.push(e.target.dataset.filter);
+            console.log(categoryFilter);
+            categoryFilter.forEach((filter) => cards.filter((card) => filter === card.category));
+          }
+
+          // filter(e.target.dataset.filter, cardsContainer[]);
+        } else {
+          console.log(`${e.target} is unchecked`);
+        }
+      }
+      return categoryFilter;
+    }); */
 
   public renderInputRange(str: string): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str}`);

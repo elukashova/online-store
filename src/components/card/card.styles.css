@@ -29,3 +29,11 @@
 .card__btn_buy {
   cursor: pointer;
 }
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: inline-block;
+}

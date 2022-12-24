@@ -1,21 +1,20 @@
 // import { DataType } from '../card/card.types';
 
-export default function filter(category: string, data: HTMLCollectionOf<Element>[]): void {
-  data.forEach((card) => {
-    const item = card;
-    console.log(card);
-    console.log(category);
-    if (item instanceof HTMLElement) {
-      item.style.display = 'none';
-    }
+import Card from '../card/card';
 
-    /* const isItemFiltered = !card.classList.contains(category);
-    const isShowAll = category.toLowerCase() === 'all';
-    if (isItemFiltered && !isShowAll) {
-      card.classList.add('anime');
-    } else {
-      card.classList.remove('hide');
-      item.classList.remove('anime');
-    } */
+export default function filterCards(categories: string[], data: Card[]): void {
+  data.forEach((card) => {
+    categories.forEach((category) => {
+      const newArr = data.filter((card) => card.category === category);
+      if (card.category === category) {
+        card.element.classList.add('visible');
+      }
+      if (card.category !== category && !card.element.classList.contains('visible')) {
+        card.element.classList.add('hidden');
+      }
+      // console.log(card.element.classList);
+      return card.element;
+    });
+    console.log(card.element);
   });
 }

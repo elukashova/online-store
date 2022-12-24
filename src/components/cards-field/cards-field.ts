@@ -33,14 +33,14 @@ export default class CardsField extends BaseComponent {
     const categoryFilter: Filter = new Filter(filtersContainer, 'Category');
     let uniqueCategories = cardsData.products.map((item) => item.category);
     uniqueCategories = Array.from(new Set(uniqueCategories));
-    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category');
+    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category', this.cardsAll);
     filtersContainer.append(categoryNames);
 
     // фильтр по размеру
-    const ratingFilter: Filter = new Filter(filtersContainer, 'Rating');
+    const ratingFilter: Filter = new Filter(filtersContainer, 'Size');
     let uniqueSize = cardsData.products.map((item) => item.size);
     uniqueSize = Array.from(new Set(uniqueSize));
-    const ratingNames: HTMLElement = ratingFilter.renderCheckbox(uniqueSize, 'rating');
+    const ratingNames: HTMLElement = ratingFilter.renderCheckbox(uniqueSize, 'size', this.cardsAll);
     filtersContainer.append(ratingNames);
 
     // фильтр по цене
@@ -63,8 +63,6 @@ export default class CardsField extends BaseComponent {
       cardsContainer.append(card.element);
     });
   }
-
-  public filterByCategory(): void {}
 
   /* функция обсервера, реагирующая на добавление карточек,
     чтобы сохранять добавленные товары в local storage */
