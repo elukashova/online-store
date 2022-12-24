@@ -25,3 +25,7 @@
   display: flex;
   flex-direction: row;
 }
+
+.card__btn_buy {
+  cursor: pointer;
+}

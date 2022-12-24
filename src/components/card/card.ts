@@ -1,9 +1,13 @@
 import './card.styles.css';
 import rendered from '../../utils/render/render';
-import { CardData } from './card.types';
+import { CardData, Observer } from './card.types';
 import BaseComponent from '../base-component/base-component';
+import { checkDataInLocalStorage } from '../../utils/localStorage';
+import { JsonObj } from '../../utils/localStorage.types';
 
 export default class Card extends BaseComponent {
+  public id: number;
+
   public title: string;
 
   public category: string;
@@ -18,8 +22,23 @@ export default class Card extends BaseComponent {
 
   public images: string[];
 
+  public buyButton: HTMLElement | null = null;
+
+  public itemPrice: number = 0;
+
+  public itemQuantity: number = 0;
+
+  public totalPrice: number = 0;
+
+  public totalItems: number = 0;
+
+  private observers: Observer[] = [];
+
+  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
+
   constructor(data: CardData) {
     super('div', 'cards__item card');
+    this.id = data.id;
     this.title = data.title;
     this.category = data.category;
     this.rating = data.rating;
@@ -30,6 +49,7 @@ export default class Card extends BaseComponent {
     this.render();
   }
 
+  // eslint-disable-next-line max-lines-per-function
   public render(): void {
     this.element.classList.add(`${this.category}`);
     rendered('img', this.element, 'card__img', '', {
@@ -47,47 +67,65 @@ export default class Card extends BaseComponent {
     rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
       src: '../../assets/icons/button-open-card.svg',
     });
-    rendered('img', buttonsWrapper, 'card__btn_buy', '', {
-      src: '../../assets/icons/button-buy.svg',
+    // проверяем local storage, добавлена ли этот товар в корзину
+    if (this.storageInfo !== null) {
+      const values: number[] = Object.values(this.storageInfo);
+      for (let i: number = 0; i < values.length; i += 1) {
+        if (values[i] === this.id) {
+          this.element.classList.add('added');
+        }
+      }
+    }
+    // подбираем нужную картинку для кнопки, в завимимости от того, есть ли карточка в корзине
+    let imgSource: string;
+    if (this.element.classList.contains('added')) {
+      imgSource = '../../assets/icons/button-close.svg';
+    } else {
+      imgSource = '../../assets/icons/button-buy.svg';
+    }
+    this.buyButton = rendered('img', buttonsWrapper, 'card__btn_buy', '', {
+      src: `${imgSource}`,
     });
+    // вешаем слушатель на кнопку
+    this.buyButton.addEventListener('click', this.buyBtnCallback);
   }
 
-  // public createCartItem(data: DataType): HTMLElement {
-  // eslint-disable-next-line max-len
-  //   const itemsContainer: HTMLElement = rendered('div', this.container, 'cart__items_container cart-items');
-  //   const cartInfoContainer: HTMLElement = rendered('div', itemsContainer, 'cart-items__info');
-  // eslint-disable-next-line max-len
-  //   const totalNumWrapper: HTMLElement = rendered('div', cartInfoContainer, 'cart-items__info_items info-items');
-  //   rendered('span', totalNumWrapper, 'info-items__text', 'Items:');
-  //   rendered('span', totalNumWrapper, 'info-items__number', '2');
-  // eslint-disable-next-line max-len
-  //   const totalPagesWrapper: HTMLElement = rendered('div', cartInfoContainer, 'cart-items__info_pages info-pages');
-  //   rendered('img', totalPagesWrapper, 'info-pages__btn-left', '', {
-  //     src: '../../assets/icons/cart-icon__left.svg',
-  //   });
-  //   rendered('span', totalPagesWrapper, 'info-pages__pages-total', '1');
-  //   rendered('img', totalPagesWrapper, 'info-pages__btn-right', '', {
-  //     src: '../../assets/icons/cart-icon__right.svg',
-  //   });
-  //   const firstItem: HTMLElement = rendered('div', itemsContainer, 'cart-items__item cart-item');
-  //   rendered('span', firstItem, 'cart-item__order', '1');
-  //   rendered('img', firstItem, 'cart-item__img', '', {
-  //     src: data.images[0],
-  //   });
-  //   const firstItemDescr: HTMLElement = rendered('div', firstItem, 'cart-item__description');
-  //   rendered('span', firstItemDescr, 'cart-item__description_title', data.title);
-  //   rendered('span', firstItemDescr, 'cart-item__description_category', data.category);
-  //   rendered('span', firstItemDescr, 'cart-item__description_size', `Size ${data.size}`);
-  // eslint-disable-next-line max-len
-  //   rendered('span', firstItemDescr, 'cart-item__description_rating', `Rating: ${data.rating.toString()}`);
-  //   rendered(
-  //     'p',
-  //     firstItemDescr,
-  //     'cart-item__description_text',
-  // eslint-disable-next-line max-len
-  //     'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nisl sem, hendrerit vitae convallis sed, interdum nec risus.',
-  //   );
+  private buyBtnCallback = (): void => {
+    if (!this.element.classList.contains('added')) {
+      this.element.classList.add('added');
+      this.buyButton?.setAttribute('src', '../../assets/icons/button-close.svg');
+      this.notifyObserver();
+    } else {
+      this.element.classList.remove('added');
+      this.buyButton?.setAttribute('src', '../../assets/icons/button-buy.svg');
+      this.notifyObserver();
+    }
+  };
 
-  //   return itemsContainer;
-  // }
+  // три метода, нужные для обсервера
+  public attachObserver(observer: Observer): void {
+    const isExist = this.observers.includes(observer);
+    if (isExist) {
+      console.log('Subject: Observer has been attached already.');
+    }
+    // console.log('Subject: Attached an observer.');
+    this.observers.push(observer);
+  }
+
+  public removeObserver(observer: Observer): void {
+    const observerIndex = this.observers.indexOf(observer);
+    if (observerIndex === -1) {
+      console.log('Subject: Nonexistent observer.');
+    }
+
+    this.observers.splice(observerIndex, 1);
+    console.log('Subject: Detached an observer.');
+  }
+
+  public notifyObserver(): void {
+    // console.log('Subject: Notifying observers...');
+    for (let i: number = 0; i < this.observers.length; i += 1) {
+      this.observers[i].update(this);
+    }
+  }
 }

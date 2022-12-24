@@ -5,12 +5,22 @@ import rendered from '../../utils/render/render';
 import cardsData from '../../assets/json/data';
 import Card from '../card/card';
 import Filter from '../filter/filter';
+import Header from '../header/header';
+import { ObservedSubject } from '../card/card.types';
+import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
+import { JsonObj } from '../../utils/localStorage.types';
 
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = [];
 
-  constructor() {
+  public addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
+
+  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
+
+  constructor(public readonly header: Header) {
     super('div', 'content__container');
+    this.render();
+    this.checkLocalStorage();
   }
 
   public render(): void {
@@ -44,18 +54,40 @@ export default class CardsField extends BaseComponent {
     filtersContainer.append(stockTitles);
 
     const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container');
-    /* =======
-    const cardsContainer: HTMLElement = rendered('div', contentContainer, 'cards__container', '', {
-      id: 'cards__container',
-    });
-    const card: Card = new Card(cardsContainer);
->>>>>>> Stashed changes */
+
     cardsData.products.forEach((data) => {
       const card: Card = new Card(data);
+      card.attachObserver(this.header);
+      card.attachObserver(this);
       this.cardsAll.push(card);
       cardsContainer.append(card.element);
     });
   }
 
   public filterByCategory(): void {}
+
+  /* функция обсервера, реагирующая на добавление карточек,
+    чтобы сохранять добавленные товары в local storage */
+  public update(subject: ObservedSubject): void {
+    if (subject instanceof Card && subject.element.classList.contains('added')) {
+      this.addedItems.push(subject.id);
+      console.log(this.addedItems);
+      setDataToLocalStorage(this.addedItems);
+    }
+
+    if (subject instanceof Card && !subject.element.classList.contains('added')) {
+      const index = this.addedItems.indexOf(subject.id);
+      this.addedItems.splice(index, 1);
+      setDataToLocalStorage(this.addedItems);
+    }
+  }
+
+  /* проверка данных в local storage, чтобы по возвращению из корзины на главную
+    не обнулялись данные о добавленных товарах */
+  private checkLocalStorage(): void {
+    if (this.storageInfo !== null) {
+      const values: number[] = Object.values(this.storageInfo);
+      this.addedItems = values.slice();
+    }
+  }
 }

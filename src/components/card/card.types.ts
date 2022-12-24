@@ -10,3 +10,13 @@ export type CardData = {
   category: string;
   images: string[];
 };
+
+export interface ObservedSubject {
+  attachObserver(observer: Observer): void;
+  removeObserver(observer: Observer): void;
+  notifyObserver(): void;
+}
+
+export interface Observer {
+  update(subject: ObservedSubject): void;
+}

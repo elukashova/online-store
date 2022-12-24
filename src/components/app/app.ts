@@ -5,7 +5,6 @@ import MainCart from '../main/main.cart/main.cart';
 import MainAbout from '../main/main.about/main.about';
 import Pages from './enums';
 import Page from '../main/page-component';
-/* import CardsField from '../cards-field/cards-field'; */
 
 export default class App {
   private static container: HTMLElement = document.body;
@@ -14,20 +13,11 @@ export default class App {
 
   private readonly footer: Footer = new Footer();
 
-  /*  private readonly cardsField: CardsField = new CardsField(); */
-
-  private mainStore: MainStore = new MainStore(Pages.StorePage);
-
-  private mainCart: MainCart = new MainCart(Pages.CartPage);
-
-  private mainAbout: MainAbout = new MainAbout(Pages.AboutPage);
-
   constructor(private readonly rootElement: HTMLElement) {}
 
   public init(): void {
     this.rootElement.classList.add('root'); // добавляю класс к боди для стилей
     this.rootElement.append(this.header.element);
-    this.header.render();
     this.renderNewPage(Pages.StorePage); // создаем базовый мейн
     this.getHashEvent(); // при клике на элементы смены страницы получаем хэш и заново рендерим
     this.rootElement.append(this.footer.element);
@@ -40,10 +30,10 @@ export default class App {
     let page: Page | null = null;
     switch (id) {
       case Pages.StorePage:
-        page = new MainStore(Pages.StorePage);
+        page = new MainStore(Pages.StorePage, this.header);
         break;
       case Pages.CartPage:
-        page = new MainCart(id);
+        page = new MainCart(id, this.header);
         break;
       case Pages.AboutPage:
         page = new MainAbout(id);
