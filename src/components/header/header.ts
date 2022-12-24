@@ -42,6 +42,7 @@ export default class Header extends BaseComponent {
     // this.updateInfo(this.totalPrice, this.cartItems);
   }
 
+  // метод для обсервера
   public update(subject: ObservedSubject): void {
     // если это ново-добавленный элемент, добавляю его цену к тотал и увеличиваю кол-во в корзине
     if (subject instanceof Card && subject.element.classList.contains('added')) {

@@ -33,7 +33,7 @@ export default class App {
         page = new MainStore(Pages.StorePage, this.header);
         break;
       case Pages.CartPage:
-        page = new MainCart(id);
+        page = new MainCart(id, this.header);
         break;
       case Pages.AboutPage:
         page = new MainAbout(id);

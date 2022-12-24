@@ -2,6 +2,8 @@ import './card.styles.css';
 import rendered from '../../utils/render/render';
 import { CardData, Observer } from './card.types';
 import BaseComponent from '../base-component/base-component';
+import { checkDataInLocalStorage } from '../../utils/localStorage';
+import { JsonObj } from '../../utils/localStorage.types';
 
 export default class Card extends BaseComponent {
   public id: number;
@@ -31,6 +33,8 @@ export default class Card extends BaseComponent {
   public totalItems: number = 0;
 
   private observers: Observer[] = [];
+
+  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
 
   constructor(data: CardData) {
     super('div', 'cards__item card');
@@ -63,9 +67,26 @@ export default class Card extends BaseComponent {
     rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
       src: '../../assets/icons/button-open-card.svg',
     });
+    // проверяем local storage, добавлена ли этот товар в корзину
+    if (this.storageInfo !== null) {
+      const values: number[] = Object.values(this.storageInfo);
+      for (let i: number = 0; i < values.length; i += 1) {
+        if (values[i] === this.id) {
+          this.element.classList.add('added');
+        }
+      }
+    }
+    // подбираем нужную картинку для кнопки, в завимимости от того, есть ли карточка в корзине
+    let imgSource: string;
+    if (this.element.classList.contains('added')) {
+      imgSource = '../../assets/icons/button-close.svg';
+    } else {
+      imgSource = '../../assets/icons/button-buy.svg';
+    }
     this.buyButton = rendered('img', buttonsWrapper, 'card__btn_buy', '', {
-      src: '../../assets/icons/button-buy.svg',
+      src: `${imgSource}`,
     });
+    // вешаем слушатель на кнопку
     this.buyButton.addEventListener('click', this.buyBtnCallback);
   }
 
@@ -81,6 +102,7 @@ export default class Card extends BaseComponent {
     }
   };
 
+  // три метода, нужные для обсервера
   public attachObserver(observer: Observer): void {
     const isExist = this.observers.includes(observer);
     if (isExist) {
