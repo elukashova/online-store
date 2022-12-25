@@ -44,6 +44,11 @@ export default class CartCard extends BaseComponent {
     itemTotalPrice: 0,
   };
 
+  // эти два указателя мне нужны для обсервера на клик на + и -
+  public minus: boolean = false;
+
+  public plus: boolean = false;
+
   constructor(private data: CardDataType, private itemsOrder: number) {
     super('div', 'cart-items__item cart-item');
     this.id = this.data.id;
@@ -93,6 +98,7 @@ export default class CartCard extends BaseComponent {
     this.minusBtn = rendered('img', changeAmountContainer, 'cart-amount__btn-minus', '', {
       src: '../../assets/icons/cart-icon__minus.svg',
     });
+    this.minusBtn.addEventListener('click', this.minusBtnCallback);
     this.itemAmountElement = rendered(
       'span',
       changeAmountContainer,
@@ -117,9 +123,24 @@ export default class CartCard extends BaseComponent {
     );
   }
 
-  private minusBtnCallback = (): void => {};
+  private minusBtnCallback = (): void => {
+    this.minus = true;
+    this.plus = false;
+    if (this.cartItemInfo.itemAmount > 0) {
+      this.cartItemInfo.itemTotalPrice -= this.price;
+      this.cartItemInfo.itemAmount -= 1;
+      if (this.priceForItemElement && this.itemAmountElement) {
+        this.priceForItemElement.textContent = `${this.cartItemInfo.itemTotalPrice}`;
+        this.itemAmountElement.textContent = `${this.cartItemInfo.itemAmount}`;
+      }
+      setDataToLocalStorage(this.cartItemInfo, `${this.id}`);
+    }
+    this.notifyObserver();
+  };
 
   private plusBtnCallback = (): void => {
+    this.plus = true;
+    this.minus = false;
     // невозможность добавить больше, чем есть на стоке
     if (this.cartItemInfo.itemAmount < this.stock) {
       this.cartItemInfo.itemTotalPrice += this.price;
@@ -129,9 +150,14 @@ export default class CartCard extends BaseComponent {
         this.itemAmountElement.textContent = `${this.cartItemInfo.itemAmount}`;
       }
       setDataToLocalStorage(this.cartItemInfo, `${this.id}`);
+      this.notifyObserver();
     }
-    this.notifyObserver();
   };
+
+  // //обновить порядок после удаления
+  // public updateOrder() {
+
+  // }
 
   // три метода, нужные для обсервера
   public attachObserver(observer: Observer): void {

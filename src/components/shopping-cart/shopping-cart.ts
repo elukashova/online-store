@@ -3,14 +3,14 @@ import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
 import CartCard from './card-cart';
 import Header from '../header/header';
-import { checkDataInLocalStorage } from '../../utils/localStorage';
+import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
 import { JsonObj } from '../../utils/localStorage.types';
 import cardsData from '../../assets/json/data';
 import { ObservedSubject } from '../card/card.types';
 // import { ItemInfoType } from './shopping-cart.types';
 
 export default class Cart extends BaseComponent {
-  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
+  private storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
 
   private itemsOrder: number = 0;
 
@@ -23,6 +23,10 @@ export default class Cart extends BaseComponent {
   private totalPriceElement: HTMLElement | null = null;
 
   private cartItemsElement: HTMLElement | null = null;
+
+  private cartContainer: HTMLElement | null = null;
+
+  private summaryContainer: HTMLElement | null = null;
 
   constructor(public readonly header: Header) {
     super('div', 'cart-container cart');
@@ -37,10 +41,9 @@ export default class Cart extends BaseComponent {
 
   // eslint-disable-next-line max-lines-per-function
   public render(): void {
-    console.log(this.storageInfo);
     // items block
-    const cartContainer: HTMLElement = rendered('div', this.element, 'cart__items_container cart-items');
-    const cartInfoContainer: HTMLElement = rendered('div', cartContainer, 'cart-items__info');
+    this.cartContainer = rendered('div', this.element, 'cart__items_container cart-items');
+    const cartInfoContainer: HTMLElement = rendered('div', this.cartContainer, 'cart-items__info');
     const totalNumWrapper: HTMLElement = rendered('div', cartInfoContainer, 'cart-items__info_items info-items');
     rendered('span', totalNumWrapper, 'info-items__text', 'Items:');
     rendered('span', totalNumWrapper, 'info-items__number', '2');
@@ -52,7 +55,7 @@ export default class Cart extends BaseComponent {
     rendered('img', totalPagesWrapper, 'info-pages__btn-right', '', {
       src: '../../assets/icons/cart-icon__right.svg',
     });
-    // item
+    // items
     // проверяем local storage и выбираем нужные данные из json для создания карточек товара
     cardsData.products.forEach((data) => {
       if (this.storageInfo !== null) {
@@ -63,35 +66,39 @@ export default class Cart extends BaseComponent {
             const card = new CartCard(data, this.itemsOrder);
             card.attachObserver(this.header);
             card.attachObserver(this);
-            cartContainer.append(card.element);
+            this.cartContainer?.append(card.element);
           }
         }
       }
     });
     // summary
-    const summaryContainer: HTMLElement = rendered('div', this.element, 'cart-summary__container cart-summary');
-    rendered('span', summaryContainer, 'cart-summary__title', 'Summary');
+    this.summaryContainer = rendered('div', this.element, 'cart-summary__container cart-summary');
+    rendered('span', this.summaryContainer, 'cart-summary__title', 'Summary');
     const totalItemsContainer: HTMLElement = rendered(
       'div',
-      summaryContainer,
+      this.summaryContainer,
       'cart-summary__total-items_container cart-total-items',
     );
     rendered('span', totalItemsContainer, 'cart-total-items__text', 'Items:');
     this.cartItemsElement = rendered('span', totalItemsContainer, 'cart-total-items__num', `${this.cartItems}`);
     const totalSumContainer: HTMLElement = rendered(
       'div',
-      summaryContainer,
+      this.summaryContainer,
       'cart-summary__total-sum_container total-sum',
     );
     rendered('span', totalSumContainer, 'cart-total-sum__text', 'Total:');
-    this.totalPriceElement = rendered('span', totalSumContainer, 'cart-total-sum__num', `${this.totalPrice}`);
-    const promocodeContainer: HTMLElement = rendered('div', summaryContainer, 'cart-summary__promocode cart-promocode');
+    this.totalPriceElement = rendered('span', totalSumContainer, 'cart-total-sum__num', `$ ${this.totalPrice}`);
+    const promocodeContainer: HTMLElement = rendered(
+      'div',
+      this.summaryContainer,
+      'cart-summary__promocode cart-promocode',
+    );
     rendered('input', promocodeContainer, 'cart-promocode__input', '', {
       type: 'search',
       placeholder: 'Enter promo code',
     });
-    rendered('div', summaryContainer, 'cart-total-sum__line');
-    rendered('button', summaryContainer, 'cart-total-sum__buy-btn', 'buy now');
+    rendered('div', this.summaryContainer, 'cart-total-sum__line');
+    rendered('button', this.summaryContainer, 'cart-total-sum__buy-btn', 'buy now');
   }
 
   // страница с пустой корзиной
@@ -110,14 +117,40 @@ export default class Cart extends BaseComponent {
   // функция обсервера
   public update(subject: ObservedSubject): void {
     if (subject instanceof CartCard) {
-      if (subject.cartItemInfo.itemAmount > 1 && this.totalPriceElement && this.cartItemsElement) {
+      if (subject.plus === true && subject.cartItemInfo.itemAmount <= subject.stock) {
         this.totalPrice += subject.price;
         this.cartItems += 1;
-        this.totalPriceElement.textContent = `${this.totalPrice}`;
-        this.cartItemsElement.textContent = `${this.cartItems}`;
+        if (this.totalPriceElement && this.cartItemsElement) {
+          this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
+          this.cartItemsElement.textContent = `${this.cartItems}`;
+        }
+      } else if (subject.minus === true && subject.cartItemInfo.itemAmount >= 0) {
+        this.totalPrice -= subject.price;
+        this.cartItems -= 1;
+        if (this.totalPriceElement && this.cartItemsElement) {
+          this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
+          this.cartItemsElement.textContent = `${this.cartItems}`;
+        }
+        this.checkIfZero(subject);
       }
-      //   this.addedItems.push(subject.id);
-      //   setDataToLocalStorage(this.addedItems);
+    }
+  }
+
+  /* проверить, являетли ли количество одного продукта нулевым
+  и последующее удаление */
+  private checkIfZero(subject: ObservedSubject): void {
+    if (subject instanceof CartCard && subject.cartItemInfo.itemAmount === 0) {
+      localStorage.removeItem(`${subject.id}`); // удаляю из local storage
+      const index = this.addedItems.indexOf(subject.id); // удаляю из массива добавленных в корзину
+      this.addedItems.splice(index, 1);
+      setDataToLocalStorage(this.addedItems); // обновляю инфу о добавленных в корзину
+      subject.element.remove(); // удаляю со страницы
+      // если у меня ноль товара на странице, надо вывести страницу пустой корзины
+      if (this.addedItems.length === 0) {
+        this.cartContainer?.remove();
+        this.summaryContainer?.remove();
+        this.showEmptyCart();
+      }
     }
   }
 }

@@ -53,16 +53,27 @@ export default class Header extends BaseComponent {
   // метод для обсервера
   public update(subject: ObservedSubject): void {
     // если это ново-добавленный элемент, добавляю его цену к тотал и увеличиваю кол-во в корзине
-    if ((subject instanceof Card && subject.element.classList.contains('added')) || subject instanceof CartCard) {
-      this.headerInfo.totalPrice += subject.price;
-      this.headerInfo.cartItems += 1;
+    if (subject instanceof Card) {
+      if (subject.element.classList.contains('added')) {
+        this.headerInfo.totalPrice += subject.price;
+        this.headerInfo.cartItems += 1;
+      } else if (!subject.element.classList.contains('added')) {
+        // если нет, наоборот
+        this.headerInfo.totalPrice -= subject.price;
+        this.headerInfo.cartItems -= 1;
+      }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
 
-    // если нет, наоборот
-    if (subject instanceof Card && !subject.element.classList.contains('added')) {
-      this.headerInfo.totalPrice -= subject.price;
-      this.headerInfo.cartItems -= 1;
+    // обсервер на увеличение количество отдельных товаров в корзине
+    if (subject instanceof CartCard) {
+      if (subject.plus === true && subject.cartItemInfo.itemAmount <= subject.stock) {
+        this.headerInfo.totalPrice += subject.price;
+        this.headerInfo.cartItems += 1;
+      } else if (subject.minus === true && subject.cartItemInfo.itemAmount >= 0) {
+        this.headerInfo.totalPrice -= subject.price;
+        this.headerInfo.cartItems -= 1;
+      }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
 
