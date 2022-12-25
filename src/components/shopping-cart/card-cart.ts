@@ -16,7 +16,13 @@ export default class CartCard extends BaseComponent {
 
   public description: string;
 
-  constructor(private data: CardDataType, private itemsQuantity: number, private header: Header) {
+  public stock: number;
+
+  public price: number;
+
+  public discount: number;
+
+  constructor(private data: CardDataType, private itemsOrder: number, private header: Header) {
     super('div', 'cart-items__item cart-item');
     this.title = data.title;
     this.category = data.category;
@@ -24,19 +30,44 @@ export default class CartCard extends BaseComponent {
     this.size = data.size;
     this.images = data.images.slice();
     this.description = data.description;
+    this.stock = data.stock;
+    this.price = data.price;
+    this.discount = data.discountPercentage;
     this.render();
   }
 
   public render(): void {
-    rendered('span', this.element, 'cart-item__order', `${this.itemsQuantity}`);
-    rendered('img', this.element, 'cart-item__img', '', {
+    // правая карточка
+    const itemCard = rendered('div', this.element, 'cart-item__card');
+    rendered('span', itemCard, 'cart-item__order', `${this.itemsOrder}`);
+    rendered('img', itemCard, 'cart-item__img', '', {
       src: this.images[0],
     });
-    const firstItemDescr: HTMLElement = rendered('div', this.element, 'cart-item__description');
+    const firstItemDescr: HTMLElement = rendered('div', itemCard, 'cart-item__description');
     rendered('span', firstItemDescr, 'cart-item__description_title', this.title);
     rendered('span', firstItemDescr, 'cart-item__description_category', this.category);
     rendered('span', firstItemDescr, 'cart-item__description_size', `Size ${this.size}`);
-    rendered('span', firstItemDescr, 'cart-item__description_rating', `Rating: ${this.rating.toString()}`);
+    rendered('span', firstItemDescr, 'cart-item__description_rating', `Rating: ${this.rating}`);
+    rendered('span', firstItemDescr, 'cart-item__description_discount', `Discount: ${this.discount}`);
     rendered('p', firstItemDescr, 'cart-item__description_text', this.description);
+
+    // левая часть с возможностью поменять количество
+    const amountContainer = rendered('div', this.element, 'cart-item__amount_container');
+    const itemAmountContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__change-container');
+    const changeAmountContainer: HTMLElement = rendered('div', itemAmountContainer, 'cart-amount__change-container');
+    rendered('img', changeAmountContainer, 'cart-amount__btn-minus', '', {
+      src: '../../assets/icons/cart-icon__minus.svg',
+    });
+    rendered('span', changeAmountContainer, 'cart-amount__amount', '1');
+    rendered('img', changeAmountContainer, 'cart-amount__btn-plus', '', {
+      src: '../../assets/icons/cart-icon__plus.svg',
+    });
+    const stockAmountContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__stock-container');
+    rendered('span', stockAmountContainer, 'cart-amount__stock-text', 'Stock:');
+    rendered('span', stockAmountContainer, 'cart-amount__stock-num', `${this.stock}`);
+
+    const itemPriceContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__price-container');
+    rendered('span', itemPriceContainer, 'cart-amount__price-text', '$');
+    rendered('span', itemPriceContainer, 'cart-amount__price-num', `${this.price}`);
   }
 }

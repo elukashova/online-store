@@ -11,7 +11,7 @@ import cardsData from '../../assets/json/data';
 export default class Cart extends BaseComponent {
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
 
-  private itemsQuantity: number = 0;
+  private itemsOrder: number = 0;
 
   constructor(public readonly header: Header) {
     super('div', 'cart-container cart');
@@ -45,31 +45,13 @@ export default class Cart extends BaseComponent {
         const values: number[] = Object.values(this.storageInfo);
         for (let i: number = 0; i < values.length; i += 1) {
           if (data.id === values[i]) {
-            this.itemsQuantity += 1;
-            const card = new CartCard(data, this.itemsQuantity, this.header);
+            this.itemsOrder += 1;
+            const card = new CartCard(data, this.itemsOrder, this.header);
             cartContainer.append(card.element);
           }
         }
       }
     });
-
-    // number
-    const amountContainer: HTMLElement = rendered('div', this.element, 'cart__amount_container cart-amount');
-    const changeAmountContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__change-container');
-    rendered('img', changeAmountContainer, 'cart-amount__btn-minus', '', {
-      src: '../../assets/icons/cart-icon__minus.svg',
-    });
-    rendered('span', changeAmountContainer, 'cart-amount__amount', '1');
-    rendered('img', changeAmountContainer, 'cart-amount__btn-plus', '', {
-      src: '../../assets/icons/cart-icon__plus.svg',
-    });
-    const stockAmountContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__stock-container');
-    rendered('span', stockAmountContainer, 'cart-amount__stock-text', 'Stock:');
-    rendered('span', stockAmountContainer, 'cart-amount__stock-num', '140');
-
-    const itemPriceContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__price-container');
-    rendered('span', itemPriceContainer, 'cart-amount__price-text', '$');
-    rendered('span', itemPriceContainer, 'cart-amount__price-num', '150');
 
     // summary
     const summaryContainer: HTMLElement = rendered('div', this.element, 'cart-summary__container cart-summary');
