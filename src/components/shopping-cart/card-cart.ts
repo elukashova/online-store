@@ -1,5 +1,5 @@
 import rendered from '../../utils/render/render';
-import { CardDataType } from '../card/card.types';
+import { CardDataType, Observer } from '../card/card.types';
 import BaseComponent from '../base-component/base-component';
 import Header from '../header/header';
 
@@ -21,6 +21,8 @@ export default class CartCard extends BaseComponent {
   public price: number;
 
   public discount: number;
+
+  private observers: Observer[] = [];
 
   constructor(private data: CardDataType, private itemsOrder: number, private header: Header) {
     super('div', 'cart-items__item cart-item');
@@ -69,5 +71,32 @@ export default class CartCard extends BaseComponent {
     const itemPriceContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__price-container');
     rendered('span', itemPriceContainer, 'cart-amount__price-text', '$');
     rendered('span', itemPriceContainer, 'cart-amount__price-num', `${this.price}`);
+  }
+
+  // три метода, нужные для обсервера
+  public attachObserver(observer: Observer): void {
+    const isExist = this.observers.includes(observer);
+    if (isExist) {
+      console.log('Subject: Observer has been attached already.');
+    }
+    // console.log('Subject: Attached an observer.');
+    this.observers.push(observer);
+  }
+
+  public removeObserver(observer: Observer): void {
+    const observerIndex = this.observers.indexOf(observer);
+    if (observerIndex === -1) {
+      console.log('Subject: Nonexistent observer.');
+    }
+
+    this.observers.splice(observerIndex, 1);
+    console.log('Subject: Detached an observer.');
+  }
+
+  public notifyObserver(): void {
+    // console.log('Subject: Notifying observers...');
+    for (let i: number = 0; i < this.observers.length; i += 1) {
+      this.observers[i].update(this);
+    }
   }
 }
