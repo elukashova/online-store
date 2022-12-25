@@ -1,5 +1,4 @@
-import { HeaderInfoType } from '../components/header/header.types';
-import { JsonObj } from './localStorage.types';
+import { DataToSet, JsonObj } from './localStorage.types';
 
 export const checkDataInLocalStorage = (key: string): JsonObj | null => {
   const response: string | null = localStorage.getItem(key);
@@ -14,7 +13,7 @@ export const checkDataInLocalStorage = (key: string): JsonObj | null => {
   return result;
 };
 
-export const setDataToLocalStorage = (data: number[] | HeaderInfoType): void => {
+export const setDataToLocalStorage = (data: DataToSet, key?: string): void => {
   if (Array.isArray(data)) {
     localStorage.removeItem('addedItems');
     const addedItems: JsonObj = {};
@@ -24,8 +23,8 @@ export const setDataToLocalStorage = (data: number[] | HeaderInfoType): void => 
     });
 
     localStorage.setItem('addedItems', JSON.stringify(addedItems));
-  } else {
-    localStorage.removeItem('headerInfo');
-    localStorage.setItem('headerInfo', JSON.stringify(data));
+  } else if (key) {
+    localStorage.removeItem(key);
+    localStorage.setItem(key, JSON.stringify(data));
   }
 };

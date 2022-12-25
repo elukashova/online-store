@@ -85,7 +85,8 @@
 
 .cart-item__description_rating,
 .cart-item__description_size,
-.cart-item__description_discount {
+.cart-item__description_discount,
+.cart-item__description_price {
   font-size: 0.9rem;
   color: #65635F;
   margin-bottom: 1%;

@@ -6,6 +6,7 @@ import Card from '../card/card';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { HeaderInfoType } from './header.types';
 import { JsonObj } from '../../utils/localStorage.types';
+import CartCard from '../shopping-cart/card-cart';
 
 export default class Header extends BaseComponent {
   public totalPriceElement: HTMLElement | null = null;
@@ -52,17 +53,17 @@ export default class Header extends BaseComponent {
   // метод для обсервера
   public update(subject: ObservedSubject): void {
     // если это ново-добавленный элемент, добавляю его цену к тотал и увеличиваю кол-во в корзине
-    if (subject instanceof Card && subject.element.classList.contains('added')) {
+    if ((subject instanceof Card && subject.element.classList.contains('added')) || subject instanceof CartCard) {
       this.headerInfo.totalPrice += subject.price;
       this.headerInfo.cartItems += 1;
-      setDataToLocalStorage(this.headerInfo);
+      setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
 
     // если нет, наоборот
     if (subject instanceof Card && !subject.element.classList.contains('added')) {
       this.headerInfo.totalPrice -= subject.price;
       this.headerInfo.cartItems -= 1;
-      setDataToLocalStorage(this.headerInfo);
+      setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
 
     // обновляю информацию в хедере
