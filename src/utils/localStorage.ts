@@ -2,8 +2,15 @@ import { HeaderInfoType } from '../components/header/header.types';
 import { JsonObj } from './localStorage.types';
 
 export const checkDataInLocalStorage = (key: string): JsonObj | null => {
-  const result = localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key) || '{}') : null;
-
+  const response: string | null = localStorage.getItem(key);
+  let result: JsonObj | null = null;
+  if (response) {
+    try {
+      result = JSON.parse(response);
+    } catch (e) {
+      console.log(e);
+    }
+  }
   return result;
 };
 
