@@ -15,6 +15,8 @@ export default class CardsField extends BaseComponent {
 
   public filtersAll: Filter[] = [];
 
+  public activeFilters: string[] = [];
+
   public addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
 
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
@@ -32,7 +34,7 @@ export default class CardsField extends BaseComponent {
     rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
 
     // фильтр по категории
-    const categoryFilter: Filter = new Filter(filtersContainer, 'Category');
+    const categoryFilter: Filter = new Filter(filtersContainer, 'Category', this.updateActiveFilters);
     let uniqueCategories = cardsData.products.map((item) => item.category);
     uniqueCategories = Array.from(new Set(uniqueCategories));
     const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category');
@@ -57,7 +59,8 @@ export default class CardsField extends BaseComponent {
 
     // объединение фильтров
     this.filtersAll.push(categoryFilter, sizeFilter, priceFilter, stockFilter);
-    this.filtersAll.forEach((filter) => filter.listenInputCheck(this.cardsAll, filter.checkboxes));
+    /* console.log(this.filtersAll);
+    this.filtersAll.forEach((filter) => this.listenInputCheck(this.cardsAll, filter.checkboxes)); */
 
     const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container');
 
@@ -68,6 +71,68 @@ export default class CardsField extends BaseComponent {
       this.cardsAll.push(card);
       cardsContainer.append(card.element);
     });
+  }
+
+  public updateActiveFilters(checkboxes: HTMLElement[]): void {
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', () => {
+        this.listenInputCheck(this.cardsAll, checkboxes);
+      });
+    });
+  }
+
+  public listenInputCheck(cards: Card[], checkboxes: HTMLElement[]): void {
+    const filters: string[] = [];
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener('click', (e) => {
+        // скрываем все карточки и обнуляем visible
+        cards.forEach((card) => {
+          card.element.classList.add('hidden');
+          card.element.classList.remove('visible');
+        });
+        // собираем массив checked фильтров или удаляем из него unchecked
+        if (e.target && e.target instanceof HTMLInputElement) {
+          if (e.target.checked) {
+            filters.push(e.target.id);
+          } else {
+            filters.splice(filters.indexOf(e.target.id), 1);
+          }
+          this.activeFilters = filters.slice();
+        }
+        this.filterByCategoryAndSize(filters, cards);
+        console.log(this.activeFilters);
+      });
+    });
+  }
+
+  public filterByCategoryAndSize(filters: string[], cards: Card[]): void {
+    const filteredArr: Card[] = [];
+    // пока тут цикл, так как пыталась работать с двумя видами фильтров
+    for (let i = 0; i < filters.length; i += 1) {
+      const temporaryCategoryArr = cards.filter((card) => filters[i] === card.category);
+      const temporarySizeArr = cards.filter((card) => filters[i] === card.size);
+
+      filteredArr.push(...temporaryCategoryArr, ...temporarySizeArr);
+
+      /* Код не срабатывает, так как у меня приходит либо один вид фильтров, либо второй.
+      Их не получчается объединить.
+      Работает полноценно либо только по размеру, либо по категории */
+    }
+
+    // если массив пустой делаем все карточки видимыми
+    if (filteredArr.length === 0) {
+      cards.forEach((card) => {
+        card.element.classList.add('visible');
+        card.element.classList.remove('hidden');
+      });
+    } else {
+      // если не пустой, делаем видимыми только отфильтрованные
+      filteredArr.forEach((visibleCard) => {
+        visibleCard.element.classList.add('visible');
+        visibleCard.element.classList.remove('hidden');
+      });
+    }
+    // console.log(filteredArr);
   }
 
   /* функция обсервера, реагирующая на добавление карточек,

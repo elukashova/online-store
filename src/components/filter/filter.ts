@@ -4,7 +4,6 @@ import cardsData from '../../assets/json/data';
 import findMinAndMaxPrice from './utils/find.minmax.price';
 import findMinAndMaxCount from './utils/find.minmax.stock';
 import RangeTypes from './enums.filter';
-import Card from '../card/card';
 
 export default class Filter {
   public checkboxes: HTMLElement[] = [];
@@ -34,58 +33,6 @@ export default class Filter {
       this.checkboxes.push(inputElement);
     });
     return filterWrapper;
-  }
-
-  public listenInputCheck(cards: Card[], checkboxes: HTMLElement[]): void {
-    const filters: string[] = [];
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', (e) => {
-        // скрываем все карточки и обнуляем visible
-        cards.forEach((card) => {
-          card.element.classList.add('hidden');
-          card.element.classList.remove('visible');
-        });
-        // собираем массив checked фильтров или удаляем из него unchecked
-        if (e.target && e.target instanceof HTMLInputElement) {
-          if (e.target.checked) {
-            filters.push(e.target.id);
-          } else {
-            filters.splice(filters.indexOf(e.target.id), 1);
-          }
-        }
-        this.filterByCategoryAndSize(filters, cards);
-      });
-    });
-  }
-
-  public filterByCategoryAndSize(filters: string[], cards: Card[]): void {
-    const filteredArr: Card[] = [];
-    // пока тут цикл, так как пыталась работать с двумя видами фильтров
-    for (let i = 0; i < filters.length; i += 1) {
-      const temporaryCategoryArr = cards.filter((card) => filters[i] === card.category);
-      const temporarySizeArr = cards.filter((card) => filters[i] === card.size);
-
-      filteredArr.push(...temporaryCategoryArr, ...temporarySizeArr);
-
-      /* Код не срабатывает, так как у меня приходит либо один вид фильтров, либо второй.
-      Их не получчается объединить.
-      Работает полноценно либо только по размеру, либо по категории */
-    }
-
-    // если массив пустой делаем все карточки видимыми
-    if (filteredArr.length === 0) {
-      cards.forEach((card) => {
-        card.element.classList.add('visible');
-        card.element.classList.remove('hidden');
-      });
-    } else {
-      // если не пустой, делаем видимыми только отфильтрованные
-      filteredArr.forEach((visibleCard) => {
-        visibleCard.element.classList.add('visible');
-        visibleCard.element.classList.remove('hidden');
-      });
-    }
-    // console.log(filteredArr);
   }
 
   public renderInputRange(str: string): HTMLElement {
@@ -120,11 +67,11 @@ export default class Filter {
       max: maxValue,
       value: maxValue,
     });
-    this.listenInputRange(lowestInput, highestInput); // вешаем функцию слушатель
+    this.changeInputRange(lowestInput, highestInput); // вешаем функцию слушатель
     return filterWrapper;
   }
 
-  public listenInputRange(lowestInput: HTMLElement, highestInput: HTMLElement): void {
+  public changeInputRange(lowestInput: HTMLElement, highestInput: HTMLElement): void {
     lowestInput.addEventListener('input', (e) => {
       if (e.target === document.getElementById('from-price')) {
         this.changeLowInput(lowestInput, highestInput, RangeTypes.PriceFrom);
