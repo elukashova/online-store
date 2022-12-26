@@ -13,6 +13,8 @@ import { JsonObj } from '../../utils/localStorage.types';
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = [];
 
+  public filtersAll: Filter[] = [];
+
   public addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
 
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
@@ -33,15 +35,15 @@ export default class CardsField extends BaseComponent {
     const categoryFilter: Filter = new Filter(filtersContainer, 'Category');
     let uniqueCategories = cardsData.products.map((item) => item.category);
     uniqueCategories = Array.from(new Set(uniqueCategories));
-    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category', this.cardsAll);
+    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category');
     filtersContainer.append(categoryNames);
 
     // фильтр по размеру
-    const ratingFilter: Filter = new Filter(filtersContainer, 'Size');
+    const sizeFilter: Filter = new Filter(filtersContainer, 'Size');
     let uniqueSize = cardsData.products.map((item) => item.size);
     uniqueSize = Array.from(new Set(uniqueSize));
-    const ratingNames: HTMLElement = ratingFilter.renderCheckbox(uniqueSize, 'size', this.cardsAll);
-    filtersContainer.append(ratingNames);
+    const sizeNames: HTMLElement = sizeFilter.renderCheckbox(uniqueSize, 'size');
+    filtersContainer.append(sizeNames);
 
     // фильтр по цене
     const priceFilter: Filter = new Filter(filtersContainer, 'Price');
@@ -52,6 +54,10 @@ export default class CardsField extends BaseComponent {
     const stockFilter: Filter = new Filter(filtersContainer, 'Stock');
     const stockTitles: HTMLElement = stockFilter.renderInputRange('stock');
     filtersContainer.append(stockTitles);
+
+    // объединение фильтров
+    this.filtersAll.push(categoryFilter, sizeFilter, priceFilter, stockFilter);
+    this.filtersAll.forEach((filter) => filter.listenInputCheck(this.cardsAll, filter.checkboxes));
 
     const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container');
 

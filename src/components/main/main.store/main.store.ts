@@ -13,6 +13,5 @@ export default class MainStore extends Page {
 
   public setContent(): void {
     this.element.append(this.cardsField.element);
-    this.cardsField.render();
   }
 }

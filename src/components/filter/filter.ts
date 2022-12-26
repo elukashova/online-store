@@ -4,17 +4,16 @@ import cardsData from '../../assets/json/data';
 import findMinAndMaxPrice from './utils/find.minmax.price';
 import findMinAndMaxCount from './utils/find.minmax.stock';
 import RangeTypes from './enums.filter';
-import filterCards from './test';
 import Card from '../card/card';
-// import filter from './test';
 
 export default class Filter {
+  public checkboxes: HTMLElement[] = [];
+
   constructor(private readonly container: HTMLElement, private readonly name: string) {}
 
-  public renderCheckbox<T>(data: T[], str: string, cards: Card[]): HTMLElement {
+  public renderCheckbox<T>(data: T[], str: string): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str} ${str}`);
     rendered('legend', filterWrapper, `${str}__legend-1`, this.name);
-    const checkboxes: HTMLElement[] = [];
     data.forEach((item, ind) => {
       const inputWrapper: HTMLElement = rendered('div', filterWrapper, `${str}__input-wrapper`);
       const inputElement: HTMLElement = rendered(
@@ -26,113 +25,68 @@ export default class Filter {
           id: `${item}`,
           type: 'checkbox',
           name: `${str}`,
-          'data-filter': `${item}`,
         },
       );
       rendered('label', inputWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${str}-${ind + 1}`,
       });
-      rendered('span', inputWrapper, `${str}__out-of-${ind + 1}`, '1/5');
-      checkboxes.push(inputElement);
+      rendered('span', inputWrapper, `${str}__out-of-${ind + 1}`, ' 1/5');
+      this.checkboxes.push(inputElement);
     });
-    this.listenInputCheck(cards, checkboxes);
     return filterWrapper;
   }
 
   public listenInputCheck(cards: Card[], checkboxes: HTMLElement[]): void {
-    cards.forEach((card) => card.element.classList.remove('visible', 'hidden'));
-    const categoriesFilters: string[] = [];
-    const sizeFilters: string[] = [];
+    const filters: string[] = [];
     checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener('click', (e) => {
-        if (checkbox instanceof HTMLInputElement) {
-          if (e.target && e.target instanceof HTMLInputElement) {
-            const filterName = checkbox.dataset.filter;
-            if (filterName) {
-              if (e.target.name === 'category') {
-                if (categoriesFilters.includes(filterName)) {
-                  categoriesFilters.splice(categoriesFilters.indexOf(filterName));
-                }
-                if (checkbox.checked) {
-                  categoriesFilters.push(filterName);
-                }
-              }
-              if (e.target.name === 'size') {
-                if (sizeFilters.includes(filterName)) {
-                  sizeFilters.splice(sizeFilters.indexOf(filterName));
-                }
-                if (checkbox.checked) {
-                  sizeFilters.push(filterName);
-                }
-              }
-            }
+      checkbox.addEventListener('change', (e) => {
+        // скрываем все карточки и обнуляем visible
+        cards.forEach((card) => {
+          card.element.classList.add('hidden');
+          card.element.classList.remove('visible');
+        });
+        // собираем массив checked фильтров или удаляем из него unchecked
+        if (e.target && e.target instanceof HTMLInputElement) {
+          if (e.target.checked) {
+            filters.push(e.target.id);
+          } else {
+            filters.splice(filters.indexOf(e.target.id), 1);
           }
         }
-        filterCards(categoriesFilters, cards);
-        /* if (e.target && e.target instanceof HTMLInputElement) {
-          if (e.target.dataset.filter) {
-            filterCards()
-          }
-        } */
+        this.filterByCategoryAndSize(filters, cards);
       });
     });
   }
 
-  /*
+  public filterByCategoryAndSize(filters: string[], cards: Card[]): void {
+    const filteredArr: Card[] = [];
+    // пока тут цикл, так как пыталась работать с двумя видами фильтров
+    for (let i = 0; i < filters.length; i += 1) {
+      const temporaryCategoryArr = cards.filter((card) => filters[i] === card.category);
+      const temporarySizeArr = cards.filter((card) => filters[i] === card.size);
 
-  checkbox.addEventListener('click', (e) => {
-        const filters: HTMLElement[] = [];
+      filteredArr.push(...temporaryCategoryArr, ...temporarySizeArr);
 
-        console.log(e.target);
-        if (e.target && e.target instanceof HTMLInputElement) {
-          if (e.target.checked) {
-            filters.push(e.target);
-          }  else {
-            filters.filter((elem) => !elem);
-          }
-          if (e.target.dataset.filter) {
-            console.log(e.target.dataset.filter);
-          }
-        }
-        console.log(filters);
+      /* Код не срабатывает, так как у меня приходит либо один вид фильтров, либо второй.
+      Их не получчается объединить.
+      Работает полноценно либо только по размеру, либо по категории */
+    }
+
+    // если массив пустой делаем все карточки видимыми
+    if (filteredArr.length === 0) {
+      cards.forEach((card) => {
+        card.element.classList.add('visible');
+        card.element.classList.remove('hidden');
       });
-      */
-  /* if (el instanceof HTMLInputElement) {
-          if (el.checked) {
-            console.log(el);
-          }
-        } */
-  /*
-  /* if (el instanceof HTMLElement) {
-        el.addEventListener('click', (e) => {
-          console.log(e.target);
-        });
-      } */
-  /* if (checkbox instanceof HTMLInputElement) {
-        if (checkbox.checked) {
-          checkbox.addEventListener('click', (e) => {
-            console.log(checkbox, e.target);
-          });
-        }
-      } */
-
-  /* inputCheckbox.addEventListener('click', (e) => {
-      if (e && e.target && e.target instanceof HTMLInputElement) {
-        if (e.target.checked) {
-          console.log(`${e.target} is checked`);
-          if (e.target.dataset.filter) {
-            categoryFilter.push(e.target.dataset.filter);
-            console.log(categoryFilter);
-            categoryFilter.forEach((filter) => cards.filter((card) => filter === card.category));
-          }
-
-          // filter(e.target.dataset.filter, cardsContainer[]);
-        } else {
-          console.log(`${e.target} is unchecked`);
-        }
-      }
-      return categoryFilter;
-    }); */
+    } else {
+      // если не пустой, делаем видимыми только отфильтрованные
+      filteredArr.forEach((visibleCard) => {
+        visibleCard.element.classList.add('visible');
+        visibleCard.element.classList.remove('hidden');
+      });
+    }
+    // console.log(filteredArr);
+  }
 
   public renderInputRange(str: string): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str}`);

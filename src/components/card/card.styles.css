@@ -35,5 +35,8 @@
 }
 
 .visible {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  height: max-content;
 }
