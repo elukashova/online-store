@@ -37,14 +37,14 @@ export default class CardsField extends BaseComponent {
     const categoryFilter: Filter = new Filter(filtersContainer, 'Category', this.updateActiveFilters);
     let uniqueCategories = cardsData.products.map((item) => item.category);
     uniqueCategories = Array.from(new Set(uniqueCategories));
-    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category');
+    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category', this.cardsAll);
     filtersContainer.append(categoryNames);
 
     // фильтр по размеру
     const sizeFilter: Filter = new Filter(filtersContainer, 'Size', this.updateActiveFilters);
     let uniqueSize = cardsData.products.map((item) => item.size);
     uniqueSize = Array.from(new Set(uniqueSize));
-    const sizeNames: HTMLElement = sizeFilter.renderCheckbox(uniqueSize, 'size');
+    const sizeNames: HTMLElement = sizeFilter.renderCheckbox(uniqueSize, 'size', this.cardsAll);
     filtersContainer.append(sizeNames);
 
     // фильтр по цене
@@ -59,7 +59,6 @@ export default class CardsField extends BaseComponent {
 
     // объединение фильтров
     this.filtersAll.push(categoryFilter, sizeFilter, priceFilter, stockFilter);
-    console.log(this.activeFilters);
     /*
     this.filtersAll.forEach((filter) => this.listenInputCheck(this.cardsAll, filter.checkboxes)); */
 
@@ -74,67 +73,23 @@ export default class CardsField extends BaseComponent {
     });
   }
 
-  public updateActiveFilters(checkboxes: HTMLElement[]): void {
+  // пока не работает
+  public updateActiveFilters(checkboxes: HTMLElement[], filters: string[]): void {
     checkboxes.forEach((checkbox) => {
       checkbox.addEventListener('change', () => {
-        this.listenInputCheck(this.cardsAll, checkboxes);
-      });
-    });
-  }
-
-  public listenInputCheck(cards: Card[], checkboxes: HTMLElement[]): void {
-    const filters: string[] = [];
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener('click', (e) => {
-        // скрываем все карточки и обнуляем visible
-        cards.forEach((card) => {
-          card.element.classList.add('hidden');
-          card.element.classList.remove('visible');
-        });
-        // собираем массив checked фильтров или удаляем из него unchecked
-        if (e.target && e.target instanceof HTMLInputElement) {
-          if (e.target.checked) {
-            filters.push(e.target.id);
-          } else {
-            filters.splice(filters.indexOf(e.target.id), 1);
+        if (checkbox instanceof HTMLInputElement) {
+          for (let i = 0; i < filters.length; i += 1) {
+            console.log(checkbox.id, filters[i]);
+            if (checkbox.id === filters[i]) {
+              this.activeFilters.push(checkbox.id); // !this.activeFilters тут undefined
+            } else {
+              this.activeFilters.splice(this.activeFilters.indexOf(checkbox.id));
+            }
           }
         }
-        console.log(filters);
-        this.activeFilters = filters.slice();
-        this.filterByCategoryAndSize(filters, cards);
-        console.log(this.activeFilters);
       });
     });
-  }
-
-  public filterByCategoryAndSize(filters: string[], cards: Card[]): void {
-    const filteredArr: Card[] = [];
-    // пока тут цикл, так как пыталась работать с двумя видами фильтров
-    for (let i = 0; i < filters.length; i += 1) {
-      const temporaryCategoryArr = cards.filter((card) => filters[i] === card.category);
-      const temporarySizeArr = cards.filter((card) => filters[i] === card.size);
-
-      filteredArr.push(...temporaryCategoryArr, ...temporarySizeArr);
-
-      /* Код не срабатывает, так как у меня приходит либо один вид фильтров, либо второй.
-      Их не получчается объединить.
-      Работает полноценно либо только по размеру, либо по категории */
-    }
-
-    // если массив пустой делаем все карточки видимыми
-    if (filteredArr.length === 0) {
-      cards.forEach((card) => {
-        card.element.classList.add('visible');
-        card.element.classList.remove('hidden');
-      });
-    } else {
-      // если не пустой, делаем видимыми только отфильтрованные
-      filteredArr.forEach((visibleCard) => {
-        visibleCard.element.classList.add('visible');
-        visibleCard.element.classList.remove('hidden');
-      });
-    }
-    // console.log(filteredArr);
+    console.log(this.activeFilters);
   }
 
   /* функция обсервера, реагирующая на добавление карточек,

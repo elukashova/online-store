@@ -4,6 +4,8 @@ import cardsData from '../../assets/json/data';
 import findMinAndMaxPrice from './utils/find.minmax.price';
 import findMinAndMaxCount from './utils/find.minmax.stock';
 import RangeTypes from './enums.filter';
+import Card from '../card/card';
+import CardsField from '../cards-field/cards-field';
 
 export default class Filter {
   public checkboxes: HTMLElement[] = [];
@@ -11,10 +13,10 @@ export default class Filter {
   constructor(
     private readonly container: HTMLElement,
     private readonly name: string,
-    public updateActiveFilters: (checkboxes: HTMLElement[]) => void,
+    public updateActiveFilters: (checkboxes: HTMLElement[], filters: string[]) => void,
   ) {}
 
-  public renderCheckbox<T>(data: T[], str: string): HTMLElement {
+  public renderCheckbox<T>(data: T[], str: string, cards: Card[]): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str} ${str}`);
     rendered('legend', filterWrapper, `${str}__legend-1`, this.name);
     data.forEach((item, ind) => {
@@ -36,7 +38,57 @@ export default class Filter {
       rendered('span', inputWrapper, `${str}__out-of-${ind + 1}`, ' 1/5');
       this.checkboxes.push(inputElement);
     });
+    this.listenInputCheck(cards, this.checkboxes);
     return filterWrapper;
+  }
+
+  public listenInputCheck(cards: Card[], checkboxes: HTMLElement[]): void {
+    const filters: string[] = [];
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', (e) => {
+        // скрываем все карточки и обнуляем visible
+        cards.forEach((card) => {
+          card.element.classList.add('hidden');
+          card.element.classList.remove('visible');
+        });
+        // собираем массив checked фильтров или удаляем из него unchecked
+        if (e.target && e.target instanceof HTMLInputElement) {
+          if (e.target.checked) {
+            filters.push(e.target.id);
+          } else {
+            filters.splice(filters.indexOf(e.target.id), 1);
+          }
+        }
+        updateActiveFilters(checkboxes, filters);
+        this.filterByCategoryAndSize(filters, cards);
+      });
+    });
+  }
+
+  public filterByCategoryAndSize(filters: string[], cards: Card[]): void {
+    const filteredArr: Card[] = [];
+    // пока тут цикл, так как пыталась работать с двумя видами фильтров
+    for (let i = 0; i < filters.length; i += 1) {
+      const temporaryCategoryArr = cards.filter((card) => filters[i] === card.category);
+      const temporarySizeArr = cards.filter((card) => filters[i] === card.size);
+
+      filteredArr.push(...temporaryCategoryArr, ...temporarySizeArr);
+    }
+
+    // если массив пустой делаем все карточки видимыми
+    if (filteredArr.length === 0) {
+      cards.forEach((card) => {
+        card.element.classList.add('visible');
+        card.element.classList.remove('hidden');
+      });
+    } else {
+      // если не пустой, делаем видимыми только отфильтрованные
+      filteredArr.forEach((visibleCard) => {
+        visibleCard.element.classList.add('visible');
+        visibleCard.element.classList.remove('hidden');
+      });
+    }
+    // console.log(filteredArr);
   }
 
   public renderInputRange(str: string): HTMLElement {
