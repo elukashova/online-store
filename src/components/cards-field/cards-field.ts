@@ -41,25 +41,26 @@ export default class CardsField extends BaseComponent {
     filtersContainer.append(categoryNames);
 
     // фильтр по размеру
-    const sizeFilter: Filter = new Filter(filtersContainer, 'Size');
+    const sizeFilter: Filter = new Filter(filtersContainer, 'Size', this.updateActiveFilters);
     let uniqueSize = cardsData.products.map((item) => item.size);
     uniqueSize = Array.from(new Set(uniqueSize));
     const sizeNames: HTMLElement = sizeFilter.renderCheckbox(uniqueSize, 'size');
     filtersContainer.append(sizeNames);
 
     // фильтр по цене
-    const priceFilter: Filter = new Filter(filtersContainer, 'Price');
+    const priceFilter: Filter = new Filter(filtersContainer, 'Price', this.updateActiveFilters);
     const pricesTitles: HTMLElement = priceFilter.renderInputRange('price');
     filtersContainer.append(pricesTitles);
 
     // фильтр по стоку
-    const stockFilter: Filter = new Filter(filtersContainer, 'Stock');
+    const stockFilter: Filter = new Filter(filtersContainer, 'Stock', this.updateActiveFilters);
     const stockTitles: HTMLElement = stockFilter.renderInputRange('stock');
     filtersContainer.append(stockTitles);
 
     // объединение фильтров
     this.filtersAll.push(categoryFilter, sizeFilter, priceFilter, stockFilter);
-    /* console.log(this.filtersAll);
+    console.log(this.activeFilters);
+    /*
     this.filtersAll.forEach((filter) => this.listenInputCheck(this.cardsAll, filter.checkboxes)); */
 
     const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container');
@@ -97,8 +98,9 @@ export default class CardsField extends BaseComponent {
           } else {
             filters.splice(filters.indexOf(e.target.id), 1);
           }
-          this.activeFilters = filters.slice();
         }
+        console.log(filters);
+        this.activeFilters = filters.slice();
         this.filterByCategoryAndSize(filters, cards);
         console.log(this.activeFilters);
       });

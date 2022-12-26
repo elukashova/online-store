@@ -8,7 +8,11 @@ import RangeTypes from './enums.filter';
 export default class Filter {
   public checkboxes: HTMLElement[] = [];
 
-  constructor(private readonly container: HTMLElement, private readonly name: string) {}
+  constructor(
+    private readonly container: HTMLElement,
+    private readonly name: string,
+    public updateActiveFilters: (checkboxes: HTMLElement[]) => void,
+  ) {}
 
   public renderCheckbox<T>(data: T[], str: string): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str} ${str}`);
