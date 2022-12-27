@@ -24,6 +24,7 @@
   align-self: baseline;
 }
 
+
 .cart-items__info_items {
   display: flex;
   width: 20%;
@@ -37,9 +38,33 @@
   gap: 15%;
 }
 
+.info-items__number {
+  width: 3rem;
+  border-radius: 10%;
+  height: 1.5rem;
+  color: #65635F;
+  cursor: text;
+  text-align: center;
+}
+
+.info-items__number::placeholder {
+  color: #65635F;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.info-items__number:focus::placeholder {
+  color: white;
+}
+
 .info-pages__btn-left,
 .info-pages__btn-right {
   cursor: pointer;
+}
+
+.disabled {
+  cursor: default;
+  opacity: 30%;
 }
 
 .cart-items__item {

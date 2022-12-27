@@ -87,7 +87,7 @@ export default class CartCard extends BaseComponent {
     rendered('span', firstItemDescr, 'cart-item__description_category', this.category);
     rendered('span', firstItemDescr, 'cart-item__description_size', `Size ${this.size}`);
     rendered('span', firstItemDescr, 'cart-item__description_rating', `Rating: ${this.rating}`);
-    rendered('span', firstItemDescr, 'cart-item__description_price', `Price: ${this.price}`);
+    rendered('span', firstItemDescr, 'cart-item__description_price', `Price: $ ${this.price}`);
     rendered('span', firstItemDescr, 'cart-item__description_discount', `Discount: ${this.discount}`);
     rendered('p', firstItemDescr, 'cart-item__description_text', this.description);
 
@@ -96,7 +96,7 @@ export default class CartCard extends BaseComponent {
     const itemAmountContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__change-container');
     const changeAmountContainer: HTMLElement = rendered('div', itemAmountContainer, 'cart-amount__change-container');
     this.minusBtn = rendered('img', changeAmountContainer, 'cart-amount__btn-minus', '', {
-      src: '../../assets/icons/cart-icon__minus.svg',
+      src: '../../assets/icons/cart-btn__minus.svg',
     });
     this.minusBtn.addEventListener('click', this.minusBtnCallback);
     this.itemAmountElement = rendered(
@@ -106,7 +106,7 @@ export default class CartCard extends BaseComponent {
       `${this.cartItemInfo.itemAmount}`,
     );
     this.plusBtn = rendered('img', changeAmountContainer, 'cart-amount__btn-plus', '', {
-      src: '../../assets/icons/cart-icon__plus.svg',
+      src: '../../assets/icons/cart-btn__plus.svg',
     });
     this.plusBtn.addEventListener('click', this.plusBtnCallback);
     const stockAmountContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__stock-container');
@@ -134,8 +134,8 @@ export default class CartCard extends BaseComponent {
         this.itemAmountElement.textContent = `${this.cartItemInfo.itemAmount}`;
       }
       setDataToLocalStorage(this.cartItemInfo, `${this.id}`);
+      this.notifyObserver();
     }
-    this.notifyObserver();
   };
 
   private plusBtnCallback = (): void => {
