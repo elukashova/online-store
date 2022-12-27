@@ -207,35 +207,41 @@ export default class Cart extends BaseComponent {
   private itemsNumberInputCallback = (e: Event): void => {
     e.preventDefault();
     if (this.itemsPerPageElement && e.target instanceof HTMLInputElement) {
-      this.itemsNumberChange = true;
       // проверка, нужно ли реактивировать кнопки
       this.activateBothButtons();
       this.itemsPerPageElement.textContent = e.target.value;
       this.itemsPerPage = Number(e.target.value);
-      this.deleteCards();
-      this.pagesNumber = Math.ceil(this.addedItems.length / this.itemsPerPage);
-      // обновить нумерацию страниц и создать новые карточки
-      this.updatePageNumber();
-      this.startIdx = this.itemsPerPage * (this.currentPage - 1);
-      this.endIdx = this.startIdx + this.itemsPerPage;
-      if (this.currentPage === 1) {
-        this.startIdx = 0;
-        this.endIdx = this.startIdx + this.itemsPerPage;
-        this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
-        this.deactivateLeftButton();
-      } else if (this.currentPage === this.pagesNumber) {
-        this.createItemsCards(this.addedItems.slice(this.startIdx));
-        this.deactivateRightButton();
-      } else {
-        this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
-      }
+      this.updateAfterChange();
       // проверить, единственная ли у нас страница
-      if (this.itemsPerPage === this.addedItems.length) {
+      // eslint-disable-next-line max-len
+      if (this.itemsPerPage === this.addedItems.length || Number(e.target.value) > this.addedItems.length) {
         this.currentPage = 1;
         this.deactivateBothButtons();
       }
     }
   };
+
+  // повторяющийся код, который использую при пагинации и удалении
+  private updateAfterChange(): void {
+    this.itemsNumberChange = true;
+    this.deleteCards();
+    this.pagesNumber = Math.ceil(this.addedItems.length / this.itemsPerPage);
+    // обновить нумерацию страниц и создать новые карточки
+    this.updatePageNumber();
+    this.startIdx = this.itemsPerPage * (this.currentPage - 1);
+    this.endIdx = this.startIdx + this.itemsPerPage;
+    if (this.currentPage === 1) {
+      this.startIdx = 0;
+      this.endIdx = this.startIdx + this.itemsPerPage;
+      this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
+      this.deactivateLeftButton();
+    } else if (this.currentPage === this.pagesNumber) {
+      this.createItemsCards(this.addedItems.slice(this.startIdx));
+      this.deactivateRightButton();
+    } else {
+      this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
+    }
+  }
 
   // обновление номера страницы
   private updatePageNumber(): void {
@@ -314,6 +320,28 @@ export default class Cart extends BaseComponent {
     }
   }
 
+  // функция обсервера
+  public update(subject: ObservedSubject): void {
+    if (subject instanceof CartCard) {
+      if (subject.plus === true && subject.cartItemInfo.itemAmount <= subject.stock) {
+        this.totalPrice += subject.price;
+        this.cartItems += 1;
+        if (this.totalPriceElement && this.cartItemsElement) {
+          this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
+          this.cartItemsElement.textContent = `${this.cartItems}`;
+        }
+      } else if (subject.minus === true && subject.cartItemInfo.itemAmount >= 0) {
+        this.totalPrice -= subject.price;
+        this.cartItems -= 1;
+        if (this.totalPriceElement && this.cartItemsElement) {
+          this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
+          this.cartItemsElement.textContent = `${this.cartItems}`;
+        }
+        this.checkIfZero(subject);
+      }
+    }
+  }
+
   /* проверить, является ли количество одного продукта нулевым
   и последующее удаление */
   private checkIfZero(subject: ObservedSubject): void {
@@ -322,7 +350,7 @@ export default class Cart extends BaseComponent {
       const index = this.addedItems.indexOf(subject.id); // удаляю из массива добавленных в корзину
       this.addedItems.splice(index, 1);
       setDataToLocalStorage(this.addedItems); // обновляю инфу о добавленных в корзину
-      subject.element.remove(); // удаляю со страницы
+      this.updateAfterChange();
       // если у меня ноль товара на странице, надо вывести страницу пустой корзины
       if (this.addedItems.length === 0) {
         this.cartContainer?.remove();
@@ -344,27 +372,5 @@ export default class Cart extends BaseComponent {
     });
     rendered('span', this.element, 'cart__empty_title', 'Your cart is empty!');
     rendered('span', this.element, 'cart__empty_text', 'Looks like you have not added anything to your cart yet.');
-  }
-
-  // функция обсервера
-  public update(subject: ObservedSubject): void {
-    if (subject instanceof CartCard) {
-      if (subject.plus === true && subject.cartItemInfo.itemAmount <= subject.stock) {
-        this.totalPrice += subject.price;
-        this.cartItems += 1;
-        if (this.totalPriceElement && this.cartItemsElement) {
-          this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
-          this.cartItemsElement.textContent = `${this.cartItems}`;
-        }
-      } else if (subject.minus === true && subject.cartItemInfo.itemAmount >= 0) {
-        this.totalPrice -= subject.price;
-        this.cartItems -= 1;
-        if (this.totalPriceElement && this.cartItemsElement) {
-          this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
-          this.cartItemsElement.textContent = `${this.cartItems}`;
-        }
-        this.checkIfZero(subject);
-      }
-    }
   }
 }
