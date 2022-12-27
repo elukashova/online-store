@@ -235,6 +235,9 @@ export default class Cart extends BaseComponent {
       this.endIdx = this.startIdx + this.itemsPerPage;
       this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
       this.deactivateLeftButton();
+      if (this.pagesNumber === 1) {
+        this.deactivateRightButton();
+      }
     } else if (this.currentPage === this.pagesNumber) {
       this.createItemsCards(this.addedItems.slice(this.startIdx));
       this.deactivateRightButton();
