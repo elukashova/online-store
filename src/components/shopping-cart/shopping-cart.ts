@@ -51,10 +51,8 @@ export default class Cart extends BaseComponent {
   // булеан, который нужен для обновления порядкового номера при пролистывании назад
   private slideBack: boolean = false;
 
-  // для хранения невыведенных товаров за раз для пагинации
-  private addedItemsTempRight: number[] = [];
-
-  private addedItemsTempLeft: number[] = [];
+  // и для обновления количества товара на странице
+  private itemsNumberChange: boolean = false;
 
   constructor(public readonly header: Header) {
     super('div', 'cart-container cart');
@@ -102,8 +100,7 @@ export default class Cart extends BaseComponent {
       // передаем первые два товара на первую страницу пагинации
       this.createItemsCards(this.addedItems.slice(0, this.itemsPerPage));
       // активируем кнопку и добавляем листенер
-      this.updateBtnState(this.rightArrowBtn);
-      this.rightArrowBtn.addEventListener('click', this.rightBtnCallback);
+      this.activateRightButton();
     }
 
     // summary
@@ -141,10 +138,11 @@ export default class Cart extends BaseComponent {
     cardsData.products.forEach((data) => {
       for (let i: number = 0; i < array.length; i += 1) {
         if (data.id === array[i]) {
-          if (this.slideBack === true) {
+          if (this.slideBack === true || this.itemsNumberChange === true) {
             this.itemsOrder = this.addedItems.indexOf(array[0]);
           }
           this.slideBack = false;
+          this.itemsNumberChange = false;
           this.itemsOrder += 1;
           const card = new CartCard(data, this.itemsOrder);
           card.attachObserver(this.header);
@@ -164,10 +162,7 @@ export default class Cart extends BaseComponent {
     this.currentPage += 1;
     this.updatePageNumber();
     // активируем левую кнопку и вешаем слушатель
-    if (this.leftArrowBtn?.classList.contains('disabled')) {
-      this.updateBtnState(this.leftArrowBtn);
-      this.leftArrowBtn.addEventListener('click', this.leftBtnCallback);
-    }
+    this.activateLeftButton();
     // удаляем старые карточки
     this.deleteCards();
     // проверяем количнство следующих карточек
@@ -176,8 +171,7 @@ export default class Cart extends BaseComponent {
     if (this.addedItems.slice(this.startIdx).length <= this.itemsPerPage) {
       this.createItemsCards(this.addedItems.slice(this.startIdx));
       if (this.currentPage === this.pagesNumber && this.rightArrowBtn) {
-        this.updateBtnState(this.rightArrowBtn);
-        this.rightArrowBtn.removeEventListener('click', this.rightBtnCallback);
+        this.deactivateRightButton();
       }
     } else {
       this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
@@ -204,8 +198,7 @@ export default class Cart extends BaseComponent {
     this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
     if (this.currentPage === 1) {
       if (this.leftArrowBtn) {
-        this.updateBtnState(this.leftArrowBtn);
-        this.leftArrowBtn.removeEventListener('click', this.leftBtnCallback);
+        this.deactivateLeftButton();
       }
     }
   };
@@ -214,30 +207,97 @@ export default class Cart extends BaseComponent {
   private itemsNumberInputCallback = (e: Event): void => {
     e.preventDefault();
     if (this.itemsPerPageElement && e.target instanceof HTMLInputElement) {
+      this.itemsNumberChange = true;
+      // проверка, нужно ли реактивировать кнопки
+      this.activateBothButtons();
       this.itemsPerPageElement.textContent = e.target.value;
       this.itemsPerPage = Number(e.target.value);
       this.deleteCards();
-      this.itemsOrder = 0;
       this.pagesNumber = Math.ceil(this.addedItems.length / this.itemsPerPage);
-      this.createItemsCards(this.addedItems.slice(0, this.itemsPerPage));
+      // обновить нумерацию страниц и создать новые карточки
+      this.updatePageNumber();
+      this.startIdx = this.itemsPerPage * (this.currentPage - 1);
+      this.endIdx = this.startIdx + this.itemsPerPage;
+      if (this.currentPage === 1) {
+        this.startIdx = 0;
+        this.endIdx = this.startIdx + this.itemsPerPage;
+        this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
+        this.deactivateLeftButton();
+      } else if (this.currentPage === this.pagesNumber) {
+        this.createItemsCards(this.addedItems.slice(this.startIdx));
+        this.deactivateRightButton();
+      } else {
+        this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
+      }
+      // проверить, единственная ли у нас страница
       if (this.itemsPerPage === this.addedItems.length) {
         this.currentPage = 1;
-        if (this.leftArrowBtn && !this.leftArrowBtn.classList.contains('disabled')) {
-          this.updateBtnState(this.leftArrowBtn);
-          this.leftArrowBtn.removeEventListener('click', this.leftBtnCallback);
-        }
-        if (this.rightArrowBtn && !this.rightArrowBtn.classList.contains('disabled')) {
-          this.updateBtnState(this.rightArrowBtn);
-          this.rightArrowBtn.removeEventListener('click', this.rightBtnCallback);
-        }
+        this.deactivateBothButtons();
       }
     }
   };
 
-  // обновление номера страницы для пагинации
+  // обновление номера страницы
   private updatePageNumber(): void {
     if (this.currentPageElement) {
-      this.currentPageElement.textContent = `${this.currentPage}`;
+      // если я нахожусь на странице, которая превышает возможное кол-во страниц (пагинация)
+      if (this.currentPage > this.pagesNumber) {
+        this.currentPage = this.pagesNumber;
+        this.currentPageElement.textContent = `${this.pagesNumber}`;
+        if (this.rightArrowBtn) {
+          this.deactivateRightButton();
+        }
+      } else {
+        this.currentPageElement.textContent = `${this.currentPage}`;
+      }
+    }
+  }
+
+  // разные функции активации и деактивации кнопок
+  private deactivateBothButtons(): void {
+    this.deactivateLeftButton();
+    this.deactivateRightButton();
+  }
+
+  private deactivateLeftButton(): void {
+    if (this.leftArrowBtn && !this.leftArrowBtn.classList.contains('disabled')) {
+      this.updateBtnState(this.leftArrowBtn);
+      this.leftArrowBtn.removeEventListener('click', this.leftBtnCallback);
+    }
+  }
+
+  private deactivateRightButton(): void {
+    if (this.rightArrowBtn && !this.rightArrowBtn.classList.contains('disabled')) {
+      this.updateBtnState(this.rightArrowBtn);
+      this.rightArrowBtn.removeEventListener('click', this.rightBtnCallback);
+    }
+  }
+
+  private activateBothButtons(): void {
+    this.activateLeftButton();
+    this.activateRightButton();
+  }
+
+  private activateLeftButton(): void {
+    if (this.leftArrowBtn && this.leftArrowBtn.classList.contains('disabled')) {
+      this.updateBtnState(this.leftArrowBtn);
+      this.leftArrowBtn.addEventListener('click', this.leftBtnCallback);
+    }
+  }
+
+  private activateRightButton(): void {
+    if (this.rightArrowBtn && this.rightArrowBtn.classList.contains('disabled')) {
+      this.updateBtnState(this.rightArrowBtn);
+      this.rightArrowBtn.addEventListener('click', this.rightBtnCallback);
+    }
+  }
+
+  // активируем и деактивирем кнопки (класс)
+  private updateBtnState(btn: HTMLElement): void {
+    if (btn && btn.classList.contains('disabled')) {
+      btn.classList.remove('disabled');
+    } else if (btn && !btn.classList.contains('disabled')) {
+      btn.classList.add('disabled');
     }
   }
 
@@ -251,15 +311,6 @@ export default class Cart extends BaseComponent {
           idx -= 1;
         }
       }
-    }
-  }
-
-  // активируем и деактивирем кноки
-  private updateBtnState(btn: HTMLElement): void {
-    if (btn && btn.classList.contains('disabled')) {
-      btn.classList.remove('disabled');
-    } else if (btn && !btn.classList.contains('disabled')) {
-      btn.classList.add('disabled');
     }
   }
 
@@ -277,6 +328,7 @@ export default class Cart extends BaseComponent {
         this.cartContainer?.remove();
         this.summaryContainer?.remove();
         this.showEmptyCart();
+        localStorage.removeItem('addedItems');
       }
     }
   }
