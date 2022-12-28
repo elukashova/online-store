@@ -101,7 +101,6 @@ export default class Cart extends BaseComponent {
     }
   }
 
-  // eslint-disable-next-line max-lines-per-function
   public render(): void {
     // items block
     this.cartContainer = rendered('div', this.element, 'cart__items_container cart-items');
@@ -185,7 +184,6 @@ export default class Cart extends BaseComponent {
   }
 
   // колбэк для правой стрелки (пагинация)
-  // eslint-disable-next-line max-lines-per-function
   private rightBtnCallback = (e: Event): void => {
     this.slideBack = false;
     e.preventDefault();
