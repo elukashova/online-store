@@ -8,7 +8,7 @@ import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/loca
 import { JsonObj } from '../../utils/localStorage.types';
 import cardsData from '../../assets/json/data';
 import { ObservedSubject } from '../card/card.types';
-// import { ItemInfoType } from './shopping-cart.types';
+import { PromoInputs, PromoValues } from './shopping-cart.types';
 
 export default class Cart extends BaseComponent {
   private storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
@@ -36,6 +36,14 @@ export default class Cart extends BaseComponent {
   private currentPageElement: HTMLElement | null = null;
 
   private itemsPerPageElement: HTMLElement | null = null;
+
+  private promocodeContainer: HTMLElement | null = null;
+
+  private promoInputElement: HTMLElement | null = null;
+
+  private promoApplyWrapper: HTMLElement | null = null;
+
+  private activePromosElement: HTMLElement | null = null;
 
   private itemsPerPage: number = 2;
 
@@ -120,15 +128,18 @@ export default class Cart extends BaseComponent {
     );
     rendered('span', totalSumContainer, 'cart-total-sum__text', 'Total:');
     this.totalPriceElement = rendered('span', totalSumContainer, 'cart-total-sum__num', `$ ${this.totalPrice}`);
-    const promocodeContainer: HTMLElement = rendered(
-      'div',
-      this.summaryContainer,
-      'cart-summary__promocode cart-promocode',
-    );
-    rendered('input', promocodeContainer, 'cart-promocode__input', '', {
+    this.promocodeContainer = rendered('div', this.summaryContainer, 'cart-summary__promocode cart-promocode');
+    this.promoInputElement = rendered('input', this.promocodeContainer, 'cart-promocode__input', '', {
       type: 'search',
       placeholder: 'Enter promo code',
     });
+    this.promoInputElement.addEventListener('input', this.promocodeInputCallback);
+    this.activePromosElement = rendered(
+      'p',
+      this.promocodeContainer,
+      'cart-promocode__active-codes',
+      "Active promocodes: 'BEHAPPY', 'SMILE'",
+    );
     rendered('div', this.summaryContainer, 'cart-total-sum__line');
     rendered('button', this.summaryContainer, 'cart-total-sum__buy-btn', 'buy now');
   }
@@ -220,6 +231,42 @@ export default class Cart extends BaseComponent {
       }
     }
   };
+
+  // колбэк для промокода
+  private promocodeInputCallback = (e: Event): void => {
+    e.preventDefault();
+    if (this.activePromosElement && e.target instanceof HTMLInputElement) {
+      const { value } = e.target;
+      if (value === PromoInputs.behappy || value === PromoInputs.smile) {
+        const key: number = this.choosePromoValue(value);
+        this.promoApplyWrapper = document.createElement('div');
+        this.promoApplyWrapper.classList.add('cart-promocode__code-apply_wrapper');
+        rendered('span', this.promoApplyWrapper, 'cart-promocode__code-apply_text', `${value} - ${key} %`);
+        // const applyPromoBtn: HTMLElement =
+        rendered('button', this.promoApplyWrapper, 'cart-promocode__code-apply_btn', 'apply');
+        let parent: ParentNode | null = null;
+        if (this.activePromosElement.parentNode) {
+          parent = this.activePromosElement.parentNode;
+          parent?.insertBefore(this.promoApplyWrapper, this.activePromosElement);
+        }
+      } else if (this.promoApplyWrapper) {
+        if (this.promoApplyWrapper.parentElement === this.promocodeContainer) {
+          this.promocodeContainer?.removeChild(this.promoApplyWrapper);
+        }
+      }
+    }
+  };
+
+  // выбрать нужное значение промокода
+  private choosePromoValue(value: string): number {
+    let result: number;
+    if (value === PromoInputs.behappy) {
+      result = PromoValues.behappy;
+    } else {
+      result = PromoValues.smile;
+    }
+    return result;
+  }
 
   // повторяющийся код, который использую при пагинации и удалении
   private updateAfterChange(): void {
