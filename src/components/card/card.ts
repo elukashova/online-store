@@ -1,6 +1,6 @@
 import './card.styles.css';
 import rendered from '../../utils/render/render';
-import { CardData, Observer } from './card.types';
+import { CardDataType, Observer } from './card.types';
 import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
 import { JsonObj } from '../../utils/localStorage.types';
@@ -36,7 +36,7 @@ export default class Card extends BaseComponent {
 
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
 
-  constructor(data: CardData) {
+  constructor(data: CardDataType) {
     super('div', 'cards__item card');
     this.id = data.id;
     this.title = data.title;

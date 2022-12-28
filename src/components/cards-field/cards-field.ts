@@ -71,7 +71,6 @@ export default class CardsField extends BaseComponent {
   public update(subject: ObservedSubject): void {
     if (subject instanceof Card && subject.element.classList.contains('added')) {
       this.addedItems.push(subject.id);
-      console.log(this.addedItems);
       setDataToLocalStorage(this.addedItems);
     }
 
