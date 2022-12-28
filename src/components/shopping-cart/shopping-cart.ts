@@ -263,12 +263,7 @@ export default class Cart extends BaseComponent {
       }
       if (value === PromoInputs.behappy || value === PromoInputs.smile) {
         const key: number = this.choosePromoValue(value);
-        this.promoApplyWrapper = this.createAplyOrDropPromoBlock(value, key, 'apply');
-        let parent: ParentNode | null = null;
-        if (this.currentPromosElement.parentNode) {
-          parent = this.currentPromosElement.parentNode;
-          parent?.insertBefore(this.promoApplyWrapper, this.currentPromosElement);
-        }
+        this.createApplyBlock(value, key);
       }
     }
   };
@@ -286,8 +281,17 @@ export default class Cart extends BaseComponent {
     return result;
   }
 
+  // подвешивание блок apply, с кнопкой и без
+  private createApplyBlock(value: string, key: number): void {
+    this.promoApplyWrapper = this.createAplyOrDropPromoBlock(value, key, 'apply');
+    if (this.currentPromosElement && this.currentPromosElement.parentNode) {
+      const parent: ParentNode | null = this.currentPromosElement.parentNode;
+      parent.insertBefore(this.promoApplyWrapper, this.currentPromosElement);
+    }
+  }
+
   // создание блока для применения или сброса прокомода
-  private createAplyOrDropPromoBlock(value: string, key: number, action: string): HTMLElement {
+  private createAplyOrDropPromoBlock(value: string, key: number, action?: string): HTMLElement {
     const newBlock: HTMLElement = document.createElement('div');
     newBlock.classList.add(`cart-promocode__code-${action}_wrapper`);
     rendered('span', newBlock, `cart-promocode__code-${action}_text`, `Promo ${value} - ${key} %`);
@@ -309,9 +313,14 @@ export default class Cart extends BaseComponent {
     this.deletePromoApplyBlock();
     // данные для создания блока с drop
     const value: string | null = this.currentPromoName ? this.currentPromoName : '';
-    this.appliedPromos.push(value);
-    this.afterPromoPrice = this.calculateNewPrice();
     const key: number | null = value ? this.choosePromoValue(value) : null;
+    // сохраняем инфо о премененном коде
+    this.appliedPromos.push(value);
+    // оставляем описание промо под input, но без кнопки
+    if (value && key) {
+      this.createApplyBlock(value, key);
+    }
+    this.afterPromoPrice = this.calculateNewPrice();
     if (this.totalSumContainer && key && value) {
       // запоминаем будущего родителя новых элементов
       const parent: ParentNode | null = this.totalSumContainer.parentNode;
@@ -339,7 +348,6 @@ export default class Cart extends BaseComponent {
           parent.insertBefore(this.afterPromoPriceContainer, this.promocodeContainer);
           parent.insertBefore(this.appliedPromosElement, this.promocodeContainer);
         }
-        // запоминаем, что одно промо уже применено
       } else if (this.newPriceElement) {
         this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
       }
@@ -378,6 +386,14 @@ export default class Cart extends BaseComponent {
           parent.removeChild(this.afterPromoPriceContainer);
           parent.removeChild(this.appliedPromosElement);
           this.totalSumContainer.classList.remove('old-price');
+        }
+      }
+      // если в поле осталось название дропнутого промо, надо вывести кнопку apply
+      if (this.promoInputElement && this.promoInputElement instanceof HTMLInputElement) {
+        if (promo && this.promoInputElement.value === promo) {
+          this.deletePromoApplyBlock();
+          const key: number = this.choosePromoValue(promo);
+          this.createApplyBlock(promo, key);
         }
       }
     }
