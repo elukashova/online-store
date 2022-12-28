@@ -535,12 +535,20 @@ export default class Cart extends BaseComponent {
           this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
           this.cartItemsElement.textContent = `${this.cartItems}`;
         }
+        if (this.newPriceElement) {
+          this.afterPromoPrice = this.calculateNewPrice();
+          this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
+        }
       } else if (subject.minus === true && subject.cartItemInfo.itemAmount >= 0) {
         this.totalPrice -= subject.price;
         this.cartItems -= 1;
         if (this.totalPriceElement && this.cartItemsElement) {
           this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
           this.cartItemsElement.textContent = `${this.cartItems}`;
+        }
+        if (this.newPriceElement) {
+          this.afterPromoPrice = this.calculateNewPrice();
+          this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
         }
         this.checkIfZero(subject);
       }
