@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import './cards-field.styles.css';
 import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
@@ -13,9 +12,9 @@ import { JsonObj } from '../../utils/localStorage.types';
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = [];
 
-  public filtersAll: Filter[] = [];
-
   public activeFilters: string[] = [];
+
+  public visibleCards: Card[] = [];
 
   public addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
 
@@ -37,14 +36,14 @@ export default class CardsField extends BaseComponent {
     const categoryFilter: Filter = new Filter(filtersContainer, 'Category', this.updateActiveFilters);
     let uniqueCategories = cardsData.products.map((item) => item.category);
     uniqueCategories = Array.from(new Set(uniqueCategories));
-    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category', this.cardsAll);
+    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category' /* this.cardsAll */);
     filtersContainer.append(categoryNames);
 
     // фильтр по размеру
     const sizeFilter: Filter = new Filter(filtersContainer, 'Size', this.updateActiveFilters);
     let uniqueSize = cardsData.products.map((item) => item.size);
     uniqueSize = Array.from(new Set(uniqueSize));
-    const sizeNames: HTMLElement = sizeFilter.renderCheckbox(uniqueSize, 'size', this.cardsAll);
+    const sizeNames: HTMLElement = sizeFilter.renderCheckbox(uniqueSize, 'size' /* this.cardsAll */);
     filtersContainer.append(sizeNames);
 
     // фильтр по цене
@@ -57,11 +56,6 @@ export default class CardsField extends BaseComponent {
     const stockTitles: HTMLElement = stockFilter.renderInputRange('stock');
     filtersContainer.append(stockTitles);
 
-    // объединение фильтров
-    this.filtersAll.push(categoryFilter, sizeFilter, priceFilter, stockFilter);
-    /*
-    this.filtersAll.forEach((filter) => this.listenInputCheck(this.cardsAll, filter.checkboxes)); */
-
     const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container');
 
     cardsData.products.forEach((data) => {
@@ -73,24 +67,72 @@ export default class CardsField extends BaseComponent {
     });
   }
 
-  // пока не работает
-  public updateActiveFilters(checkboxes: HTMLElement[], filters: string[]): void {
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', () => {
-        if (checkbox instanceof HTMLInputElement) {
-          for (let i = 0; i < filters.length; i += 1) {
-            console.log(checkbox.id, filters[i]);
-            if (checkbox.id === filters[i]) {
-              this.activeFilters.push(checkbox.id); // !this.activeFilters тут undefined
-            } else {
-              this.activeFilters.splice(this.activeFilters.indexOf(checkbox.id));
-            }
-          }
-        }
-      });
-    });
+  // функция апдейта активных фильтров
+  public updateActiveFilters = (filter: string): void => {
+    if (this.activeFilters.includes(filter)) {
+      this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
+    } else if (filter.split(',')[0] === 'Price') {
+      const prevPrice = this.activeFilters.find((elem) => elem.startsWith(filter.split(',')[0]));
+      if (prevPrice !== undefined) {
+        this.activeFilters.splice(this.activeFilters.indexOf(prevPrice), 1, filter);
+      } else {
+        this.activeFilters.push(filter);
+      }
+    } else if (filter.split(',')[0] === 'Count') {
+      console.log('Count active');
+      const prevCount = this.activeFilters.find((elem) => elem.startsWith(filter.split(',')[0]));
+      if (prevCount !== undefined) {
+        this.activeFilters.splice(this.activeFilters.indexOf(prevCount), 1, filter);
+      } else {
+        this.activeFilters.push(filter);
+      }
+    } else if (!this.activeFilters.includes(filter)) {
+      this.activeFilters.push(filter);
+    }
     console.log(this.activeFilters);
+    this.filterByCategoryAndSize(this.activeFilters, this.cardsAll);
+  };
+
+  /*  public filtersAll(activeFilters: string[], cards: Card[]): void {
+    this.filterByCategoryAndSize(activeFilters, cards);
+    this.filterByPriceAndCount(activeFilters, cards);
+  } */
+
+  public filterByCategoryAndSize(activeFilters: string[], cards: Card[]): void {
+    cards.forEach((card) => {
+      if (activeFilters.length === 0) {
+        // если массив пустой делаем все карточки видимыми
+        card.element.classList.add('visible');
+        card.element.classList.remove('hidden');
+      } else {
+        card.element.classList.add('hidden');
+        card.element.classList.remove('visible');
+      }
+    });
+    let filtredBySize: Card[] = [];
+    let filtredByCategory: Card[] = [];
+    /*     let filtredByPrice: Card[] = [];
+    let filtredByCount: Card[] = []; */
+    // eslint-disable-next-line max-len
+    filtredBySize = cards.filter((card) => activeFilters.some((filter) => card.size.includes(filter)));
+    // eslint-disable-next-line max-len
+    filtredByCategory = cards.filter((card) => activeFilters.some((filter) => card.category.includes(filter)));
+
+    if (filtredBySize.length > 0 && filtredByCategory.length > 0) {
+      // eslint-disable-next-line max-len
+      this.visibleCards = [...filtredBySize.filter((item) => filtredByCategory.indexOf(item) !== -1)];
+    } else if (filtredBySize.length > 0 && filtredByCategory.length === 0) {
+      this.visibleCards = [...filtredBySize];
+    } else if (filtredBySize.length === 0 && filtredByCategory.length > 0) {
+      this.visibleCards = [...filtredByCategory];
+    }
+    this.visibleCards.forEach((visibleCard) => {
+      visibleCard.element.classList.add('visible');
+      visibleCard.element.classList.remove('hidden');
+    });
   }
+
+  /* public filterByPriceAndCount(activeFilters: string[], cards: Card[]): void {} */
 
   /* функция обсервера, реагирующая на добавление карточек,
     чтобы сохранять добавленные товары в local storage */

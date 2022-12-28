@@ -4,8 +4,6 @@ import cardsData from '../../assets/json/data';
 import findMinAndMaxPrice from './utils/find.minmax.price';
 import findMinAndMaxCount from './utils/find.minmax.stock';
 import RangeTypes from './enums.filter';
-import Card from '../card/card';
-import CardsField from '../cards-field/cards-field';
 
 export default class Filter {
   public checkboxes: HTMLElement[] = [];
@@ -13,10 +11,10 @@ export default class Filter {
   constructor(
     private readonly container: HTMLElement,
     private readonly name: string,
-    public updateActiveFilters: (checkboxes: HTMLElement[], filters: string[]) => void,
+    public updateActiveFilters: (elem: string) => void,
   ) {}
 
-  public renderCheckbox<T>(data: T[], str: string, cards: Card[]): HTMLElement {
+  public renderCheckbox(data: string[], str: string /* , cards: Card[] */): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str} ${str}`);
     rendered('legend', filterWrapper, `${str}__legend-1`, this.name);
     data.forEach((item, ind) => {
@@ -32,65 +30,17 @@ export default class Filter {
           name: `${str}`,
         },
       );
+      inputElement.addEventListener('change', () => this.updateActiveFilters(item)); // устанавливаем слушатель на инпут при создании и передаем в cardfields значение id любого измененного чекбокса
       rendered('label', inputWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${str}-${ind + 1}`,
       });
       rendered('span', inputWrapper, `${str}__out-of-${ind + 1}`, ' 1/5');
       this.checkboxes.push(inputElement);
     });
-    this.listenInputCheck(cards, this.checkboxes);
     return filterWrapper;
   }
 
-  public listenInputCheck(cards: Card[], checkboxes: HTMLElement[]): void {
-    const filters: string[] = [];
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', (e) => {
-        // скрываем все карточки и обнуляем visible
-        cards.forEach((card) => {
-          card.element.classList.add('hidden');
-          card.element.classList.remove('visible');
-        });
-        // собираем массив checked фильтров или удаляем из него unchecked
-        if (e.target && e.target instanceof HTMLInputElement) {
-          if (e.target.checked) {
-            filters.push(e.target.id);
-          } else {
-            filters.splice(filters.indexOf(e.target.id), 1);
-          }
-        }
-        updateActiveFilters(checkboxes, filters);
-        this.filterByCategoryAndSize(filters, cards);
-      });
-    });
-  }
-
-  public filterByCategoryAndSize(filters: string[], cards: Card[]): void {
-    const filteredArr: Card[] = [];
-    // пока тут цикл, так как пыталась работать с двумя видами фильтров
-    for (let i = 0; i < filters.length; i += 1) {
-      const temporaryCategoryArr = cards.filter((card) => filters[i] === card.category);
-      const temporarySizeArr = cards.filter((card) => filters[i] === card.size);
-
-      filteredArr.push(...temporaryCategoryArr, ...temporarySizeArr);
-    }
-
-    // если массив пустой делаем все карточки видимыми
-    if (filteredArr.length === 0) {
-      cards.forEach((card) => {
-        card.element.classList.add('visible');
-        card.element.classList.remove('hidden');
-      });
-    } else {
-      // если не пустой, делаем видимыми только отфильтрованные
-      filteredArr.forEach((visibleCard) => {
-        visibleCard.element.classList.add('visible');
-        visibleCard.element.classList.remove('hidden');
-      });
-    }
-    // console.log(filteredArr);
-  }
-
+  // eslint-disable-next-line max-lines-per-function
   public renderInputRange(str: string): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str}`);
     rendered('legend', filterWrapper, `filters__${str}_legend`, this.name);
@@ -124,26 +74,41 @@ export default class Filter {
       value: maxValue,
     });
     this.changeInputRange(lowestInput, highestInput); // вешаем функцию слушатель
+
     return filterWrapper;
   }
 
   public changeInputRange(lowestInput: HTMLElement, highestInput: HTMLElement): void {
-    lowestInput.addEventListener('input', (e) => {
-      if (e.target === document.getElementById('from-price')) {
-        this.changeLowInput(lowestInput, highestInput, RangeTypes.PriceFrom);
-      }
-      if (e.target === document.getElementById('from-stock')) {
-        this.changeLowInput(lowestInput, highestInput, RangeTypes.StockFrom);
-      }
+    if (lowestInput instanceof HTMLInputElement && highestInput instanceof HTMLInputElement) {
+      lowestInput.addEventListener('input', (e) => {
+        if (e.target === document.getElementById('from-price')) {
+          this.changeLowInput(lowestInput, highestInput, RangeTypes.PriceFrom);
+          this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
+        }
+        if (e.target === document.getElementById('from-stock')) {
+          this.changeLowInput(lowestInput, highestInput, RangeTypes.StockFrom);
+          this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+        }
+      });
+      highestInput.addEventListener('input', (e) => {
+        if (e.target === document.getElementById('to-price')) {
+          this.changeHighInput(lowestInput, highestInput, RangeTypes.PriceTo);
+          this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
+        }
+        if (e.target === document.getElementById('to-stock')) {
+          this.changeHighInput(lowestInput, highestInput, RangeTypes.StockTo);
+          this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+        }
+      });
+    }
+
+    /* lowestInput.addEventListener('change', () => {
+      str === 'price'
+        ? this.updateActiveFilters(`Price, ${minValue}, ${maxValue}`)
+        : this.updateActiveFilters(`Count, ${minValue}, ${maxValue}`);
     });
-    highestInput.addEventListener('input', (e) => {
-      if (e.target === document.getElementById('to-price')) {
-        this.changeHighInput(lowestInput, highestInput, RangeTypes.PriceTo);
-      }
-      if (e.target === document.getElementById('to-stock')) {
-        this.changeHighInput(lowestInput, highestInput, RangeTypes.StockTo);
-      }
-    });
+    highestInput.addEventListener('change', () =>
+    this.updateActiveFilters(`Price, ${minValue}, ${maxValue}`)); */
   }
 
   public changeLowInput(lowestInput: HTMLElement, highestInput: HTMLElement, id: string): void {
