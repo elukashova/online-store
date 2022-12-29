@@ -1,3 +1,6 @@
+/* eslint-disable max-lines-per-function */
+/* eslint-disable max-len */
+
 import './cards-field.styles.css';
 import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
@@ -16,6 +19,8 @@ export default class CardsField extends BaseComponent {
 
   public visibleCards: Card[] = [];
 
+  /* private cardsContainer: HTMLElement; */
+
   public addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
 
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
@@ -29,35 +34,36 @@ export default class CardsField extends BaseComponent {
   public render(): void {
     const filtersContainer: HTMLElement = rendered('form', this.element, 'filters__container filters');
     const buttonsContainer: HTMLElement = rendered('div', filtersContainer, 'filters__btns-wrapper');
-    rendered('button', buttonsContainer, 'filters__btn-reset', 'Reset filters');
+    const reset = rendered('button', buttonsContainer, 'filters__btn-reset', 'Reset filters');
+    reset.addEventListener('click', this.resetFilters);
     rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
-
     // фильтр по категории
     const categoryFilter: Filter = new Filter(filtersContainer, 'Category', this.updateActiveFilters);
     let uniqueCategories = cardsData.products.map((item) => item.category);
     uniqueCategories = Array.from(new Set(uniqueCategories));
-    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category' /* this.cardsAll */);
+    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category');
     filtersContainer.append(categoryNames);
-
     // фильтр по размеру
     const sizeFilter: Filter = new Filter(filtersContainer, 'Size', this.updateActiveFilters);
     let uniqueSize = cardsData.products.map((item) => item.size);
     uniqueSize = Array.from(new Set(uniqueSize));
-    const sizeNames: HTMLElement = sizeFilter.renderCheckbox(uniqueSize, 'size' /* this.cardsAll */);
+    const sizeNames: HTMLElement = sizeFilter.renderCheckbox(uniqueSize, 'size');
     filtersContainer.append(sizeNames);
-
     // фильтр по цене
     const priceFilter: Filter = new Filter(filtersContainer, 'Price', this.updateActiveFilters);
     const pricesTitles: HTMLElement = priceFilter.renderInputRange('price');
     filtersContainer.append(pricesTitles);
-
     // фильтр по стоку
     const stockFilter: Filter = new Filter(filtersContainer, 'Stock', this.updateActiveFilters);
     const stockTitles: HTMLElement = stockFilter.renderInputRange('stock');
     filtersContainer.append(stockTitles);
 
-    const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container');
-
+    const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container', '', {
+      id: 'cards__container',
+    });
+    rendered('p', cardsContainer, 'cards__not-found hidden', 'Product not found', {
+      id: 'cards__not-found',
+    });
     cardsData.products.forEach((data) => {
       const card: Card = new Card(data);
       card.attachObserver(this.header);
@@ -66,6 +72,12 @@ export default class CardsField extends BaseComponent {
       cardsContainer.append(card.element);
     });
   }
+
+  // функция reset фильтров
+  public resetFilters = (): void => {
+    this.activeFilters = [];
+    this.filterByCategoryAndSize(this.activeFilters, this.cardsAll);
+  };
 
   // функция апдейта активных фильтров
   public updateActiveFilters = (filter: string): void => {
@@ -79,7 +91,6 @@ export default class CardsField extends BaseComponent {
         this.activeFilters.push(filter);
       }
     } else if (filter.split(',')[0] === 'Count') {
-      console.log('Count active');
       const prevCount = this.activeFilters.find((elem) => elem.startsWith(filter.split(',')[0]));
       if (prevCount !== undefined) {
         this.activeFilters.splice(this.activeFilters.indexOf(prevCount), 1, filter);
@@ -89,16 +100,88 @@ export default class CardsField extends BaseComponent {
     } else if (!this.activeFilters.includes(filter)) {
       this.activeFilters.push(filter);
     }
-    console.log(this.activeFilters);
     this.filterByCategoryAndSize(this.activeFilters, this.cardsAll);
   };
 
-  /*  public filtersAll(activeFilters: string[], cards: Card[]): void {
-    this.filterByCategoryAndSize(activeFilters, cards);
-    this.filterByPriceAndCount(activeFilters, cards);
-  } */
-
+  // eslint-disable-next-line max-lines-per-function
   public filterByCategoryAndSize(activeFilters: string[], cards: Card[]): void {
+    this.resetClasses(activeFilters, cards);
+    this.visibleCards.length = 0;
+    const [priceFrom, priceTo] = this.checkPrice(activeFilters);
+    const [countFrom, countTo] = this.checkCount(activeFilters);
+
+    const bySize: Card[] = cards.filter((card) => activeFilters.some((filter) => card.size.includes(filter)));
+    const byCategory: Card[] = cards.filter((card) => activeFilters.some((filter) => card.category.includes(filter)));
+    const byPrice: Card[] = cards.filter((card) => card.price >= priceFrom && card.price <= priceTo);
+    const byCount: Card[] = cards.filter((card) => card.stock >= countFrom && card.stock <= countTo);
+    this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount);
+    const notFoundText = document.getElementById('cards__not-found');
+    if (this.visibleCards.length === 0 && this.activeFilters.length !== 0) {
+      if (notFoundText) {
+        notFoundText.classList.add('visible');
+        notFoundText.classList.remove('hidden');
+        this.cardsAll.forEach((card) => {
+          card.element.classList.add('hidden');
+          card.element.classList.remove('visible');
+        });
+      }
+    } else {
+      this.visibleCards.forEach((visibleCard) => {
+        if (notFoundText) {
+          notFoundText.classList.add('hidden');
+          notFoundText.classList.remove('visible');
+        }
+        visibleCard.element.classList.add('visible');
+        visibleCard.element.classList.remove('hidden');
+      });
+    }
+  }
+
+  // функция принимает отфильтрованные значения категории, размера, цены и остатка на складе в виде массивов карточек,
+  // проверяет, что массивы не пустые и в зависимости от этого фильтрует товары,
+  // исключая те, которые не подходят по всем активным фильтрам.
+  public filterArrays(arr1?: Card[], arr2?: Card[], arr3?: Card[], arr4?: Card[]): Card[] {
+    let arrays: Card[][] = [];
+    arrays.length = 0;
+    if (arr1 && arr1.length === 0) {
+      if (arr2 && arr2.length === 0 && arr3 && arr3.length === 0) {
+        if (arr4) arrays = [[...arr4]];
+      } else if (arr2 && arr2.length === 0 && arr4 && arr4.length === 0) {
+        if (arr3) arrays = [[...arr3]];
+      } else if (arr3 && arr3.length === 0 && arr4 && arr4.length === 0) {
+        if (arr2) arrays = [[...arr2]];
+      } else if (arr2 && arr2.length === 0) {
+        if (arr3 && arr4) arrays = [[...arr3], [...arr4]];
+      } else if (arr3 && arr3.length === 0) {
+        if (arr2 && arr4) arrays = [[...arr2], [...arr4]];
+      } else if (arr4 && arr4.length === 0) {
+        if (arr2 && arr3) arrays = [[...arr2], [...arr3]];
+      } else if (arr2 && arr3 && arr4) arrays = [[...arr2], [...arr3], [...arr4]];
+    } else if (arr2 && arr2.length === 0) {
+      if (arr3 && arr3.length === 0 && arr4 && arr4.length === 0) {
+        if (arr1 && arr3) arrays = [[...arr1]];
+      } else if (arr3 && arr3.length === 0) {
+        if (arr1 && arr4) arrays = [[...arr1], [...arr4]];
+      } else if (arr4 && arr4.length === 0) {
+        if (arr1 && arr3) arrays = [[...arr1], [...arr3]];
+      } else if (arr1 && arr3 && arr4) arrays = [[...arr1], [...arr3], [...arr4]];
+    } else if (arr3 && arr3.length === 0) {
+      if (arr4 && arr4.length === 0) {
+        if (arr1 && arr2) arrays = [[...arr1], [...arr2]];
+      } else if (arr1 && arr2 && arr4) arrays = [[...arr1], [...arr2], [...arr4]];
+    } else if (arr4 && arr4.length === 0) {
+      if (arr1 && arr2 && arr3) arrays = [[...arr1], [...arr2], [...arr3]];
+    } else if (arr1 && arr2 && arr3 && arr4) {
+      if (arr1.length > 0 && arr2.length > 0 && arr3.length > 0 && arr4.length > 0) {
+        arrays = [[...arr1], [...arr2], [...arr3], [...arr4]];
+      }
+    }
+    let result: Card[] = [];
+    result = arrays.reduce((acc, item) => acc.filter((elem) => item.includes(elem)));
+    return result;
+  }
+
+  public resetClasses(activeFilters: string[], cards: Card[]): void {
     cards.forEach((card) => {
       if (activeFilters.length === 0) {
         // если массив пустой делаем все карточки видимыми
@@ -109,27 +192,26 @@ export default class CardsField extends BaseComponent {
         card.element.classList.remove('visible');
       }
     });
-    let filtredBySize: Card[] = [];
-    let filtredByCategory: Card[] = [];
-    /*     let filtredByPrice: Card[] = [];
-    let filtredByCount: Card[] = []; */
-    // eslint-disable-next-line max-len
-    filtredBySize = cards.filter((card) => activeFilters.some((filter) => card.size.includes(filter)));
-    // eslint-disable-next-line max-len
-    filtredByCategory = cards.filter((card) => activeFilters.some((filter) => card.category.includes(filter)));
+  }
 
-    if (filtredBySize.length > 0 && filtredByCategory.length > 0) {
-      // eslint-disable-next-line max-len
-      this.visibleCards = [...filtredBySize.filter((item) => filtredByCategory.indexOf(item) !== -1)];
-    } else if (filtredBySize.length > 0 && filtredByCategory.length === 0) {
-      this.visibleCards = [...filtredBySize];
-    } else if (filtredBySize.length === 0 && filtredByCategory.length > 0) {
-      this.visibleCards = [...filtredByCategory];
-    }
-    this.visibleCards.forEach((visibleCard) => {
-      visibleCard.element.classList.add('visible');
-      visibleCard.element.classList.remove('hidden');
+  public checkPrice(activeFilters: string[]): number[] {
+    let result: number[] = [];
+    activeFilters.forEach((filter) => {
+      if (filter.split(',')[0] === 'Price') {
+        result = [+filter.split(',')[1], +filter.split(',')[2]];
+      }
     });
+    return result;
+  }
+
+  public checkCount(activeFilters: string[]): number[] {
+    let result: number[] = [];
+    activeFilters.forEach((filter) => {
+      if (filter.split(',')[0] === 'Count') {
+        result = [+filter.split(',')[1], +filter.split(',')[2]];
+      }
+    });
+    return result;
   }
 
   /* public filterByPriceAndCount(activeFilters: string[], cards: Card[]): void {} */

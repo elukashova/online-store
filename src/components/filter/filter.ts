@@ -14,7 +14,7 @@ export default class Filter {
     public updateActiveFilters: (elem: string) => void,
   ) {}
 
-  public renderCheckbox(data: string[], str: string /* , cards: Card[] */): HTMLElement {
+  public renderCheckbox(data: string[], str: string): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str} ${str}`);
     rendered('legend', filterWrapper, `${str}__legend-1`, this.name);
     data.forEach((item, ind) => {
@@ -65,6 +65,7 @@ export default class Filter {
       min: minValue,
       max: maxValue,
       value: minValue,
+      step: '1',
     });
     const highestInput: HTMLElement = rendered('input', sliderWrapper, `filters__${str}_highest`, '', {
       id: `to-${str}`,
@@ -72,9 +73,10 @@ export default class Filter {
       min: minValue,
       max: maxValue,
       value: maxValue,
+      step: '1',
     });
     this.changeInputRange(lowestInput, highestInput); // вешаем функцию слушатель
-
+    console.log(lowestInput, highestInput);
     return filterWrapper;
   }
 
@@ -101,14 +103,6 @@ export default class Filter {
         }
       });
     }
-
-    /* lowestInput.addEventListener('change', () => {
-      str === 'price'
-        ? this.updateActiveFilters(`Price, ${minValue}, ${maxValue}`)
-        : this.updateActiveFilters(`Count, ${minValue}, ${maxValue}`);
-    });
-    highestInput.addEventListener('change', () =>
-    this.updateActiveFilters(`Price, ${minValue}, ${maxValue}`)); */
   }
 
   public changeLowInput(lowestInput: HTMLElement, highestInput: HTMLElement, id: string): void {
@@ -118,7 +112,7 @@ export default class Filter {
     const countFrom: HTMLElement | null = document.getElementById('from-stock-value');
     if (low && high && low instanceof HTMLInputElement && high instanceof HTMLInputElement) {
       const gap = 1;
-      if (+high.value - +low.value <= gap) {
+      if (+high.value - +low.value < gap) {
         low.value = (+high.value - gap).toString();
       }
 
@@ -143,7 +137,7 @@ export default class Filter {
     const countTo: HTMLElement | null = document.getElementById('to-stock-value');
     if (low && high && low instanceof HTMLInputElement && high instanceof HTMLInputElement) {
       const gap = 1;
-      if (+high.value - +low.value <= gap) {
+      if (+high.value - +low.value < gap) {
         high.value = (+low.value + gap).toString();
       }
       if (id === RangeTypes.PriceTo) {

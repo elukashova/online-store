@@ -4,28 +4,29 @@ const EslintPlugin = require('eslint-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const devServer = (isDev) => !isDev ? {} : {
-  devServer: {
-    open: true,
-    hot: true,
-    port: 8080,
-    static: path.resolve(__dirname, './dist')
-  }
-};
+const devServer = (isDev) =>
+  !isDev
+    ? {}
+    : {
+        devServer: {
+          open: true,
+          hot: true,
+          port: 8080,
+          static: path.resolve(__dirname, './dist'),
+        },
+      };
 
-module.exports = ({develop}) => ({
-  mode: develop ? "development" : "production",
-  devtool: develop ? "inline-source-map" : false,
+module.exports = ({ develop }) => ({
+  mode: develop ? 'development' : 'production',
+  devtool: develop ? 'inline-source-map' : false,
   entry: {
-    main: [
-      './src/index.ts'
-    ]
+    main: ['./src/index.ts'],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
     assetModuleFilename: 'assets/images/[name][ext]',
-    clean: true
+    clean: true,
   },
   module: {
     rules: [
@@ -33,10 +34,10 @@ module.exports = ({develop}) => ({
         test: /\.[tj]s$/i,
         use: [
           {
-              loader: 'ts-loader',
-              options: {
-                  transpileOnly: true,
-              },
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+            },
           },
         ],
         exclude: ['/node_modules/'],
@@ -51,20 +52,13 @@ module.exports = ({develop}) => ({
       },
       {
         test: /\.(css)$/i,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader'
-        ],
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
       {
         test: /\.(s[ac]ss)$/i,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-          'sass-loader'
-        ]
-      }
-    ]
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+      },
+    ],
   },
   resolve: {
     extensions: ['.ts', '.js'],
@@ -73,20 +67,20 @@ module.exports = ({develop}) => ({
     new HtmlWebpackPlugin({
       title: 'Online store',
       template: './src/index.html',
-      filename: './index.html'
+      filename: './index.html',
     }),
     new EslintPlugin({ extensions: 'ts' }),
     new MiniCssExtractPlugin({
-      filename: '[name].css'
+      filename: '[name].css',
     }),
     new CopyPlugin({
       patterns: [
         {
           from: path.resolve(__dirname, 'src/assets'),
-          to: path.resolve(__dirname, 'dist/assets')
-        }
-      ]
-    })
+          to: path.resolve(__dirname, 'dist/assets'),
+        },
+      ],
+    }),
   ],
-  ...devServer(develop)
+  ...devServer(develop),
 });

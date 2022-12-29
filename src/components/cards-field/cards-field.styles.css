@@ -1,10 +1,10 @@
 .content__container {
+  width: 90%;
   display: grid;
-  grid-template-columns: 20% 75%;
-  column-gap: 5%;
-  margin-left: auto;
-  margin-right: auto;
-  margin: 5rem;
+  grid-template-columns: 20% 65%;
+  justify-content: center;
+  column-gap: 6em;
+  margin: 7.5em 3.5em 2.5em 3.5em;
 }
 
 .filters__container {
@@ -27,5 +27,20 @@
 .cards__container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 2%;
+  gap: 30px;
+}
+
+.cards__not-found {
+  grid-column: span 4;
+  align-self: center;
+  justify-self: center;
+  font-size: 1.2em;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: flex;
 }
