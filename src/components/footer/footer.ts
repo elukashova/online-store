@@ -5,6 +5,7 @@ import rendered from '../../utils/render/render';
 export default class Footer extends BaseComponent {
   constructor() {
     super('footer', 'footer');
+    this.render();
   }
 
   public render(): void {

@@ -9,7 +9,8 @@ const devServer = (isDev) => !isDev ? {} : {
     open: true,
     hot: true,
     port: 8080,
-    static: path.resolve(__dirname, './dist')
+    static: path.resolve(__dirname, './dist'),
+    historyApiFallback: true,
   }
 };
 
