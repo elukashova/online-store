@@ -30,7 +30,7 @@ export default class Header extends BaseComponent {
     const container: HTMLElement = rendered('div', this.element, 'header__container');
     const logoLink: HTMLElement = rendered('a', container, 'header__logo logo', '', { href: '/' });
     rendered('img', logoLink, 'logo__img', '', {
-      src: '../../../assets/icons/logo-placeholder.svg',
+      src: 'assets/icons/logo-placeholder.svg',
     });
     const menu: HTMLElement = rendered('ul', container, 'header__menu menu');
     const storePage: HTMLElement = rendered('li', menu, 'menu__item menu__item_current');
@@ -44,7 +44,7 @@ export default class Header extends BaseComponent {
     const shoppingCart: HTMLElement = rendered('li', menu, 'menu__item cart');
     const shoppingCartLink: HTMLElement = rendered('a', shoppingCart, 'menu__item cart', '', { href: '#cart' });
     rendered('img', shoppingCartLink, 'cart__icon', '', {
-      src: '../../../assets/icons/cart.svg',
+      src: 'assets/icons/cart.svg',
     });
     this.cartItemsElement = rendered('span', shoppingCart, 'cart__items-number', `${this.headerInfo.cartItems}`);
     // this.updateInfo(this.totalPrice, this.cartItems);

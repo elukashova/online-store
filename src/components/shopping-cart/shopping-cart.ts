@@ -1,12 +1,12 @@
 /* eslint-disable max-lines-per-function */
 import './shopping-cart.styles.css';
+import cardsData from '../../assets/json/data';
 import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
 import CartCard from './card-cart';
 import Header from '../header/header';
 import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
 import { JsonObj } from '../../utils/localStorage.types';
-import cardsData from '../../assets/json/data';
 import { ObservedSubject } from '../card/card.types';
 import { PromoInputs, PromoValues } from './shopping-cart.types';
 
@@ -116,11 +116,11 @@ export default class Cart extends BaseComponent {
     this.itemsPerPageElement.addEventListener('change', this.itemsNumberInputCallback);
     const totalPagesWrapper: HTMLElement = rendered('div', cartInfoContainer, 'cart-items__info_pages info-pages');
     this.leftArrowBtn = rendered('img', totalPagesWrapper, 'info-pages__btn-left disabled', '', {
-      src: '../../assets/icons/cart-btn__left.svg',
+      src: 'assets/icons/cart-btn__left.svg',
     });
     this.currentPageElement = rendered('span', totalPagesWrapper, 'info-pages__pages-total', `${this.currentPage}`);
     this.rightArrowBtn = rendered('img', totalPagesWrapper, 'info-pages__btn-right disabled', '', {
-      src: '../../assets/icons/cart-btn__right.svg',
+      src: 'assets/icons/cart-btn__right.svg',
     });
 
     // items
@@ -579,7 +579,7 @@ export default class Cart extends BaseComponent {
     this.element.style.flexDirection = 'column';
 
     rendered('img', this.element, 'cart__empty_img', '', {
-      src: '../../assets/images/empty-cart.png',
+      src: 'assets/images/empty-cart.png',
     });
     rendered('span', this.element, 'cart__empty_title', 'Your cart is empty!');
     rendered('span', this.element, 'cart__empty_text', 'Looks like you have not added anything to your cart yet.');

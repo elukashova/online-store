@@ -11,7 +11,7 @@ const posters = {
       size: '30x30',
       stock: 94,
       category: 'Abstract',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 2,
@@ -24,7 +24,7 @@ const posters = {
       size: '40x40',
       stock: 34,
       category: 'Nature',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 3,
@@ -37,7 +37,7 @@ const posters = {
       size: '30x30',
       stock: 36,
       category: 'Romantic',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 4,
@@ -50,7 +50,7 @@ const posters = {
       size: '40x40',
       stock: 123,
       category: 'Space',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 5,
@@ -63,7 +63,7 @@ const posters = {
       size: '30x30',
       stock: 32,
       category: 'Urban',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 6,
@@ -76,7 +76,7 @@ const posters = {
       size: '30x30',
       stock: 83,
       category: 'Characters',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 7,
@@ -89,7 +89,7 @@ const posters = {
       size: '40x40',
       stock: 50,
       category: 'Abstract',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 8,
@@ -102,7 +102,7 @@ const posters = {
       size: '30x30',
       stock: 68,
       category: 'Nature',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 9,
@@ -115,7 +115,7 @@ const posters = {
       size: '40x40',
       stock: 96,
       category: 'Romantic',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 10,
@@ -128,7 +128,7 @@ const posters = {
       size: '50x50',
       stock: 89,
       category: 'Space',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 11,
@@ -141,7 +141,7 @@ const posters = {
       size: '40x40',
       stock: 65,
       category: 'Urban',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 12,
@@ -154,7 +154,7 @@ const posters = {
       size: '30x30',
       stock: 52,
       category: 'Characters',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 13,
@@ -167,7 +167,7 @@ const posters = {
       size: '40x40',
       stock: 61,
       category: 'Abstract',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 14,
@@ -180,7 +180,7 @@ const posters = {
       size: '30x30',
       stock: 114,
       category: 'Nature',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 15,
@@ -193,7 +193,7 @@ const posters = {
       size: '40x40',
       stock: 105,
       category: 'Romantic',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 16,
@@ -206,7 +206,7 @@ const posters = {
       size: '50x50',
       stock: 110,
       category: 'Space',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 17,
@@ -219,7 +219,7 @@ const posters = {
       size: '40x40',
       stock: 78,
       category: 'Urban',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 18,
@@ -232,7 +232,7 @@ const posters = {
       size: '30x30',
       stock: 88,
       category: 'Characters',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 19,
@@ -245,7 +245,7 @@ const posters = {
       size: '50x50',
       stock: 54,
       category: 'Abstract',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 20,
@@ -258,7 +258,7 @@ const posters = {
       size: '50x50',
       stock: 140,
       category: 'Nature',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 21,
@@ -271,7 +271,7 @@ const posters = {
       size: '40x40',
       stock: 65,
       category: 'Romantic',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 22,
@@ -284,7 +284,7 @@ const posters = {
       size: '50x50',
       stock: 140,
       category: 'Space',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 23,
@@ -297,7 +297,7 @@ const posters = {
       size: '40x40',
       stock: 23,
       category: 'Urban',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
     {
       id: 24,
@@ -310,7 +310,7 @@ const posters = {
       size: '50x50',
       stock: 2,
       category: 'Characters',
-      images: ['../../assets/images/temp-painting.png', '../../assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
     },
   ],
 };
