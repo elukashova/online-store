@@ -1,14 +1,14 @@
 import Header from '../header/header';
 import Footer from '../footer/footer';
 import { Routes } from './enums';
-import Page from '../main/page-component';
+import Main from '../main/main-component';
 import CardsField from '../cards-field/cards-field';
 import Cart from '../shopping-cart/shopping-cart';
 
 export default class App {
   private readonly header: Header;
 
-  private readonly mainContainer: Page = new Page();
+  private readonly mainContainer: Main = new Main();
 
   private readonly footer: Footer = new Footer();
 
