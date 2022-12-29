@@ -8,7 +8,7 @@ import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/loca
 import { JsonObj } from '../../utils/localStorage.types';
 import cardsData from '../../assets/json/data';
 import { ObservedSubject } from '../card/card.types';
-// import { ItemInfoType } from './shopping-cart.types';
+import { PromoInputs, PromoValues } from './shopping-cart.types';
 
 export default class Cart extends BaseComponent {
   private storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
@@ -20,6 +20,8 @@ export default class Cart extends BaseComponent {
   private cartItems: number;
 
   private totalPrice: number;
+
+  private totalSumContainer: HTMLElement | null = null;
 
   private totalPriceElement: HTMLElement | null = null;
 
@@ -54,6 +56,36 @@ export default class Cart extends BaseComponent {
   // и для обновления количества товара на странице
   private itemsNumberChange: boolean = false;
 
+  // элементы для промокода
+
+  private promocodeContainer: HTMLElement | null = null;
+
+  private promoInputElement: HTMLElement | null = null;
+
+  private promoApplyWrapper: HTMLElement | null = null;
+
+  private promoDropWrapper: HTMLElement | null = null;
+
+  private currentPromosElement: HTMLElement | null = null;
+
+  private applyPromoBtn: HTMLElement | null = null;
+
+  private dropPromoBtn: HTMLElement | null = null;
+
+  private newPriceElement: HTMLElement | null = null;
+
+  private appliedPromosElement: HTMLElement | null = null;
+
+  private afterPromoPriceContainer: HTMLElement | null = null;
+
+  private currentPromoValue: number = 0;
+
+  private afterPromoPrice: number = 0;
+
+  private currentPromoName: string = '';
+
+  private appliedPromos: string[] = [];
+
   constructor(public readonly header: Header) {
     super('div', 'cart-container cart');
     this.cartItems = this.header.headerInfo.cartItems;
@@ -69,7 +101,6 @@ export default class Cart extends BaseComponent {
     }
   }
 
-  // eslint-disable-next-line max-lines-per-function
   public render(): void {
     // items block
     this.cartContainer = rendered('div', this.element, 'cart__items_container cart-items');
@@ -113,22 +144,21 @@ export default class Cart extends BaseComponent {
     );
     rendered('span', totalItemsContainer, 'cart-total-items__text', 'Items:');
     this.cartItemsElement = rendered('span', totalItemsContainer, 'cart-total-items__num', `${this.cartItems}`);
-    const totalSumContainer: HTMLElement = rendered(
-      'div',
-      this.summaryContainer,
-      'cart-summary__total-sum_container total-sum',
-    );
-    rendered('span', totalSumContainer, 'cart-total-sum__text', 'Total:');
-    this.totalPriceElement = rendered('span', totalSumContainer, 'cart-total-sum__num', `$ ${this.totalPrice}`);
-    const promocodeContainer: HTMLElement = rendered(
-      'div',
-      this.summaryContainer,
-      'cart-summary__promocode cart-promocode',
-    );
-    rendered('input', promocodeContainer, 'cart-promocode__input', '', {
+    this.totalSumContainer = rendered('div', this.summaryContainer, 'cart-summary__total-sum_container total-sum');
+    rendered('span', this.totalSumContainer, 'cart-total-sum__text', 'Total:');
+    this.totalPriceElement = rendered('span', this.totalSumContainer, 'cart-total-sum__num', `$ ${this.totalPrice}`);
+    this.promocodeContainer = rendered('div', this.summaryContainer, 'cart-summary__promocode cart-promocode');
+    this.promoInputElement = rendered('input', this.promocodeContainer, 'cart-promocode__input', '', {
       type: 'search',
       placeholder: 'Enter promo code',
     });
+    this.promoInputElement.addEventListener('input', this.promocodeInputCallback);
+    this.currentPromosElement = rendered(
+      'p',
+      this.promocodeContainer,
+      'cart-promocode__active-codes',
+      "Active promo codes: 'BEHAPPY', 'SMILE'",
+    );
     rendered('div', this.summaryContainer, 'cart-total-sum__line');
     rendered('button', this.summaryContainer, 'cart-total-sum__buy-btn', 'buy now');
   }
@@ -154,7 +184,6 @@ export default class Cart extends BaseComponent {
   }
 
   // колбэк для правой стрелки (пагинация)
-  // eslint-disable-next-line max-lines-per-function
   private rightBtnCallback = (e: Event): void => {
     this.slideBack = false;
     e.preventDefault();
@@ -220,6 +249,177 @@ export default class Cart extends BaseComponent {
       }
     }
   };
+
+  // колбэк для ввода промокода
+  private promocodeInputCallback = (e: Event): void => {
+    e.preventDefault();
+    if (this.currentPromosElement && e.target instanceof HTMLInputElement) {
+      const { value } = e.target;
+      this.currentPromoName = value;
+      if (this.promoApplyWrapper) {
+        this.deletePromoApplyBlock();
+      }
+      if (value === PromoInputs.behappy || value === PromoInputs.smile) {
+        const key: number = this.choosePromoValue(value);
+        this.createApplyBlock(value, key);
+      }
+    }
+  };
+
+  // выбрать нужное значение промокода
+  private choosePromoValue(value: string): number {
+    let result: number;
+    if (value === PromoInputs.behappy) {
+      this.currentPromoValue = PromoValues.behappy;
+      result = this.currentPromoValue;
+    } else {
+      this.currentPromoValue = PromoValues.smile;
+      result = this.currentPromoValue;
+    }
+    return result;
+  }
+
+  // подвешивание блок apply, с кнопкой и без
+  private createApplyBlock(value: string, key: number): void {
+    this.promoApplyWrapper = this.createAplyOrDropPromoBlock(value, key, 'apply');
+    if (this.currentPromosElement && this.currentPromosElement.parentNode) {
+      const parent: ParentNode | null = this.currentPromosElement.parentNode;
+      parent.insertBefore(this.promoApplyWrapper, this.currentPromosElement);
+    }
+  }
+
+  // создание блока для применения или сброса прокомода
+  private createAplyOrDropPromoBlock(value: string, key: number, action?: string): HTMLElement {
+    const newBlock: HTMLElement = document.createElement('div');
+    newBlock.classList.add(`cart-promocode__code-${action}_wrapper`);
+    rendered('span', newBlock, `cart-promocode__code-${action}_text`, `Promo ${value} - ${key} %`);
+    if (action === 'apply' && !this.appliedPromos.includes(value)) {
+      this.applyPromoBtn = rendered('button', newBlock, `cart-promocode__code-${action}_btn`, `${action}`);
+      this.applyPromoBtn.addEventListener('click', this.applyPromoCallback);
+    } else if (action === 'drop') {
+      this.dropPromoBtn = rendered('button', newBlock, `cart-promocode__code-${action}_btn`, `${action}`, {
+        name: value,
+      });
+      this.dropPromoBtn.addEventListener('click', this.dropPromoCallback);
+    }
+    return newBlock;
+  }
+
+  // колбэк при применении промокода
+  private applyPromoCallback = (e: Event): void => {
+    e.preventDefault();
+    this.deletePromoApplyBlock();
+    // данные для создания блока с drop
+    const value: string | null = this.currentPromoName ? this.currentPromoName : '';
+    const key: number | null = value ? this.choosePromoValue(value) : null;
+    // сохраняем инфо о премененном коде
+    this.appliedPromos.push(value);
+    // оставляем описание промо под input, но без кнопки
+    if (value && key) {
+      this.createApplyBlock(value, key);
+    }
+    this.afterPromoPrice = this.calculateNewPrice();
+    if (this.totalSumContainer && key && value) {
+      // запоминаем будущего родителя новых элементов
+      const parent: ParentNode | null = this.totalSumContainer.parentNode;
+      // если это первый код
+      if (this.appliedPromos.length === 1) {
+        // перечеркиваем старую цену
+        this.totalSumContainer.classList.add('old-price');
+        // создаем блок с новой ценой
+        this.afterPromoPriceContainer = document.createElement('div');
+        this.afterPromoPriceContainer.classList.add('cart-summary__total-sum_container');
+        this.afterPromoPriceContainer.classList.add('new-price');
+        rendered('span', this.afterPromoPriceContainer, 'cart-total-sum__text', 'Total:');
+        this.newPriceElement = rendered(
+          'span',
+          this.afterPromoPriceContainer,
+          'cart-total-sum__num',
+          `$ ${this.afterPromoPrice}`,
+        );
+        // создаем родителя для промокодов
+        this.appliedPromosElement = document.createElement('div');
+        this.appliedPromosElement.classList.add('cart-promocode__applied-codes');
+        rendered('span', this.appliedPromosElement, 'cart-promocode__applied-codes_title', 'Applied promo codes:');
+        // подвешиваем новый элемент
+        if (parent && this.promocodeContainer) {
+          parent.insertBefore(this.afterPromoPriceContainer, this.promocodeContainer);
+          parent.insertBefore(this.appliedPromosElement, this.promocodeContainer);
+        }
+      } else if (this.newPriceElement) {
+        this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
+      }
+      // создание блока с drop
+      this.promoDropWrapper = this.createAplyOrDropPromoBlock(value, key, 'drop');
+      //  подвешиваем drop
+      if (this.appliedPromosElement) {
+        this.appliedPromosElement.append(this.promoDropWrapper);
+      }
+    }
+  };
+
+  // колбэк при удаления промокода
+  private dropPromoCallback = (e: Event): void => {
+    e.preventDefault();
+    // удаляем промо из массива с примененными промо
+    if (e.target instanceof HTMLButtonElement) {
+      const promo: string | null = e.target.hasAttribute('name') ? e.target.getAttribute('name') : '';
+      if (promo) {
+        const idx: number = this.appliedPromos.indexOf(promo);
+        this.appliedPromos.splice(idx, 1);
+      }
+      // пересчитываем цену и удаляем блок с экрана
+      if (this.appliedPromos.length !== 0) {
+        this.afterPromoPrice = this.calculateNewPrice();
+        if (this.newPriceElement) {
+          this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
+        }
+        const elementToRemove: ParentNode | null = e.target.parentNode;
+        if (this.appliedPromosElement && elementToRemove) {
+          this.appliedPromosElement.removeChild(elementToRemove);
+        }
+      } else if (this.appliedPromosElement) {
+        const parent: ParentNode | null = this.appliedPromosElement.parentNode;
+        if (parent && this.afterPromoPriceContainer && this.totalSumContainer) {
+          parent.removeChild(this.afterPromoPriceContainer);
+          parent.removeChild(this.appliedPromosElement);
+          this.totalSumContainer.classList.remove('old-price');
+        }
+      }
+      // если в поле осталось название дропнутого промо, надо вывести кнопку apply
+      if (this.promoInputElement && this.promoInputElement instanceof HTMLInputElement) {
+        if (promo && this.promoInputElement.value === promo) {
+          this.deletePromoApplyBlock();
+          const key: number = this.choosePromoValue(promo);
+          this.createApplyBlock(promo, key);
+        }
+      }
+    }
+  };
+
+  // удаление блока с применением промокода
+  private deletePromoApplyBlock(): void {
+    if (this.promoApplyWrapper) {
+      if (this.promoApplyWrapper.parentElement === this.promocodeContainer) {
+        this.promocodeContainer?.removeChild(this.promoApplyWrapper);
+      }
+    }
+  }
+
+  // считаем цену после примеренного промокода
+  private calculateNewPrice(): number {
+    const promoValues: number[] = [];
+    let result: number = 0;
+    if (this.appliedPromos.length !== 0) {
+      this.appliedPromos.forEach((promo) => {
+        const value: number = this.choosePromoValue(promo);
+        promoValues.push(value);
+      });
+      const temp: number = promoValues.reduce((a, v) => a + v, 0);
+      result = this.totalPrice - (this.totalPrice * temp) / 100;
+    }
+    return result;
+  }
 
   // повторяющийся код, который использую при пагинации и удалении
   private updateAfterChange(): void {
@@ -333,12 +533,20 @@ export default class Cart extends BaseComponent {
           this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
           this.cartItemsElement.textContent = `${this.cartItems}`;
         }
+        if (this.newPriceElement) {
+          this.afterPromoPrice = this.calculateNewPrice();
+          this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
+        }
       } else if (subject.minus === true && subject.cartItemInfo.itemAmount >= 0) {
         this.totalPrice -= subject.price;
         this.cartItems -= 1;
         if (this.totalPriceElement && this.cartItemsElement) {
           this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
           this.cartItemsElement.textContent = `${this.cartItems}`;
+        }
+        if (this.newPriceElement) {
+          this.afterPromoPrice = this.calculateNewPrice();
+          this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
         }
         this.checkIfZero(subject);
       }
