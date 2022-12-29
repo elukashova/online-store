@@ -1,6 +1,4 @@
-/* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
-
 import './cards-field.styles.css';
 import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
@@ -13,13 +11,11 @@ import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/loca
 import { JsonObj } from '../../utils/localStorage.types';
 
 export default class CardsField extends BaseComponent {
-  public cardsAll: Card[] = [];
+  public cardsAll: Card[] = []; // все карточки
 
-  public activeFilters: string[] = [];
+  public activeFilters: string[] = []; // активные фильтры
 
-  public visibleCards: Card[] = [];
-
-  /* private cardsContainer: HTMLElement; */
+  public visibleCards: Card[] = []; // текущие видимые карточки (для сортировки)
 
   public addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
 
@@ -57,13 +53,10 @@ export default class CardsField extends BaseComponent {
     const stockFilter: Filter = new Filter(filtersContainer, 'Stock', this.updateActiveFilters);
     const stockTitles: HTMLElement = stockFilter.renderInputRange('stock');
     filtersContainer.append(stockTitles);
-
     const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container', '', {
       id: 'cards__container',
     });
-    rendered('p', cardsContainer, 'cards__not-found hidden', 'Product not found', {
-      id: 'cards__not-found',
-    });
+    rendered('p', cardsContainer, 'cards__not-found hidden', 'Product not found', { id: 'cards__not-found' });
     cardsData.products.forEach((data) => {
       const card: Card = new Card(data);
       card.attachObserver(this.header);
@@ -73,13 +66,15 @@ export default class CardsField extends BaseComponent {
     });
   }
 
-  // функция reset фильтров
+  // функция reset всех фильтров
   public resetFilters = (): void => {
     this.activeFilters = [];
-    this.filterByCategoryAndSize(this.activeFilters, this.cardsAll);
+    this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
 
-  // функция апдейта активных фильтров
+  // Функция апдейта активных фильтров. В фильтры цены и стока приходят значения
+  // в формате 'Price, 75, 125'. Проверяем есть ли значение, начинающееся на Price
+  // в массиве. Если нет - пушим, есть - заменяем.
   public updateActiveFilters = (filter: string): void => {
     if (this.activeFilters.includes(filter)) {
       this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
@@ -100,20 +95,20 @@ export default class CardsField extends BaseComponent {
     } else if (!this.activeFilters.includes(filter)) {
       this.activeFilters.push(filter);
     }
-    this.filterByCategoryAndSize(this.activeFilters, this.cardsAll);
+    this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
 
-  // eslint-disable-next-line max-lines-per-function
-  public filterByCategoryAndSize(activeFilters: string[], cards: Card[]): void {
-    this.resetClasses(activeFilters, cards);
+  public addClassesForCards(activeFilters: string[], cards: Card[]): void {
+    this.resetClasses(activeFilters, cards); // сбрасываем классы
     this.visibleCards.length = 0;
-    const [priceFrom, priceTo] = this.checkPrice(activeFilters);
-    const [countFrom, countTo] = this.checkCount(activeFilters);
+    const [priceFrom, priceTo] = this.getPrice(activeFilters); // получаем конкретные значения фильтров цены и стока
+    const [countFrom, countTo] = this.getCount(activeFilters);
 
     const bySize: Card[] = cards.filter((card) => activeFilters.some((filter) => card.size.includes(filter)));
     const byCategory: Card[] = cards.filter((card) => activeFilters.some((filter) => card.category.includes(filter)));
     const byPrice: Card[] = cards.filter((card) => card.price >= priceFrom && card.price <= priceTo);
     const byCount: Card[] = cards.filter((card) => card.stock >= countFrom && card.stock <= countTo);
+
     this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount);
     const notFoundText = document.getElementById('cards__not-found');
     if (this.visibleCards.length === 0 && this.activeFilters.length !== 0) {
@@ -137,9 +132,9 @@ export default class CardsField extends BaseComponent {
     }
   }
 
-  // функция принимает отфильтрованные значения категории, размера, цены и остатка на складе в виде массивов карточек,
-  // проверяет, что массивы не пустые и в зависимости от этого фильтрует товары,
-  // исключая те, которые не подходят по всем активным фильтрам.
+  // функция принимает отфильтрованные значения категории, размера, цены и остатка
+  // на складе в виде массивов карточек, проверяет, что массивы не пустые и в зависимости
+  // от этого фильтрует товары, исключая те, которые не подходят по всем активным фильтрам.
   public filterArrays(arr1?: Card[], arr2?: Card[], arr3?: Card[], arr4?: Card[]): Card[] {
     let arrays: Card[][] = [];
     arrays.length = 0;
@@ -181,6 +176,7 @@ export default class CardsField extends BaseComponent {
     return result;
   }
 
+  // сброс классов
   public resetClasses(activeFilters: string[], cards: Card[]): void {
     cards.forEach((card) => {
       if (activeFilters.length === 0) {
@@ -194,7 +190,7 @@ export default class CardsField extends BaseComponent {
     });
   }
 
-  public checkPrice(activeFilters: string[]): number[] {
+  public getPrice(activeFilters: string[]): number[] {
     let result: number[] = [];
     activeFilters.forEach((filter) => {
       if (filter.split(',')[0] === 'Price') {
@@ -204,7 +200,7 @@ export default class CardsField extends BaseComponent {
     return result;
   }
 
-  public checkCount(activeFilters: string[]): number[] {
+  public getCount(activeFilters: string[]): number[] {
     let result: number[] = [];
     activeFilters.forEach((filter) => {
       if (filter.split(',')[0] === 'Count') {
@@ -214,14 +210,11 @@ export default class CardsField extends BaseComponent {
     return result;
   }
 
-  /* public filterByPriceAndCount(activeFilters: string[], cards: Card[]): void {} */
-
   /* функция обсервера, реагирующая на добавление карточек,
     чтобы сохранять добавленные товары в local storage */
   public update(subject: ObservedSubject): void {
     if (subject instanceof Card && subject.element.classList.contains('added')) {
       this.addedItems.push(subject.id);
-      console.log(this.addedItems);
       setDataToLocalStorage(this.addedItems);
     }
 

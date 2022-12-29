@@ -1,18 +1,19 @@
 import './main.styles.css';
 
-import rendered from '../../utils/render/render';
+// import rendered from '../../utils/render/render';
 import BaseComponent from '../base-component/base-component';
 
 export default class Page extends BaseComponent {
   constructor() {
     super('main', 'main');
+    this.render();
   }
 
   public render(): HTMLElement {
     return this.element;
   }
 
-  public setContent(): void {
-    rendered('div', this.element, 'main__container');
+  public setContent(component: Element): void {
+    this.element.append(component);
   }
 }

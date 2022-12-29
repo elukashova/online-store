@@ -1,6 +1,7 @@
-const enum Pages {
-  StorePage = 'store',
-  CartPage = 'cart',
-  AboutPage = 'about',
+import CardsField from '../cards-field/cards-field';
+import Cart from '../shopping-cart/shopping-cart';
+
+export interface Routes {
+  store: CardsField;
+  cart: Cart;
 }
-export default Pages;

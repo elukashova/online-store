@@ -1,6 +1,6 @@
 import './card.styles.css';
 import rendered from '../../utils/render/render';
-import { CardData, Observer } from './card.types';
+import { CardDataType, Observer } from './card.types';
 import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
 import { JsonObj } from '../../utils/localStorage.types';
@@ -36,7 +36,7 @@ export default class Card extends BaseComponent {
 
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
 
-  constructor(data: CardData) {
+  constructor(data: CardDataType) {
     super('div', 'cards__item card');
     this.id = data.id;
     this.title = data.title;
@@ -65,7 +65,7 @@ export default class Card extends BaseComponent {
     rendered('p', cardInfoWrapper, 'card__discount', `Discount: ${this.discountPercentage}%`);
     const buttonsWrapper: HTMLElement = rendered('div', cardInfo, 'card__btns');
     rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
-      src: '../../assets/icons/button-open-card.svg',
+      src: 'assets/icons/button-open-card.svg',
     });
     // проверяем local storage, добавлена ли этот товар в корзину
     if (this.storageInfo !== null) {
@@ -79,9 +79,9 @@ export default class Card extends BaseComponent {
     // подбираем нужную картинку для кнопки, в завимимости от того, есть ли карточка в корзине
     let imgSource: string;
     if (this.element.classList.contains('added')) {
-      imgSource = '../../assets/icons/button-close.svg';
+      imgSource = 'assets/icons/button-close.svg';
     } else {
-      imgSource = '../../assets/icons/button-buy.svg';
+      imgSource = 'assets/icons/button-buy.svg';
     }
     this.buyButton = rendered('img', buttonsWrapper, 'card__btn_buy', '', {
       src: `${imgSource}`,
@@ -93,11 +93,11 @@ export default class Card extends BaseComponent {
   private buyBtnCallback = (): void => {
     if (!this.element.classList.contains('added')) {
       this.element.classList.add('added');
-      this.buyButton?.setAttribute('src', '../../assets/icons/button-close.svg');
+      this.buyButton?.setAttribute('src', 'assets/icons/button-close.svg');
       this.notifyObserver();
     } else {
       this.element.classList.remove('added');
-      this.buyButton?.setAttribute('src', '../../assets/icons/button-buy.svg');
+      this.buyButton?.setAttribute('src', 'assets/icons/button-buy.svg');
       this.notifyObserver();
     }
   };

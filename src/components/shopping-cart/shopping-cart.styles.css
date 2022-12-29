@@ -1,7 +1,7 @@
 .cart-container {
   display: grid;
-  grid-template-columns: 50% 20% 20%;
-  margin: 0 auto;
+  grid-template-columns: 75% 25%;
+  margin: 1rem 5rem;
 }
 
 .cart__items_container {
@@ -9,7 +9,6 @@
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: center;
-  background-color: #DDDDDD;
 }
 
 .cart-items__info {
@@ -19,8 +18,12 @@
   align-items: center;
   color: #65635F;
   justify-content: space-around;
-  width: 60%;
+  width: 70%;
+  background-color: #DDDDDD;
+  border-bottom: 5px solid white;
+  align-self: baseline;
 }
+
 
 .cart-items__info_items {
   display: flex;
@@ -35,15 +38,47 @@
   gap: 15%;
 }
 
+.info-items__number {
+  width: 3rem;
+  border-radius: 10%;
+  height: 1.5rem;
+  color: #65635F;
+  cursor: text;
+  text-align: center;
+}
+
+.info-items__number::placeholder {
+  color: #65635F;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.info-items__number:focus::placeholder {
+  color: white;
+}
+
 .info-pages__btn-left,
 .info-pages__btn-right {
   cursor: pointer;
 }
 
+.disabled {
+  cursor: default;
+  opacity: 30%;
+}
+
 .cart-items__item {
   display: grid;
+  grid-template-columns: 70% 30%;
+}
+
+.cart-item__card {
+  padding-top: 2%;
+  display: grid;
   grid-template-columns: 10% 30% 60%;
-  padding-bottom: 5%;
+  border-bottom: 5px solid white;
+  padding-bottom: 2%;
+  background-color: #DDDDDD;
 }
 
 .cart-item__order {
@@ -74,10 +109,12 @@
 }
 
 .cart-item__description_rating,
-.cart-item__description_size {
-  font-size: 1rem;
+.cart-item__description_size,
+.cart-item__description_discount,
+.cart-item__description_price {
+  font-size: 0.9rem;
   color: #65635F;
-  margin-bottom: 5%;
+  margin-bottom: 1%;
 }
 
 .cart-item__description_text {
@@ -85,9 +122,10 @@
   font-size: 1rem;
   line-height: 1.5rem;
   padding-right: 5%;
+  margin-top: 5%;
 }
 
-.cart__amount_container {
+.cart-item__amount_container {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -138,19 +176,20 @@
   flex-direction: column;
   flex-wrap: nowrap;
   justify-content: center;
-  gap: 8%;
+  gap: 3%;
 }
 
 .cart-summary__title {
   font-weight: 700;
   font-size: 1.2rem;
+  margin-bottom: 2%;
 }
 
 .cart-summary__total-items_container,
 .cart-summary__total-sum_container {
   display: flex;
   flex-wrap: nowrap;
-  gap: 2%;
+  gap: 1%;
 }
 
 .cart-total-items__text,
@@ -162,10 +201,38 @@
   font-weight: 300;
 }
 
+.cart-total-items__text,
+.cart-total-sum__text {
+  font-weight: 500;
+  color: #FF7D15;
+}
+
+.old-price {
+  text-decoration: line-through;
+}
+
 .cart-summary__promocode {
   position: relative;
   display: flex;
   min-width: 100px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-promocode__applied-codes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #FF7D15;
+}
+
+.cart-promocode__applied-codes_title {
+  margin-top: 1%;
+  color: #65635F;
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-transform: uppercase;
 }
 
 .cart-promocode__input {
@@ -175,6 +242,7 @@
   width: 100%;
   padding: 2% 5% 2% 5%;
   outline: 0;
+  margin-bottom: 2%;
 }
 
 .cart-promocode__input::placeholder {
@@ -193,6 +261,43 @@
   position: relative;
 }
 
+.cart-promocode__active-codes {
+  color: #65635F;
+  font-weight: 300;
+  font-size: 0.9rem;
+  user-select: text;
+}
+
+.cart-promocode__code-apply_wrapper,
+.cart-promocode__code-drop_wrapper {
+  display: flex;
+  align-self: center;
+  margin-top: 2%;
+  margin-bottom: 2%;
+  align-items: center;
+  flex-wrap: nowrap;
+  width: 100%;
+  justify-content: center;
+  gap: 2%;
+}
+
+.cart-promocode__code-apply_text,
+.cart-promocode__code-drop_text {
+  color: #FF7D15;
+  margin-right: 2%;
+}
+
+.cart-promocode__code-apply_btn,
+.cart-promocode__code-drop_btn {
+  cursor: pointer;
+  background-color: #FF7D15;
+  color: #FFF;
+  font-size: 1rem;
+  text-transform: uppercase;
+  height: 1.5rem;
+  width: 4rem;
+}
+
 .cart-total-sum__line {
   border-bottom: 1px solid #65635F;
 }
@@ -204,5 +309,16 @@
   font-size: 1rem;
   text-transform: uppercase;
   height: 2.5rem;
+}
+
+.cart__empty_title {
+  font-size: 1.6rem;
+  font-weight: 400;
+  text-align: center;
+}
+
+.cart__empty_text {
+  font-size: 1.1rem;
+  text-align: center;
 }
 

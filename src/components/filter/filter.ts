@@ -30,7 +30,8 @@ export default class Filter {
           name: `${str}`,
         },
       );
-      inputElement.addEventListener('change', () => this.updateActiveFilters(item)); // устанавливаем слушатель на инпут при создании и передаем в cardfields значение id любого измененного чекбокса
+      inputElement.addEventListener('change', () => this.updateActiveFilters(item));
+      // устанавливаем слушатель на инпут при создании и передаем в cardfields измененные чекбоксы
       rendered('label', inputWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${str}-${ind + 1}`,
       });
@@ -40,7 +41,6 @@ export default class Filter {
     return filterWrapper;
   }
 
-  // eslint-disable-next-line max-lines-per-function
   public renderInputRange(str: string): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str}`);
     rendered('legend', filterWrapper, `filters__${str}_legend`, this.name);
