@@ -19,13 +19,18 @@
 .card__info_wrapper {
   display: flex;
   flex-direction: column;
+  width: 72%;
 }
 
 .card__btns {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  width: 28%;
 }
 
-.card__btn_buy {
+.card__btn_buy,
+.card__btn_open-card {
   cursor: pointer;
+  width: 45%;
 }
