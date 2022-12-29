@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const EslintPlugin = require('eslint-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const assets = path.resolve(__dirname, 'assets');
 
 const devServer = (isDev) => !isDev ? {} : {
   devServer: {
@@ -69,6 +70,7 @@ module.exports = ({develop}) => ({
   },
   resolve: {
     extensions: ['.ts', '.js'],
+    roots: [__dirname, assets]
   },
   plugins: [
     new HtmlWebpackPlugin({
