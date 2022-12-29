@@ -1,67 +1,75 @@
 import Header from '../header/header';
 import Footer from '../footer/footer';
-import MainStore from '../main/main.store/main.store';
-import MainCart from '../main/main.cart/main.cart';
-import MainAbout from '../main/main.about/main.about';
-import Pages from './enums';
-import Page from '../main/page-component';
+import { Routes } from './enums';
+import Main from '../main/main-component';
+import CardsField from '../cards-field/cards-field';
+import Cart from '../shopping-cart/shopping-cart';
 
 export default class App {
-  private static container: HTMLElement = document.body;
+  private readonly header: Header;
 
-  private readonly header: Header = new Header();
+  private readonly mainContainer: Main = new Main();
 
   private readonly footer: Footer = new Footer();
 
-  constructor(private readonly rootElement: HTMLElement) {}
+  private readonly routes: Routes;
+
+  constructor(private readonly rootElement: HTMLElement) {
+    this.header = new Header(this.route);
+    this.routes = {
+      store: new CardsField(this.header),
+      cart: new Cart(this.header),
+    };
+    this.init();
+  }
 
   public init(): void {
-    this.rootElement.classList.add('root'); // добавляю класс к боди для стилей
+    this.rootElement.classList.add('root');
     this.rootElement.append(this.header.element);
-    this.renderNewPage(Pages.StorePage); // создаем базовый мейн
-    this.getHashEvent(); // при клике на элементы смены страницы получаем хэш и заново рендерим
+    this.rootElement.append(this.mainContainer.element);
     this.rootElement.append(this.footer.element);
-    this.footer.render();
+    this.locationHandler();
   }
 
-  public renderNewPage(id: string): void {
-    // рендер страницы по полученному id
-    // проверяем с каким enum совпадает переданный id
-    let page: Page | null = null;
-    switch (id) {
-      case Pages.StorePage:
-        page = new MainStore(Pages.StorePage, this.header);
+  public route = (event: Event): void => {
+    const e: Event = event || window.event;
+    e.preventDefault();
+    if (e.target instanceof HTMLAnchorElement) {
+      window.history.pushState({}, '', e.target.href);
+      this.locationHandler();
+    }
+  };
+
+  public locationHandler = async (): Promise<void> => {
+    let location: string = window.location.pathname;
+    if (location.length === 0) {
+      location = '/';
+    }
+
+    let component: Element | null;
+
+    switch (location) {
+      case '/cart':
+        this.routes.cart = new Cart(this.header);
+        component = this.routes.cart.element;
         break;
-      case Pages.CartPage:
-        page = new MainCart(id, this.header);
-        break;
-      case Pages.AboutPage:
-        page = new MainAbout(id);
+      case '/':
+        this.routes.store = new CardsField(this.header);
+        component = this.routes.store.element;
         break;
       default:
-        console.log('Страницы с таким ID нет');
+        // строки для теста, будут заменены 404
+        component = document.createElement('div');
+        component.textContent = 'NO PAGE FOUND';
     }
 
-    const currentMain: HTMLElement | null = document.querySelector('main');
-    if (page) {
-      page.setContent();
-      const pageMain = page.render();
-      if (currentMain) {
-        currentMain.replaceWith(pageMain); // если мейн уже есть - заменяем его
-      } else {
-        App.container.append(pageMain); // если мейна нет (первая загрузка страницы) - вставляем его
+    if (!this.mainContainer.element.hasChildNodes()) {
+      this.mainContainer.setContent(component);
+    } else {
+      const child: ChildNode | null = this.mainContainer.element.firstChild;
+      if (child) {
+        this.mainContainer.element.replaceChild(component, child);
       }
     }
-  }
-
-  private getHashEvent(): void {
-    // по клику получаем hash и рендерим по нему новый мейн
-    window.addEventListener('hashchange', () => {
-      const hash = window.location.hash.slice(1);
-      if (hash === '') {
-        this.renderNewPage(Pages.StorePage);
-      }
-      this.renderNewPage(hash);
-    });
-  }
+  };
 }
