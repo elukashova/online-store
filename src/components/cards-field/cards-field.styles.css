@@ -22,6 +22,52 @@
 .filters__btn-copy {
   background: none;
   color: #65635f;
+  cursor: pointer;
+}
+
+.cards__content {
+}
+
+.cards__sort-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8em;
+  margin: 0 0 3% 0;
+}
+
+.cards__sort-products {
+  cursor: pointer;
+}
+.cards__sort-by-price {
+}
+.cards__sort-by-price {
+}
+.cards__sort-by-rating {
+}
+.cards__found-count {
+}
+.cards__search-wrapper {
+  display: flex;
+  border-radius: 25px;
+  padding: 10px;
+  border: 1px solid #65635f80;
+}
+.cards__search {
+}
+
+.cards__search-icon {
+  width: 25px;
+}
+.cards__view-types {
+  display: flex;
+  gap: 17%;
+}
+.cards__view-line,
+.cards__view-block {
+  max-height: 30px;
+  min-width: 30px;
+  cursor: pointer;
 }
 
 .cards__container {

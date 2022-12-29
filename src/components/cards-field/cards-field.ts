@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
 import './cards-field.styles.css';
 import BaseComponent from '../base-component/base-component';
@@ -53,7 +54,28 @@ export default class CardsField extends BaseComponent {
     const stockFilter: Filter = new Filter(filtersContainer, 'Stock', this.updateActiveFilters);
     const stockTitles: HTMLElement = stockFilter.renderInputRange('stock');
     filtersContainer.append(stockTitles);
-    const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container', '', {
+
+    const contentContainer: HTMLElement = rendered('div', this.element, 'cards__content');
+    const sortWrapper = rendered('div', contentContainer, 'cards__sort-wrapper');
+    const selectInput = rendered('select', sortWrapper, 'cards__sort-products');
+    rendered('option', selectInput, 'cards__sort-by-price', 'Sort posters', {
+      value: 'price',
+      disabled: '',
+      selected: '',
+    });
+    rendered('option', selectInput, 'cards__sort-by-price', 'Sort by price', { value: 'price' });
+    rendered('option', selectInput, 'cards__sort-by-rating', 'Sort by rating', { value: 'rating' });
+    rendered('div', sortWrapper, 'cards__found-count', 'Found: 100');
+    const searchInputWrapper = rendered('div', sortWrapper, 'cards__search-wrapper');
+    rendered('input', searchInputWrapper, 'cards__search', '', {
+      type: 'search',
+      placeholder: 'Search poster',
+    });
+    rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg' });
+    const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
+    rendered('img', viewTypes, 'cards__view-line', '', { src: 'assets/icons/list-line.png' });
+    rendered('img', viewTypes, 'cards__view-block', '', { src: 'assets/icons/list-block.png' });
+    const cardsContainer: HTMLElement = rendered('div', contentContainer, 'cards__container', '', {
       id: 'cards__container',
     });
     rendered('p', cardsContainer, 'cards__not-found hidden', 'Product not found', { id: 'cards__not-found' });
