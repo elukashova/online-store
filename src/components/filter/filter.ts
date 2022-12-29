@@ -4,46 +4,41 @@ import cardsData from '../../assets/json/data';
 import findMinAndMaxPrice from './utils/find.minmax.price';
 import findMinAndMaxCount from './utils/find.minmax.stock';
 import RangeTypes from './enums.filter';
-// import filter from './test';
 
 export default class Filter {
-  constructor(private readonly container: HTMLElement, private readonly name: string) {}
+  public checkboxes: HTMLElement[] = [];
 
-  public renderCheckbox<T>(data: T[], str: string): HTMLElement {
+  constructor(
+    private readonly container: HTMLElement,
+    private readonly name: string,
+    public updateActiveFilters: (elem: string) => void,
+  ) {}
+
+  public renderCheckbox(data: string[], str: string): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str} ${str}`);
     rendered('legend', filterWrapper, `${str}__legend-1`, this.name);
     data.forEach((item, ind) => {
       const inputWrapper: HTMLElement = rendered('div', filterWrapper, `${str}__input-wrapper`);
-      const inputCheckbox = rendered('input', inputWrapper, `${str}__input-${ind + 1} ${item}`, '', {
-        id: `${item}`,
-        type: 'checkbox',
-        name: `${str}-${ind + 1}`,
-        'data-filter': `${item}`,
-      });
+      const inputElement: HTMLElement = rendered(
+        'input',
+        inputWrapper,
+        `${str}__input-${ind + 1} ${item} ${str}-item`,
+        '',
+        {
+          id: `${item}`,
+          type: 'checkbox',
+          name: `${str}`,
+        },
+      );
+      inputElement.addEventListener('change', () => this.updateActiveFilters(item));
+      // устанавливаем слушатель на инпут при создании и передаем в cardfields измененные чекбоксы
       rendered('label', inputWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${str}-${ind + 1}`,
       });
-      rendered('span', inputWrapper, `${str}__out-of-${ind + 1}`, '1/5');
-      this.listenInputCheck(inputCheckbox);
+      rendered('span', inputWrapper, `${str}__out-of-${ind + 1}`, ' 1/5');
+      this.checkboxes.push(inputElement);
     });
     return filterWrapper;
-  }
-
-  public listenInputCheck(inputCheckbox: HTMLElement): void {
-    inputCheckbox.addEventListener('click', (e) => {
-      if (e.target && e.target instanceof HTMLInputElement) {
-        if (e.target.checked) {
-          if (e.target.dataset.filter) {
-            const cardsContainer: HTMLCollectionOf<Element> = document.getElementsByClassName(
-              `${e.target.dataset.filter}`,
-            );
-            const arr = Array.prototype.slice.call(cardsContainer);
-            console.log(arr);
-            //  filter(e.target.dataset.filter, cardsContainer[]);
-          }
-        }
-      }
-    });
   }
 
   public renderInputRange(str: string): HTMLElement {
@@ -70,6 +65,7 @@ export default class Filter {
       min: minValue,
       max: maxValue,
       value: minValue,
+      step: '1',
     });
     const highestInput: HTMLElement = rendered('input', sliderWrapper, `filters__${str}_highest`, '', {
       id: `to-${str}`,
@@ -77,28 +73,36 @@ export default class Filter {
       min: minValue,
       max: maxValue,
       value: maxValue,
+      step: '1',
     });
-    this.listenInputRange(lowestInput, highestInput); // вешаем функцию слушатель
+    this.changeInputRange(lowestInput, highestInput); // вешаем функцию слушатель
+    console.log(lowestInput, highestInput);
     return filterWrapper;
   }
 
-  public listenInputRange(lowestInput: HTMLElement, highestInput: HTMLElement): void {
-    lowestInput.addEventListener('input', (e) => {
-      if (e.target === document.getElementById('from-price')) {
-        this.changeLowInput(lowestInput, highestInput, RangeTypes.PriceFrom);
-      }
-      if (e.target === document.getElementById('from-stock')) {
-        this.changeLowInput(lowestInput, highestInput, RangeTypes.StockFrom);
-      }
-    });
-    highestInput.addEventListener('input', (e) => {
-      if (e.target === document.getElementById('to-price')) {
-        this.changeHighInput(lowestInput, highestInput, RangeTypes.PriceTo);
-      }
-      if (e.target === document.getElementById('to-stock')) {
-        this.changeHighInput(lowestInput, highestInput, RangeTypes.StockTo);
-      }
-    });
+  public changeInputRange(lowestInput: HTMLElement, highestInput: HTMLElement): void {
+    if (lowestInput instanceof HTMLInputElement && highestInput instanceof HTMLInputElement) {
+      lowestInput.addEventListener('input', (e) => {
+        if (e.target === document.getElementById('from-price')) {
+          this.changeLowInput(lowestInput, highestInput, RangeTypes.PriceFrom);
+          this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
+        }
+        if (e.target === document.getElementById('from-stock')) {
+          this.changeLowInput(lowestInput, highestInput, RangeTypes.StockFrom);
+          this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+        }
+      });
+      highestInput.addEventListener('input', (e) => {
+        if (e.target === document.getElementById('to-price')) {
+          this.changeHighInput(lowestInput, highestInput, RangeTypes.PriceTo);
+          this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
+        }
+        if (e.target === document.getElementById('to-stock')) {
+          this.changeHighInput(lowestInput, highestInput, RangeTypes.StockTo);
+          this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+        }
+      });
+    }
   }
 
   public changeLowInput(lowestInput: HTMLElement, highestInput: HTMLElement, id: string): void {
@@ -108,7 +112,7 @@ export default class Filter {
     const countFrom: HTMLElement | null = document.getElementById('from-stock-value');
     if (low && high && low instanceof HTMLInputElement && high instanceof HTMLInputElement) {
       const gap = 1;
-      if (+high.value - +low.value <= gap) {
+      if (+high.value - +low.value < gap) {
         low.value = (+high.value - gap).toString();
       }
 
@@ -133,7 +137,7 @@ export default class Filter {
     const countTo: HTMLElement | null = document.getElementById('to-stock-value');
     if (low && high && low instanceof HTMLInputElement && high instanceof HTMLInputElement) {
       const gap = 1;
-      if (+high.value - +low.value <= gap) {
+      if (+high.value - +low.value < gap) {
         high.value = (+low.value + gap).toString();
       }
       if (id === RangeTypes.PriceTo) {

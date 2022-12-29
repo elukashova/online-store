@@ -5,13 +5,14 @@
 }
 
 .card__img {
-  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .card__info {
   display: flex;
-  flex-direction: row;
-  align-items: flex-end;
+  flex-direction: column;
   justify-content: space-between;
   background-color: aliceblue;
 }
@@ -24,8 +25,20 @@
 .card__btns {
   display: flex;
   flex-direction: row;
+  align-self: end;
 }
 
 .card__btn_buy {
   cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  height: max-content;
 }
