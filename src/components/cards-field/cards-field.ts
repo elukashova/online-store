@@ -98,24 +98,26 @@ export default class CardsField extends BaseComponent {
   // в формате 'Price, 75, 125'. Проверяем есть ли значение, начинающееся на Price
   // в массиве. Если нет - пушим, есть - заменяем.
   public updateActiveFilters = (filter: string): void => {
-    if (filter.split(',')[0] === 'Price') {
-      const prevPrice = this.activeFilters.find((elem) => elem.startsWith(filter.split(',')[0]));
+    const getFilterType = (value: string): string => value.split(',')[0];
+    const pushToActive = (array: string[], value: string): number => array.push(value);
+    if (getFilterType(filter) === 'Price') {
+      const prevPrice = this.activeFilters.find((elem) => elem.startsWith(getFilterType(filter)));
       if (prevPrice !== undefined) {
         this.activeFilters.splice(this.activeFilters.indexOf(prevPrice), 1, filter);
       } else {
-        this.activeFilters.push(filter);
+        pushToActive(this.activeFilters, filter);
       }
-    } else if (filter.split(',')[0] === 'Count') {
-      const prevCount = this.activeFilters.find((elem) => elem.startsWith(filter.split(',')[0]));
+    } else if (getFilterType(filter) === 'Count') {
+      const prevCount = this.activeFilters.find((elem) => elem.startsWith(getFilterType(filter)));
       if (prevCount !== undefined) {
         this.activeFilters.splice(this.activeFilters.indexOf(prevCount), 1, filter);
       } else {
-        this.activeFilters.push(filter);
+        pushToActive(this.activeFilters, filter);
       }
     } else if (this.activeFilters.includes(filter)) {
       this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
     } else if (!this.activeFilters.includes(filter)) {
-      this.activeFilters.push(filter);
+      pushToActive(this.activeFilters, filter);
     }
     this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
@@ -123,16 +125,20 @@ export default class CardsField extends BaseComponent {
   public addClassesForCards(activeFilters: string[], cards: Card[]): void {
     this.resetClasses(activeFilters, cards); // сбрасываем классы
     this.visibleCards.length = 0;
-    const [priceFrom, priceTo] = this.getPrice(activeFilters); // получаем конкретные значения фильтров цены и стока
-    const [countFrom, countTo] = this.getCount(activeFilters);
 
     const bySize: Card[] = cards.filter((card) => activeFilters.some((filt) => card.size.includes(filt)));
     const byCategory: Card[] = cards.filter((card) => activeFilters.some((filt) => card.category.includes(filt)));
-    const byPrice: Card[] = cards.filter((card) => card.price >= priceFrom && card.price <= priceTo);
-    const byCount: Card[] = cards.filter((card) => card.stock >= countFrom && card.stock <= countTo);
+    const byPrice: Card[] = cards.filter((card) => {
+      const [priceFrom, priceTo] = this.getPrice(activeFilters);
+      return card.price >= priceFrom && card.price <= priceTo;
+    });
+    const byCount: Card[] = cards.filter((card) => {
+      const [countFrom, countTo] = this.getCount(activeFilters);
+      return card.stock >= countFrom && card.stock <= countTo;
+    });
 
     this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount);
-
+    console.log(this.visibleCards);
     const notFoundText = document.getElementById('cards__not-found');
     if (this.visibleCards.length === 0 && this.activeFilters.length !== 0) {
       if (notFoundText) {
@@ -158,44 +164,9 @@ export default class CardsField extends BaseComponent {
   // функция принимает отфильтрованные значения категории, размера, цены и остатка
   // на складе в виде массивов карточек, проверяет, что массивы не пустые и в зависимости
   // от этого фильтрует товары, исключая те, которые не подходят по всем активным фильтрам.
-  public filterArrays(arr1?: Card[], arr2?: Card[], arr3?: Card[], arr4?: Card[]): Card[] {
-    let arrays: Card[][] = [];
-    arrays.length = 0;
-    if (arr1 && arr1.length === 0) {
-      if (arr2 && arr2.length === 0 && arr3 && arr3.length === 0) {
-        if (arr4) arrays = [[...arr4]];
-      } else if (arr2 && arr2.length === 0 && arr4 && arr4.length === 0) {
-        if (arr3) arrays = [[...arr3]];
-      } else if (arr3 && arr3.length === 0 && arr4 && arr4.length === 0) {
-        if (arr2) arrays = [[...arr2]];
-      } else if (arr2 && arr2.length === 0) {
-        if (arr3 && arr4) arrays = [[...arr3], [...arr4]];
-      } else if (arr3 && arr3.length === 0) {
-        if (arr2 && arr4) arrays = [[...arr2], [...arr4]];
-      } else if (arr4 && arr4.length === 0) {
-        if (arr2 && arr3) arrays = [[...arr2], [...arr3]];
-      } else if (arr2 && arr3 && arr4) arrays = [[...arr2], [...arr3], [...arr4]];
-    } else if (arr2 && arr2.length === 0) {
-      if (arr3 && arr3.length === 0 && arr4 && arr4.length === 0) {
-        if (arr1 && arr3) arrays = [[...arr1]];
-      } else if (arr3 && arr3.length === 0) {
-        if (arr1 && arr4) arrays = [[...arr1], [...arr4]];
-      } else if (arr4 && arr4.length === 0) {
-        if (arr1 && arr3) arrays = [[...arr1], [...arr3]];
-      } else if (arr1 && arr3 && arr4) arrays = [[...arr1], [...arr3], [...arr4]];
-    } else if (arr3 && arr3.length === 0) {
-      if (arr4 && arr4.length === 0) {
-        if (arr1 && arr2) arrays = [[...arr1], [...arr2]];
-      } else if (arr1 && arr2 && arr4) arrays = [[...arr1], [...arr2], [...arr4]];
-    } else if (arr4 && arr4.length === 0) {
-      if (arr1 && arr2 && arr3) arrays = [[...arr1], [...arr2], [...arr3]];
-    } else if (arr1 && arr2 && arr3 && arr4) {
-      if (arr1.length > 0 && arr2.length > 0 && arr3.length > 0 && arr4.length > 0) {
-        arrays = [[...arr1], [...arr2], [...arr3], [...arr4]];
-      }
-    }
-    let result: Card[] = [];
-    result = arrays.reduce((acc, item) => acc.filter((elem) => item.includes(elem)));
+  public filterArrays(arr1: Card[], arr2: Card[], arr3: Card[], arr4: Card[]): Card[] {
+    const allArr = [arr1, arr2, arr3, arr4].filter((arr) => arr.length > 0);
+    const result = allArr.reduce((acc, item) => acc.filter((elem) => item.includes(elem)));
     return result;
   }
 
