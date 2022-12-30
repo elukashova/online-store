@@ -98,9 +98,7 @@ export default class CardsField extends BaseComponent {
   // в формате 'Price, 75, 125'. Проверяем есть ли значение, начинающееся на Price
   // в массиве. Если нет - пушим, есть - заменяем.
   public updateActiveFilters = (filter: string): void => {
-    if (this.activeFilters.includes(filter)) {
-      this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
-    } else if (filter.split(',')[0] === 'Price') {
+    if (filter.split(',')[0] === 'Price') {
       const prevPrice = this.activeFilters.find((elem) => elem.startsWith(filter.split(',')[0]));
       if (prevPrice !== undefined) {
         this.activeFilters.splice(this.activeFilters.indexOf(prevPrice), 1, filter);
@@ -114,6 +112,8 @@ export default class CardsField extends BaseComponent {
       } else {
         this.activeFilters.push(filter);
       }
+    } else if (this.activeFilters.includes(filter)) {
+      this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
     } else if (!this.activeFilters.includes(filter)) {
       this.activeFilters.push(filter);
     }
@@ -126,12 +126,13 @@ export default class CardsField extends BaseComponent {
     const [priceFrom, priceTo] = this.getPrice(activeFilters); // получаем конкретные значения фильтров цены и стока
     const [countFrom, countTo] = this.getCount(activeFilters);
 
-    const bySize: Card[] = cards.filter((card) => activeFilters.some((filter) => card.size.includes(filter)));
-    const byCategory: Card[] = cards.filter((card) => activeFilters.some((filter) => card.category.includes(filter)));
+    const bySize: Card[] = cards.filter((card) => activeFilters.some((filt) => card.size.includes(filt)));
+    const byCategory: Card[] = cards.filter((card) => activeFilters.some((filt) => card.category.includes(filt)));
     const byPrice: Card[] = cards.filter((card) => card.price >= priceFrom && card.price <= priceTo);
     const byCount: Card[] = cards.filter((card) => card.stock >= countFrom && card.stock <= countTo);
 
     this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount);
+
     const notFoundText = document.getElementById('cards__not-found');
     if (this.visibleCards.length === 0 && this.activeFilters.length !== 0) {
       if (notFoundText) {

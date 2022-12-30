@@ -6,7 +6,6 @@
 
 .card__img {
   width: 100%;
-  height: 100%;
   object-fit: cover;
 }
 
@@ -42,3 +41,10 @@
   flex-wrap: nowrap;
   height: max-content;
 }
+
+/* .cards__item.line-view {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+ */

@@ -54,6 +54,10 @@
   border: 1px solid #65635f80;
 }
 .cards__search {
+  padding: 0.2rem;
+  outline: none;
+  text-align: center;
+  word-wrap: break-word;
 }
 
 .cards__search-icon {
@@ -90,3 +94,9 @@
 .visible {
   display: flex;
 }
+
+/* .cards__container.line-view {
+  display: flex;
+  flex-direction: column;
+}
+ */
