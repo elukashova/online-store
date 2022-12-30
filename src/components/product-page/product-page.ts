@@ -28,12 +28,12 @@ export default class ProductPage extends BaseComponent {
 
   private productImages: string[] = [];
 
-  private isValidProduct: boolean = false;
+  // private breadcrumpsProps: string[] = [];
 
-  private breadcrumpsProps: string[] = [];
+  private storeAnchorElement: HTMLElement | null = null;
 
   // TODO: сюда надо будет передать данные из локал сторадж о том, добавлен ли товар в корзину
-  constructor(id: number) {
+  constructor(id: number, private callback: (event: Event) => void) {
     super('div', 'product__container product');
     cardsData.products.forEach((item) => {
       if (item.id === id) {
@@ -47,18 +47,29 @@ export default class ProductPage extends BaseComponent {
         this.productDiscount = item.discountPercentage;
         this.productDescription = item.description;
         this.productImages = item.images.slice();
-        this.isValidProduct = true; // TODO: нужен этот булеан?
       }
     });
-    this.breadcrumpsProps.push('Store', this.productCategory, this.productSize, this.productTitle);
+    /* this.breadcrumpsProps.push('Store', this.productCategory,
+    this.productSize, this.productTitle); */
     this.render();
   }
 
+  // eslint-disable-next-line max-lines-per-function
   public render(): void {
     // левая часть
     const imagesCrumbsContainer: HTMLElement = rendered('div', this.element, 'product__images-and-crumbs-container');
     const breadCrumbsContainer: HTMLElement = rendered('div', imagesCrumbsContainer, 'product__breadcrumbs breadcrump');
-    this.createBreadCrumps(breadCrumbsContainer, this.breadcrumpsProps);
+    this.storeAnchorElement = rendered('a', breadCrumbsContainer, 'breadcrump__store', 'Store', {
+      href: '/',
+    });
+    this.storeAnchorElement.addEventListener('click', this.backToStoreCallback);
+    rendered('span', breadCrumbsContainer, 'breadcrump__breadcrumps', '>>');
+    rendered('span', breadCrumbsContainer, 'breadcrump__category', `${this.productCategory}`);
+    rendered('span', breadCrumbsContainer, 'breadcrump__breadcrumps', '>>');
+    rendered('span', breadCrumbsContainer, 'breadcrump__size', `${this.productSize}`);
+    rendered('span', breadCrumbsContainer, 'breadcrump__breadcrumps', '>>');
+    rendered('span', breadCrumbsContainer, 'breadcrump__title', `${this.productTitle}`);
+    // this.createBreadCrumps(breadCrumbsContainer, this.breadcrumpsProps);
 
     const imagesContainer: HTMLElement = rendered('div', imagesCrumbsContainer, 'product__imgs-container');
     const miniImagesWrapper: HTMLElement = rendered('div', imagesContainer, 'product__mini-imgs-wrapper product-img');
@@ -74,11 +85,14 @@ export default class ProductPage extends BaseComponent {
 
     // правая часть
     const productInfoContainer: HTMLElement = rendered('div', this.element, 'product__info-container product-info');
-    const backBtnWrapper: HTMLElement = rendered('div', productInfoContainer, 'product-info__back-btn-wrapper');
-    rendered('img', backBtnWrapper, 'product-info__back-btn', '', {
+    const backBtnAnchor: HTMLElement = rendered('a', productInfoContainer, 'product-info__back-btn-link', '', {
+      href: '/',
+    });
+    rendered('img', backBtnAnchor, 'product-info__back-btn', '', {
       src: 'assets/icons/btn-back.svg',
     });
-    rendered('span', backBtnWrapper, 'product-info__back-btn_text', 'back');
+    rendered('span', backBtnAnchor, 'product-info__back-btn_text', 'back');
+    backBtnAnchor.addEventListener('click', this.backToStoreCallback);
     const productDescr: HTMLElement = rendered('div', productInfoContainer, 'product-info__description-block');
     rendered('span', productDescr, 'product-info__title', this.productTitle);
     rendered('span', productDescr, 'product-info__category', this.productCategory);
@@ -93,21 +107,12 @@ export default class ProductPage extends BaseComponent {
     rendered('button', productInfoContainer, 'product-info__buy-now-btn', 'buy it now');
   }
 
-  // метод для вставки хлебных крошек
-  private createBreadCrumps(parent: HTMLElement, props: string[]): void {
-    const breadcrump: string = '>>';
-    // вставляю символы между разными элементами массива
-    const allElements: string[] = props.reduce((list: string[], el: string, i: number) => {
-      list.push(el);
-      if (i !== props.length - 1) {
-        list.push(breadcrump);
-      }
-      return list;
-    }, []);
-
-    allElements.forEach((prop) => {
-      const propClass: string = prop === '>>' ? 'breadcrumps' : prop.toLowerCase();
-      rendered('span', parent, `breadcrump__${propClass}`, `${prop}`);
-    });
-  }
+  // возврат на главную страницу
+  private backToStoreCallback = (e: Event): void => {
+    e.preventDefault();
+    const { target } = e;
+    if (target && target instanceof HTMLAnchorElement) {
+      this.callback(e);
+    }
+  };
 }

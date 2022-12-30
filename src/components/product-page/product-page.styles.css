@@ -30,6 +30,10 @@
     color: #9A9191;
 }
 
+.breadcrump__store {
+    color: #65635F;
+}
+
 .product__imgs-container {
     display: flex;
     align-items: center;
@@ -70,15 +74,22 @@
     gap: 1.5rem;
 }
 
-.product-info__back-btn-wrapper {
+.product-info__back-btn-link {
     display: flex;
     flex-direction: row;
     gap: 2%;
     align-items: center;
+    justify-content: space-between;
+    text-transform: uppercase;
+    color: #65635F;
+    font-size: 0.9rem;
+    font-weight: 500;
+    width: 3.6rem;
 }
 
 .product-info__back-btn {
     cursor: pointer;
+    pointer-events: none;
 }
 
 .product-info__back-btn_text {
@@ -86,6 +97,7 @@
     color: #65635F;
     font-size: 0.9rem;
     font-weight: 500;
+    pointer-events: none;
 }
 
 .product-info__description-block {

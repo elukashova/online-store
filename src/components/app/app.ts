@@ -76,7 +76,7 @@ export default class App {
         break;
       // TODO: решить проблему с рефрешем страницы
       case `/${this.productID}`:
-        this.routes.productPage = new ProductPage(Number(this.productID));
+        this.routes.productPage = new ProductPage(Number(this.productID), this.route);
         this.component = this.routes.productPage.element;
         break;
       default: // TODO: строки для теста, будут заменены 404
