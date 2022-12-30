@@ -17,7 +17,7 @@ export default class CardsField extends BaseComponent {
 
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
 
-  constructor(public readonly header: Header) {
+  constructor(public readonly header: Header, private callback: (event: Event) => void) {
     super('div', 'content__container');
     this.render();
     this.checkLocalStorage();
@@ -56,7 +56,7 @@ export default class CardsField extends BaseComponent {
     const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container');
 
     cardsData.products.forEach((data) => {
-      const card: Card = new Card(data);
+      const card: Card = new Card(data, this.callback);
       card.attachObserver(this.header);
       card.attachObserver(this);
       this.cardsAll.push(card);

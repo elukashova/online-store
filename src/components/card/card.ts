@@ -36,7 +36,7 @@ export default class Card extends BaseComponent {
 
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
 
-  constructor(data: CardDataType) {
+  constructor(data: CardDataType, private callback: (event: Event) => void) {
     super('div', 'cards__item card');
     this.id = data.id;
     this.title = data.title;
@@ -64,9 +64,11 @@ export default class Card extends BaseComponent {
     rendered('p', cardInfoWrapper, 'card__price', `$ ${this.price}`);
     rendered('p', cardInfoWrapper, 'card__discount', `Discount: ${this.discountPercentage}%`);
     const buttonsWrapper: HTMLElement = rendered('div', cardInfo, 'card__btns');
-    rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
+    const productPageBtn: HTMLElement = rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
       src: 'assets/icons/button-open-card.svg',
+      id: `${this.id}`,
     });
+    productPageBtn.addEventListener('click', this.productPageBtnCallback);
     // проверяем local storage, добавлена ли этот товар в корзину
     if (this.storageInfo !== null) {
       const values: number[] = Object.values(this.storageInfo);
@@ -89,6 +91,15 @@ export default class Card extends BaseComponent {
     // вешаем слушатель на кнопку
     this.buyButton.addEventListener('click', this.buyBtnCallback);
   }
+
+  // колбэк для рутинга
+  private productPageBtnCallback = (e: Event): void => {
+    e.preventDefault();
+    const { target } = e;
+    if (target && target instanceof HTMLImageElement) {
+      this.callback(e);
+    }
+  };
 
   private buyBtnCallback = (): void => {
     if (!this.element.classList.contains('added')) {
