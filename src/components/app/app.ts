@@ -43,8 +43,14 @@ export default class App {
       this.locationHandler();
     }
     if (e.target instanceof HTMLImageElement) {
-      window.history.pushState({}, '', e.target.id);
-      this.productID = e.target.id;
+      if (Number(e.target.id)) {
+        window.history.pushState({}, '', e.target.id);
+        this.productID = e.target.id;
+      } else {
+        const id: string = e.target.id.slice(3);
+        window.history.pushState({}, '', id);
+        this.productID = id;
+      }
       this.locationHandler();
     }
   };

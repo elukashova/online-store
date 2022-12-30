@@ -52,9 +52,11 @@ export default class Card extends BaseComponent {
   // eslint-disable-next-line max-lines-per-function
   public render(): void {
     this.element.classList.add(`${this.category}`);
-    rendered('img', this.element, 'card__img', '', {
+    const cardImg: HTMLElement = rendered('img', this.element, 'card__img', '', {
       src: this.images[0],
+      id: `img${this.id}`,
     });
+    cardImg.addEventListener('click', this.productPageBtnCallback);
     const cardInfo: HTMLElement = rendered('div', this.element, 'card__info');
     const cardInfoWrapper: HTMLElement = rendered('div', cardInfo, 'card__info_wrapper');
     rendered('p', cardInfoWrapper, 'card__name', `${this.title}`);

@@ -6,6 +6,7 @@
 
 .card__img {
   max-width: 100%;
+  cursor: pointer;
 }
 
 .card__info {
