@@ -32,6 +32,12 @@ export default class ProductPage extends BaseComponent {
 
   private storeAnchorElement: HTMLElement | null = null;
 
+  private chosenImg: HTMLElement | null = null;
+
+  private notChosenImg: HTMLElement | null = null;
+
+  private mainImage: HTMLElement | null = null;
+
   // TODO: сюда надо будет передать данные из локал сторадж о том, добавлен ли товар в корзину
   constructor(id: number, private callback: (event: Event) => void) {
     super('div', 'product__container product');
@@ -73,13 +79,16 @@ export default class ProductPage extends BaseComponent {
 
     const imagesContainer: HTMLElement = rendered('div', imagesCrumbsContainer, 'product__imgs-container');
     const miniImagesWrapper: HTMLElement = rendered('div', imagesContainer, 'product__mini-imgs-wrapper product-img');
-    this.productImages.forEach((img) => {
-      rendered('img', miniImagesWrapper, 'product-img__mini', '', {
-        src: img,
-      });
+    this.chosenImg = rendered('img', miniImagesWrapper, 'product-img__mini chosen', '', {
+      src: this.productImages[0],
     });
-    const zoomImgWrapper: HTMLElement = rendered('div', imagesContainer, 'product__zoom-img-container');
-    rendered('img', zoomImgWrapper, 'product-img__zoomed', '', {
+    this.notChosenImg = rendered('img', miniImagesWrapper, 'product-img__mini not-chosen', '', {
+      src: this.productImages[1],
+    });
+    this.notChosenImg.addEventListener('click', this.changeCurrentImgCallback);
+
+    const mainImgContainer: HTMLElement = rendered('div', imagesContainer, 'product__main-img-container');
+    this.mainImage = rendered('img', mainImgContainer, 'product-img__main-img', '', {
       src: this.productImages[0],
     });
 
@@ -113,6 +122,27 @@ export default class ProductPage extends BaseComponent {
     const { target } = e;
     if (target && target instanceof HTMLAnchorElement) {
       this.callback(e);
+    }
+  };
+
+  // колбэк для клика на новую картинку
+  private changeCurrentImgCallback = (e: Event): void => {
+    e.preventDefault();
+    const { target } = e;
+    if (target && target instanceof HTMLImageElement && this.chosenImg && this.notChosenImg) {
+      target.classList.remove('not-chosen');
+      target.classList.add('chosen');
+      this.chosenImg.classList.remove('chosen');
+      this.chosenImg.classList.add('not-chosen');
+      const temp: HTMLElement = this.chosenImg;
+      this.chosenImg = target;
+      this.notChosenImg = temp;
+      this.notChosenImg.addEventListener('click', this.changeCurrentImgCallback);
+    }
+    if (this.mainImage && this.mainImage instanceof HTMLImageElement) {
+      if (this.chosenImg && this.chosenImg instanceof HTMLImageElement) {
+        this.mainImage.src = this.chosenImg.src;
+      }
     }
   };
 }
