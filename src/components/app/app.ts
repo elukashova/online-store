@@ -1,6 +1,6 @@
 import Header from '../header/header';
 import Footer from '../footer/footer';
-import { Routes } from './enums';
+import { Routes } from './app-types';
 import Main from '../main/main-component';
 import CardsField from '../cards-field/cards-field';
 import Cart from '../shopping-cart/shopping-cart';
