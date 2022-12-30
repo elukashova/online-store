@@ -11,7 +11,7 @@ const posters = {
       size: '30x30',
       stock: 94,
       category: 'Abstract',
-      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting-2.png'],
     },
     {
       id: 2,
@@ -24,7 +24,7 @@ const posters = {
       size: '40x40',
       stock: 34,
       category: 'Nature',
-      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting-2.png'],
     },
     {
       id: 3,
@@ -37,7 +37,7 @@ const posters = {
       size: '30x30',
       stock: 36,
       category: 'Romantic',
-      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting.png'],
+      images: ['assets/images/temp-painting.png', 'assets/images/temp-painting-2.png'],
     },
     {
       id: 4,
