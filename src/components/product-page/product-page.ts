@@ -2,7 +2,7 @@ import rendered from '../../utils/render/render';
 import BaseComponent from '../base-component/base-component';
 import cardsData from '../../assets/json/data';
 import './product-page.styles.css';
-import { checkDataInLocalStorage } from '../../utils/localStorage';
+import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
 import { JsonObj } from '../../utils/localStorage.types';
 // import Header from '../header/header';
 import { Observer } from '../card/card.types';
@@ -130,6 +130,7 @@ export default class ProductPage extends BaseComponent {
     this.createAddToCartBtn(productInfoContainer);
     this.addToCartBtn?.addEventListener('click', this.addToCartBtnCallback);
     this.buyNowBtn = rendered('button', productInfoContainer, 'product-info__buy-now-btn', 'buy it now');
+    this.buyNowBtn.addEventListener('click', this.buyNowCallback);
   }
 
   // создаем кнопку добавления в корзину, в зависимости от того, добавлен ли уже постер
@@ -159,12 +160,32 @@ export default class ProductPage extends BaseComponent {
       }
       e.target.textContent = 'add to cart';
       this.isAdded = false;
+      const index = this.addedItems.indexOf(this.id);
+      this.addedItems.splice(index, 1);
+      setDataToLocalStorage(this.addedItems);
     } else if (e.target instanceof HTMLButtonElement && !e.target.classList.contains('in-cart')) {
       e.target.classList.add('in-cart');
       e.target.textContent = 'remove item';
       this.isAdded = true;
+      this.addedItems.push(this.id);
+      setDataToLocalStorage(this.addedItems);
     }
     this.notifyObserver();
+  };
+
+  // колбэк быстрой покупки
+  private buyNowCallback = (e: Event): void => {
+    e.preventDefault();
+    const { target } = e;
+    if (target instanceof HTMLButtonElement) {
+      // добавление в корзину и local storage, если товар до этого не был добавлен в козину
+      if (!this.addedItems.includes(this.id)) {
+        this.isAdded = true;
+        this.addedItems.push(this.id);
+        setDataToLocalStorage(this.addedItems);
+        this.notifyObserver();
+      }
+    }
   };
 
   // возврат на главную страницу
