@@ -41,8 +41,7 @@ export default class App {
     if (e.target instanceof HTMLAnchorElement) {
       window.history.pushState({}, '', e.target.href);
       this.locationHandler();
-    }
-    if (e.target instanceof HTMLImageElement) {
+    } else if (e.target instanceof HTMLImageElement) {
       if (Number(e.target.id)) {
         window.history.pushState({}, '', e.target.id);
         this.productID = e.target.id;
@@ -51,6 +50,11 @@ export default class App {
         window.history.pushState({}, '', id);
         this.productID = id;
       }
+      this.locationHandler();
+    } else if (e.target instanceof HTMLDivElement) {
+      const id: string = e.target.id.slice(3);
+      window.history.pushState({}, '', id);
+      this.productID = id;
       this.locationHandler();
     }
   };
@@ -67,7 +71,7 @@ export default class App {
 
     switch (location) {
       case '/cart':
-        this.routes.cart = new Cart(this.header);
+        this.routes.cart = new Cart(this.header, this.route);
         this.component = this.routes.cart.element;
         break;
       case '/':
