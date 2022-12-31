@@ -11,7 +11,7 @@ import { ObservedSubject } from '../card/card.types';
 import { PromoInputs, PromoValues } from './shopping-cart.types';
 
 export default class Cart extends BaseComponent {
-  private storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
+  private storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
 
   private itemsOrder: number = 0;
 
@@ -567,7 +567,7 @@ export default class Cart extends BaseComponent {
         this.cartContainer?.remove();
         this.summaryContainer?.remove();
         this.showEmptyCart();
-        localStorage.removeItem('addedItems');
+        localStorage.removeItem('addedPosters');
       }
     }
   }

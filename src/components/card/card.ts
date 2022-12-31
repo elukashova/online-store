@@ -34,7 +34,7 @@ export default class Card extends BaseComponent {
 
   private observers: Observer[] = [];
 
-  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
+  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
 
   constructor(data: CardDataType, private callback: (event: Event) => void) {
     super('div', 'cards__item card');

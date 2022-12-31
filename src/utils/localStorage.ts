@@ -15,14 +15,14 @@ export const checkDataInLocalStorage = (key: string): JsonObj | null => {
 
 export const setDataToLocalStorage = (data: DataToSet, key?: string): void => {
   if (Array.isArray(data)) {
-    localStorage.removeItem('addedItems');
+    localStorage.removeItem('addedPosters');
     const addedItems: JsonObj = {};
 
     data.forEach((value) => {
       addedItems[`item${value}`] = value;
     });
 
-    localStorage.setItem('addedItems', JSON.stringify(addedItems));
+    localStorage.setItem('addedPosters', JSON.stringify(addedItems));
   } else if (key) {
     localStorage.removeItem(key);
     localStorage.setItem(key, JSON.stringify(data));

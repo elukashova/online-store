@@ -15,12 +15,12 @@ export default class CardsField extends BaseComponent {
 
   public addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
 
-  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
+  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
 
   constructor(public readonly header: Header, private callback: (event: Event) => void) {
     super('div', 'content__container');
-    this.render();
     this.checkLocalStorage();
+    this.render();
   }
 
   public render(): void {
