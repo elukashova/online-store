@@ -185,6 +185,9 @@ export default class ProductPage extends BaseComponent {
         setDataToLocalStorage(this.addedItems);
         this.notifyObserver();
       }
+      // переход в козину
+      // TODO: еще нет модального окна оформления покупки
+      this.callback(e);
     }
   };
 

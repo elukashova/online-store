@@ -46,15 +46,14 @@ export default class App {
         window.history.pushState({}, '', e.target.id);
         this.productID = e.target.id;
       } else {
-        const id: string = e.target.id.slice(3);
-        window.history.pushState({}, '', id);
-        this.productID = id;
+        this.updateIDThroughSlice(e.target.id);
       }
       this.locationHandler();
     } else if (e.target instanceof HTMLDivElement) {
-      const id: string = e.target.id.slice(3);
-      window.history.pushState({}, '', id);
-      this.productID = id;
+      this.updateIDThroughSlice(e.target.id);
+      this.locationHandler();
+    } else if (e.target instanceof HTMLButtonElement) {
+      window.history.pushState({}, '', '/cart');
       this.locationHandler();
     }
   };
@@ -98,4 +97,10 @@ export default class App {
       }
     }
   };
+
+  private updateIDThroughSlice(targetId: string): void {
+    const id: string = targetId.slice(3);
+    window.history.pushState({}, '', id);
+    this.productID = id;
+  }
 }
