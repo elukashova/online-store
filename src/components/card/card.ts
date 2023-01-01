@@ -97,10 +97,8 @@ export default class Card extends BaseComponent {
   // колбэк для рутинга
   private productPageBtnCallback = (e: Event): void => {
     e.preventDefault();
-    const { target } = e;
-    if (target && target instanceof HTMLImageElement) {
-      this.callback(e);
-    }
+    window.location.href = `${this.id}`;
+    this.callback(e);
   };
 
   private buyBtnCallback = (): void => {
