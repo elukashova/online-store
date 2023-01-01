@@ -11,8 +11,7 @@
 
 .card__info {
   display: flex;
-  flex-direction: row;
-  align-items: flex-end;
+  flex-direction: column;
   justify-content: space-between;
   background-color: aliceblue;
 }
@@ -34,4 +33,15 @@
 .card__btn_open-card {
   cursor: pointer;
   width: 45%;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  height: max-content;
 }

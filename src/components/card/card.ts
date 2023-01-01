@@ -12,7 +12,7 @@ export default class Card extends BaseComponent {
 
   public category: string;
 
-  public rating: number;
+  public size: string;
 
   public stock: number;
 
@@ -41,7 +41,7 @@ export default class Card extends BaseComponent {
     this.id = data.id;
     this.title = data.title;
     this.category = data.category;
-    this.rating = data.rating;
+    this.size = data.size;
     this.stock = data.stock;
     this.price = data.price;
     this.discountPercentage = data.discountPercentage;
@@ -61,7 +61,7 @@ export default class Card extends BaseComponent {
     const cardInfoWrapper: HTMLElement = rendered('div', cardInfo, 'card__info_wrapper');
     rendered('p', cardInfoWrapper, 'card__name', `${this.title}`);
     rendered('p', cardInfoWrapper, 'card__category', `${this.category}`);
-    rendered('p', cardInfoWrapper, 'card__rating', `Rating: ${this.rating}`);
+    rendered('p', cardInfoWrapper, 'card__rating', `Size: ${this.size}`);
     rendered('p', cardInfoWrapper, 'card__stock', `Stock: ${this.stock}`);
     rendered('p', cardInfoWrapper, 'card__price', `$ ${this.price}`);
     rendered('p', cardInfoWrapper, 'card__discount', `Discount: ${this.discountPercentage}%`);
