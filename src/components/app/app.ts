@@ -5,6 +5,7 @@ import Main from '../main/main-component';
 import CardsField from '../cards-field/cards-field';
 import Cart from '../shopping-cart/shopping-cart';
 import ProductPage from '../product-page/product-page';
+import Page404 from '../404/404';
 
 export default class App {
   private readonly header: Header;
@@ -58,6 +59,7 @@ export default class App {
     }
   };
 
+  // eslint-disable-next-line max-lines-per-function
   public locationHandler = async (): Promise<void> => {
     let location: string = window.location.pathname;
     if (location.length === 0) {
@@ -84,8 +86,10 @@ export default class App {
         this.component = this.routes.productPage.element;
         break;
       default: // TODO: строки для теста, будут заменены 404
-        this.component = document.createElement('div');
-        this.component.textContent = 'NO PAGE FOUND';
+        this.routes.notfound = new Page404(this.locationHandler);
+        this.component = this.routes.notfound.element;
+        this.rootElement.removeChild(this.header.element);
+        this.rootElement.removeChild(this.footer.element);
     }
 
     if (!this.mainContainer.element.hasChildNodes()) {
