@@ -41,34 +41,22 @@ export default class App {
     e.preventDefault();
     if (e.target instanceof HTMLAnchorElement) {
       window.history.pushState({}, '', e.target.href);
-      this.locationHandler();
-    } else if (e.target instanceof HTMLImageElement) {
-      if (Number(e.target.id)) {
-        window.history.pushState({}, '', e.target.id);
-        this.productID = e.target.id;
-      } else {
-        this.updateIDThroughSlice(e.target.id);
-      }
-      this.locationHandler();
-    } else if (e.target instanceof HTMLDivElement) {
-      this.updateIDThroughSlice(e.target.id);
-      this.locationHandler();
-    } else if (e.target instanceof HTMLButtonElement) {
-      window.history.pushState({}, '', '/cart');
-      this.locationHandler();
+    } else {
+      const { href } = window.location;
+      window.history.pushState({}, '', href);
     }
+    this.locationHandler();
   };
 
   // eslint-disable-next-line max-lines-per-function
   public locationHandler = async (): Promise<void> => {
-    let location: string = window.location.pathname;
-    if (location.length === 0) {
-      location = '/';
-    }
+    const location: string = window.location.pathname.length === 0 ? '/' : window.location.pathname;
 
     if (Number(location.slice(1))) {
       this.productID = location.slice(1);
     }
+    // footer и header удаляюься на 404, поэтому надо проверить, не надо ли их снова повесить
+    this.appendHeaderFooter(this.header.element, this.footer.element);
 
     switch (location) {
       case '/cart':
@@ -86,7 +74,7 @@ export default class App {
         this.component = this.routes.productPage.element;
         break;
       default: // TODO: строки для теста, будут заменены 404
-        this.routes.notfound = new Page404(this.locationHandler);
+        this.routes.notfound = new Page404(this.route);
         this.component = this.routes.notfound.element;
         this.rootElement.removeChild(this.header.element);
         this.rootElement.removeChild(this.footer.element);
@@ -102,9 +90,10 @@ export default class App {
     }
   };
 
-  private updateIDThroughSlice(targetId: string): void {
-    const id: string = targetId.slice(3);
-    window.history.pushState({}, '', id);
-    this.productID = id;
+  private appendHeaderFooter(header: Element, footer: Element): void {
+    if (this.rootElement.firstChild !== header && this.rootElement.lastChild !== footer) {
+      this.rootElement.insertBefore(header, this.mainContainer.element);
+      this.rootElement.append(footer);
+    }
   }
 }

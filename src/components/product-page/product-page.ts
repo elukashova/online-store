@@ -187,6 +187,7 @@ export default class ProductPage extends BaseComponent {
       }
       // переход в козину
       // TODO: еще нет модального окна оформления покупки
+      window.location.href = '/cart';
       this.callback(e);
     }
   };
