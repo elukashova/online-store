@@ -49,7 +49,8 @@ export default class CartCard extends BaseComponent {
 
   public plus: boolean = false;
 
-  constructor(private data: CardDataType, private itemsOrder: number) {
+  // eslint-disable-next-line max-len
+  constructor(private data: CardDataType, private itemsOrder: number, private callback: (event: Event) => void) {
     super('div', 'cart-items__item cart-item');
     this.id = this.data.id;
     this.storageInfo = checkDataInLocalStorage(`${this.id}`);
@@ -77,7 +78,10 @@ export default class CartCard extends BaseComponent {
   // eslint-disable-next-line max-lines-per-function
   public render(): void {
     // правая карточка
-    const itemCard = rendered('div', this.element, 'cart-item__card');
+    const itemCard = rendered('div', this.element, 'cart-item__card', '', {
+      id: `crd${this.id}`,
+    });
+    itemCard.addEventListener('click', this.productPageCallback);
     rendered('span', itemCard, 'cart-item__order', `${this.cartItemInfo.itemOrder}`);
     rendered('img', itemCard, 'cart-item__img', '', {
       src: this.images[0],
@@ -122,6 +126,12 @@ export default class CartCard extends BaseComponent {
       `${this.cartItemInfo.itemTotalPrice}`,
     );
   }
+
+  private productPageCallback = (e: Event): void => {
+    e.preventDefault();
+    window.location.href = `${this.id}`;
+    this.callback(e);
+  };
 
   private minusBtnCallback = (): void => {
     this.minus = true;

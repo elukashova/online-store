@@ -5,8 +5,8 @@
 }
 
 .card__img {
-  width: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  cursor: pointer;
 }
 
 .card__info {
@@ -19,16 +19,20 @@
 .card__info_wrapper {
   display: flex;
   flex-direction: column;
+  width: 72%;
 }
 
 .card__btns {
   display: flex;
   flex-direction: row;
-  align-self: end;
+  justify-content: space-between;
+  width: 28%;
 }
 
-.card__btn_buy {
+.card__btn_buy,
+.card__btn_open-card {
   cursor: pointer;
+  width: 45%;
 }
 
 .hidden {

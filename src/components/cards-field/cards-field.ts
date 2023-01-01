@@ -32,12 +32,13 @@ export default class CardsField extends BaseComponent {
 
   public selectInput: HTMLElement | null = null;
 
-  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
+  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
 
-  constructor(public readonly header: Header) {
+
+  constructor(public readonly header: Header, private callback: (event: Event) => void) {
     super('div', 'content__container');
-    this.render();
     this.checkLocalStorage();
+    this.render();
   }
 
   public render(): void {
@@ -99,7 +100,7 @@ export default class CardsField extends BaseComponent {
     });
 
     cardsData.products.forEach((data) => {
-      const card: Card = new Card(data);
+      const card: Card = new Card(data, this.callback);
       card.attachObserver(this.header);
       card.attachObserver(this);
       this.cardsAll.push(card);
