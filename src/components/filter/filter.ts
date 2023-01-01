@@ -1,8 +1,8 @@
+/* eslint-disable max-lines-per-function */
 import './filter.styles.css';
 import rendered from '../../utils/render/render';
 import cardsData from '../../assets/json/data';
-import findMinAndMaxPrice from './utils/find.minmax.price';
-import findMinAndMaxCount from './utils/find.minmax.stock';
+import findMinAndMax from './utils/find.minmax';
 import RangeTypes from './enums.filter';
 
 export default class Filter {
@@ -47,17 +47,15 @@ export default class Filter {
     const inputWrapper: HTMLElement = rendered('div', filterWrapper, `filters__${str}_wrapper`);
     const sliderWrapper: HTMLElement = rendered('div', inputWrapper, `filters__${str}_slider`);
     const valueWrapper: HTMLElement = rendered('div', inputWrapper, `filters__${str}_value-wrapper ${str}-value`);
-    const [minPrice, maxPrice]: number[] = findMinAndMaxPrice(cardsData.products);
-    const [minCount, maxCount]: number[] = findMinAndMaxCount(cardsData.products);
+    const valuePrefix = str === 'price' ? '$ ' : '';
+    const [minPrice, maxPrice]: number[] = findMinAndMax(cardsData.products, str);
+    const [minCount, maxCount]: number[] = findMinAndMax(cardsData.products, str);
     const maxValue: string = str === 'price' ? `${maxPrice}` : `${maxCount}`;
     const minValue: string = str === 'price' ? `${minPrice}` : `${minCount}`;
-    if (str === 'price') {
-      rendered('span', valueWrapper, `${str}-value__from`, `$ ${minValue}`, { id: `from-${str}-value` });
-      rendered('span', valueWrapper, `${str}-value__to`, `$ ${maxValue}`, { id: `to-${str}-value` });
-    } else {
-      rendered('span', valueWrapper, `${str}-value__from`, `${minValue}`, { id: `from-${str}-value` });
-      rendered('span', valueWrapper, `${str}-value__to`, `${maxValue}`, { id: `to-${str}-value` });
-    }
+    rendered('span', valueWrapper, `${str}-value__from`, `${valuePrefix}${minValue}`, {
+      id: `from-${str}-value`,
+    });
+    rendered('span', valueWrapper, `${str}-value__to`, `${valuePrefix}${maxValue}`, { id: `to-${str}-value` });
 
     const lowestInput: HTMLElement = rendered('input', sliderWrapper, `filters__${str}_lowest`, '', {
       id: `from-${str}`,
@@ -75,31 +73,35 @@ export default class Filter {
       value: maxValue,
       step: '1',
     });
-    this.changeInputRange(lowestInput, highestInput); // вешаем функцию слушатель
-    console.log(lowestInput, highestInput);
+    this.addListenerToRange(lowestInput, highestInput); // вешаем функцию слушатель
     return filterWrapper;
   }
 
-  public changeInputRange(lowestInput: HTMLElement, highestInput: HTMLElement): void {
+  // eslint-disable-next-line max-len
+  public addListenerToRange(lowestInput: HTMLElement, highestInput: HTMLElement): void {
     if (lowestInput instanceof HTMLInputElement && highestInput instanceof HTMLInputElement) {
       lowestInput.addEventListener('input', (e) => {
-        if (e.target === document.getElementById('from-price')) {
-          this.changeLowInput(lowestInput, highestInput, RangeTypes.PriceFrom);
-          this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
-        }
-        if (e.target === document.getElementById('from-stock')) {
-          this.changeLowInput(lowestInput, highestInput, RangeTypes.StockFrom);
-          this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+        if (e.target && e.target instanceof HTMLElement) {
+          if (e.target.id === RangeTypes.PriceFrom) {
+            this.changeLowInput(lowestInput, highestInput, RangeTypes.PriceFrom);
+            this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
+          }
+          if (e.target.id === RangeTypes.StockFrom) {
+            this.changeLowInput(lowestInput, highestInput, RangeTypes.StockFrom);
+            this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+          }
         }
       });
       highestInput.addEventListener('input', (e) => {
-        if (e.target === document.getElementById('to-price')) {
-          this.changeHighInput(lowestInput, highestInput, RangeTypes.PriceTo);
-          this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
-        }
-        if (e.target === document.getElementById('to-stock')) {
-          this.changeHighInput(lowestInput, highestInput, RangeTypes.StockTo);
-          this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+        if (e.target && e.target instanceof HTMLElement) {
+          if (e.target.id === RangeTypes.PriceTo) {
+            this.changeHighInput(lowestInput, highestInput, RangeTypes.PriceTo);
+            this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
+          }
+          if (e.target.id === RangeTypes.StockTo) {
+            this.changeHighInput(lowestInput, highestInput, RangeTypes.StockTo);
+            this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+          }
         }
       });
     }

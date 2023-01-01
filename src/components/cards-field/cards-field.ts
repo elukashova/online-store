@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
 import './cards-field.styles.css';
 import BaseComponent from '../base-component/base-component';
@@ -19,7 +20,20 @@ export default class CardsField extends BaseComponent {
 
   public addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
 
+  public cardsContainer: HTMLElement | null = null;
+
+  public sortByPriceElement: HTMLElement | null = null;
+
+  public sortByRatingElement: HTMLElement | null = null;
+
+  public notFoundText: HTMLElement | null = null;
+
+  public postersFound: HTMLElement | null = null;
+
+  public selectInput: HTMLElement | null = null;
+
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
+
 
   constructor(public readonly header: Header, private callback: (event: Event) => void) {
     super('div', 'content__container');
@@ -53,16 +67,44 @@ export default class CardsField extends BaseComponent {
     const stockFilter: Filter = new Filter(filtersContainer, 'Stock', this.updateActiveFilters);
     const stockTitles: HTMLElement = stockFilter.renderInputRange('stock');
     filtersContainer.append(stockTitles);
-    const cardsContainer: HTMLElement = rendered('div', this.element, 'cards__container', '', {
+
+    const contentContainer: HTMLElement = rendered('div', this.element, 'cards__content');
+    const sortWrapper = rendered('div', contentContainer, 'cards__sort-wrapper');
+    this.selectInput = rendered('select', sortWrapper, 'cards__sort-products');
+    rendered('option', this.selectInput, 'cards__sort-standart-value', 'Sort posters', {
+      value: 'no-sort',
+      disabled: '',
+      selected: '',
+    });
+    this.sortByPriceElement = rendered('option', this.selectInput, 'cards__sort-by-price', 'Sort by price', {
+      value: 'price',
+    });
+    this.sortByRatingElement = rendered('option', this.selectInput, 'cards__sort-by-rating', 'Sort by rating', {
+      value: 'rating',
+    });
+    this.postersFound = rendered('div', sortWrapper, 'cards__found-count', 'Found: 24');
+    const searchInputWrapper = rendered('div', sortWrapper, 'cards__search-wrapper');
+    rendered('input', searchInputWrapper, 'cards__search', '', {
+      type: 'search',
+      placeholder: 'Search poster',
+    });
+    rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg' });
+    const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
+    rendered('img', viewTypes, 'cards__view-line', '', { src: 'assets/icons/list-line.png' });
+    rendered('img', viewTypes, 'cards__view-block', '', { src: 'assets/icons/list-block.png' });
+    this.cardsContainer = rendered('div', contentContainer, 'cards__container', '', {
       id: 'cards__container',
     });
-    rendered('p', cardsContainer, 'cards__not-found hidden', 'Product not found', { id: 'cards__not-found' });
+    this.notFoundText = rendered('p', this.cardsContainer, 'cards__not-found hidden', 'Product not found', {
+      id: 'cards__not-found',
+    });
+
     cardsData.products.forEach((data) => {
       const card: Card = new Card(data, this.callback);
       card.attachObserver(this.header);
       card.attachObserver(this);
       this.cardsAll.push(card);
-      cardsContainer.append(card.element);
+      if (this.cardsContainer) this.cardsContainer.append(card.element);
     });
   }
 
@@ -76,45 +118,50 @@ export default class CardsField extends BaseComponent {
   // в формате 'Price, 75, 125'. Проверяем есть ли значение, начинающееся на Price
   // в массиве. Если нет - пушим, есть - заменяем.
   public updateActiveFilters = (filter: string): void => {
-    if (this.activeFilters.includes(filter)) {
-      this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
-    } else if (filter.split(',')[0] === 'Price') {
-      const prevPrice = this.activeFilters.find((elem) => elem.startsWith(filter.split(',')[0]));
+    const pushToActive = (array: string[], value: string): number => array.push(value);
+    if (this.getFilterType(filter, 0) === 'Price') {
+      const prevPrice = this.activeFilters.find((elem) => elem.startsWith(this.getFilterType(filter, 0)));
       if (prevPrice !== undefined) {
         this.activeFilters.splice(this.activeFilters.indexOf(prevPrice), 1, filter);
       } else {
-        this.activeFilters.push(filter);
+        pushToActive(this.activeFilters, filter);
       }
-    } else if (filter.split(',')[0] === 'Count') {
-      const prevCount = this.activeFilters.find((elem) => elem.startsWith(filter.split(',')[0]));
+    } else if (this.getFilterType(filter, 0) === 'Count') {
+      const prevCount = this.activeFilters.find((elem) => elem.startsWith(this.getFilterType(filter, 0)));
       if (prevCount !== undefined) {
         this.activeFilters.splice(this.activeFilters.indexOf(prevCount), 1, filter);
       } else {
-        this.activeFilters.push(filter);
+        pushToActive(this.activeFilters, filter);
       }
+    } else if (this.activeFilters.includes(filter)) {
+      this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
     } else if (!this.activeFilters.includes(filter)) {
-      this.activeFilters.push(filter);
+      pushToActive(this.activeFilters, filter);
     }
     this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
 
   public addClassesForCards(activeFilters: string[], cards: Card[]): void {
     this.resetClasses(activeFilters, cards); // сбрасываем классы
-    this.visibleCards.length = 0;
-    const [priceFrom, priceTo] = this.getPrice(activeFilters); // получаем конкретные значения фильтров цены и стока
-    const [countFrom, countTo] = this.getCount(activeFilters);
 
-    const bySize: Card[] = cards.filter((card) => activeFilters.some((filter) => card.size.includes(filter)));
-    const byCategory: Card[] = cards.filter((card) => activeFilters.some((filter) => card.category.includes(filter)));
-    const byPrice: Card[] = cards.filter((card) => card.price >= priceFrom && card.price <= priceTo);
-    const byCount: Card[] = cards.filter((card) => card.stock >= countFrom && card.stock <= countTo);
+    const bySize: Card[] = cards.filter((card) => activeFilters.some((filt) => card.size.includes(filt)));
+    const byCategory: Card[] = cards.filter((card) => activeFilters.some((filt) => card.category.includes(filt)));
+    const byPrice: Card[] = cards.filter((card) => {
+      const [priceFrom, priceTo] = this.getPrice(activeFilters);
+      return card.price >= priceFrom && card.price <= priceTo;
+    });
+    const byCount: Card[] = cards.filter((card) => {
+      const [countFrom, countTo] = this.getCount(activeFilters);
+      return card.stock >= countFrom && card.stock <= countTo;
+    });
+    if (!!byCategory.length || !!bySize.length || !!byPrice.length || !!byCount.length) {
+      this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount);
+    }
 
-    this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount);
-    const notFoundText = document.getElementById('cards__not-found');
     if (this.visibleCards.length === 0 && this.activeFilters.length !== 0) {
-      if (notFoundText) {
-        notFoundText.classList.add('visible');
-        notFoundText.classList.remove('hidden');
+      if (this.notFoundText) {
+        this.notFoundText.classList.add('visible');
+        this.notFoundText.classList.remove('hidden');
         this.cardsAll.forEach((card) => {
           card.element.classList.add('hidden');
           card.element.classList.remove('visible');
@@ -122,59 +169,74 @@ export default class CardsField extends BaseComponent {
       }
     } else {
       this.visibleCards.forEach((visibleCard) => {
-        if (notFoundText) {
-          notFoundText.classList.add('hidden');
-          notFoundText.classList.remove('visible');
+        if (this.notFoundText) {
+          this.notFoundText.classList.add('hidden');
+          this.notFoundText.classList.remove('visible');
         }
         visibleCard.element.classList.add('visible');
         visibleCard.element.classList.remove('hidden');
       });
     }
+
+    // this.addSortListener(this.visibleCards);
+    if (this.postersFound) this.postersFound.textContent = `Found: ${this.visibleCards.length}`;
   }
+
+  public getFilterType = (value: string, index: number): string => value.split(',')[index];
 
   // функция принимает отфильтрованные значения категории, размера, цены и остатка
   // на складе в виде массивов карточек, проверяет, что массивы не пустые и в зависимости
   // от этого фильтрует товары, исключая те, которые не подходят по всем активным фильтрам.
-  public filterArrays(arr1?: Card[], arr2?: Card[], arr3?: Card[], arr4?: Card[]): Card[] {
-    let arrays: Card[][] = [];
-    arrays.length = 0;
-    if (arr1 && arr1.length === 0) {
-      if (arr2 && arr2.length === 0 && arr3 && arr3.length === 0) {
-        if (arr4) arrays = [[...arr4]];
-      } else if (arr2 && arr2.length === 0 && arr4 && arr4.length === 0) {
-        if (arr3) arrays = [[...arr3]];
-      } else if (arr3 && arr3.length === 0 && arr4 && arr4.length === 0) {
-        if (arr2) arrays = [[...arr2]];
-      } else if (arr2 && arr2.length === 0) {
-        if (arr3 && arr4) arrays = [[...arr3], [...arr4]];
-      } else if (arr3 && arr3.length === 0) {
-        if (arr2 && arr4) arrays = [[...arr2], [...arr4]];
-      } else if (arr4 && arr4.length === 0) {
-        if (arr2 && arr3) arrays = [[...arr2], [...arr3]];
-      } else if (arr2 && arr3 && arr4) arrays = [[...arr2], [...arr3], [...arr4]];
-    } else if (arr2 && arr2.length === 0) {
-      if (arr3 && arr3.length === 0 && arr4 && arr4.length === 0) {
-        if (arr1 && arr3) arrays = [[...arr1]];
-      } else if (arr3 && arr3.length === 0) {
-        if (arr1 && arr4) arrays = [[...arr1], [...arr4]];
-      } else if (arr4 && arr4.length === 0) {
-        if (arr1 && arr3) arrays = [[...arr1], [...arr3]];
-      } else if (arr1 && arr3 && arr4) arrays = [[...arr1], [...arr3], [...arr4]];
-    } else if (arr3 && arr3.length === 0) {
-      if (arr4 && arr4.length === 0) {
-        if (arr1 && arr2) arrays = [[...arr1], [...arr2]];
-      } else if (arr1 && arr2 && arr4) arrays = [[...arr1], [...arr2], [...arr4]];
-    } else if (arr4 && arr4.length === 0) {
-      if (arr1 && arr2 && arr3) arrays = [[...arr1], [...arr2], [...arr3]];
-    } else if (arr1 && arr2 && arr3 && arr4) {
-      if (arr1.length > 0 && arr2.length > 0 && arr3.length > 0 && arr4.length > 0) {
-        arrays = [[...arr1], [...arr2], [...arr3], [...arr4]];
-      }
-    }
-    let result: Card[] = [];
-    result = arrays.reduce((acc, item) => acc.filter((elem) => item.includes(elem)));
+  public filterArrays(arr1: Card[], arr2: Card[], arr3: Card[], arr4: Card[]): Card[] {
+    const allArr: Card[][] = [arr1, arr2, arr3, arr4].filter((arr) => arr.length > 0);
+    const result = allArr.reduce((acc, item) => acc.filter((elem) => item.includes(elem)));
     return result;
   }
+
+  public addSortListener(arr: Card[]): void {
+    console.log(arr);
+    if (this.selectInput) {
+      this.selectInput.addEventListener('change', (event) => {
+        if (event.target && event.target instanceof HTMLSelectElement) {
+          if (event.target.value === 'price') {
+            const sorting = this.sortByField(arr, 'price');
+            console.log(sorting);
+          } else {
+            this.sortByField(arr, 'rating');
+          }
+        }
+      });
+      console.log(arr);
+    }
+  }
+
+  // функция сортировки
+  public sortByField(arr: Card[], field: string): Card[] {
+    return arr.sort((a, b) => (field === 'price' ? a.price - b.price : b.rating - a.rating));
+  }
+
+  /* {public fillContainer(cards: Card[]): void {
+    console.log(cards);
+    cards.forEach((card) => {
+      if (this.visibleCards.length) {
+        if (this.cardsContainer) {
+          this.cardsContainer.removeChild(card.element);
+          this.cardsContainer.removeChild(card.element);
+        } }}); const card: Card = new Card(data);
+      card.attachObserver(this.header);
+      card.attachObserver(this);
+      console.log(this.visibleCards.length);
+      if (this.visibleCards.length) {
+        if (this.cardsContainer) {
+          this.cardsContainer.removeChild(card.element);
+          this.cardsContainer.removeChild(card.element);
+        }
+      } else {
+        this.cardsAll.push(card);
+        if (this.cardsContainer) this.cardsContainer.append(card.element);
+      }
+    });
+  } */
 
   // сброс классов
   public resetClasses(activeFilters: string[], cards: Card[]): void {
@@ -193,8 +255,8 @@ export default class CardsField extends BaseComponent {
   public getPrice(activeFilters: string[]): number[] {
     let result: number[] = [];
     activeFilters.forEach((filter) => {
-      if (filter.split(',')[0] === 'Price') {
-        result = [+filter.split(',')[1], +filter.split(',')[2]];
+      if (this.getFilterType(filter, 0) === 'Price') {
+        result = [+this.getFilterType(filter, 1), +this.getFilterType(filter, 2)];
       }
     });
     return result;
@@ -203,8 +265,8 @@ export default class CardsField extends BaseComponent {
   public getCount(activeFilters: string[]): number[] {
     let result: number[] = [];
     activeFilters.forEach((filter) => {
-      if (filter.split(',')[0] === 'Count') {
-        result = [+filter.split(',')[1], +filter.split(',')[2]];
+      if (this.getFilterType(filter, 0) === 'Count') {
+        result = [+this.getFilterType(filter, 1), +this.getFilterType(filter, 2)];
       }
     });
     return result;

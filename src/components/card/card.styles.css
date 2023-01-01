@@ -45,3 +45,10 @@
   flex-wrap: nowrap;
   height: max-content;
 }
+
+/* .cards__item.line-view {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+ */
