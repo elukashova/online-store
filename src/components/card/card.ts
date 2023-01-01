@@ -18,6 +18,8 @@ export default class Card extends BaseComponent {
 
   public price: number;
 
+  public rating: number;
+
   public discountPercentage: number;
 
   public images: string[];
@@ -44,6 +46,7 @@ export default class Card extends BaseComponent {
     this.size = data.size;
     this.stock = data.stock;
     this.price = data.price;
+    this.rating = data.rating;
     this.discountPercentage = data.discountPercentage;
     this.images = data.images.slice();
     this.render();
