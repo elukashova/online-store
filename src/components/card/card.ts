@@ -34,9 +34,9 @@ export default class Card extends BaseComponent {
 
   private observers: Observer[] = [];
 
-  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
+  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
 
-  constructor(data: CardDataType) {
+  constructor(data: CardDataType, private callback: (event: Event) => void) {
     super('div', 'cards__item card');
     this.id = data.id;
     this.title = data.title;
@@ -52,9 +52,11 @@ export default class Card extends BaseComponent {
   // eslint-disable-next-line max-lines-per-function
   public render(): void {
     this.element.classList.add(`${this.category}`);
-    rendered('img', this.element, 'card__img', '', {
+    const cardImg: HTMLElement = rendered('img', this.element, 'card__img', '', {
       src: this.images[0],
+      id: `img${this.id}`,
     });
+    cardImg.addEventListener('click', this.productPageBtnCallback);
     const cardInfo: HTMLElement = rendered('div', this.element, 'card__info');
     const cardInfoWrapper: HTMLElement = rendered('div', cardInfo, 'card__info_wrapper');
     rendered('p', cardInfoWrapper, 'card__name', `${this.title}`);
@@ -64,9 +66,11 @@ export default class Card extends BaseComponent {
     rendered('p', cardInfoWrapper, 'card__price', `$ ${this.price}`);
     rendered('p', cardInfoWrapper, 'card__discount', `Discount: ${this.discountPercentage}%`);
     const buttonsWrapper: HTMLElement = rendered('div', cardInfo, 'card__btns');
-    rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
+    const productPageBtn: HTMLElement = rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
       src: 'assets/icons/button-open-card.svg',
+      id: `${this.id}`,
     });
+    productPageBtn.addEventListener('click', this.productPageBtnCallback);
     // проверяем local storage, добавлена ли этот товар в корзину
     if (this.storageInfo !== null) {
       const values: number[] = Object.values(this.storageInfo);
@@ -89,6 +93,15 @@ export default class Card extends BaseComponent {
     // вешаем слушатель на кнопку
     this.buyButton.addEventListener('click', this.buyBtnCallback);
   }
+
+  // колбэк для рутинга
+  private productPageBtnCallback = (e: Event): void => {
+    e.preventDefault();
+    const { target } = e;
+    if (target && target instanceof HTMLImageElement) {
+      this.callback(e);
+    }
+  };
 
   private buyBtnCallback = (): void => {
     if (!this.element.classList.contains('added')) {

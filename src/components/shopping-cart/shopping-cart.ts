@@ -11,7 +11,7 @@ import { ObservedSubject } from '../card/card.types';
 import { PromoInputs, PromoValues } from './shopping-cart.types';
 
 export default class Cart extends BaseComponent {
-  private storageInfo: JsonObj | null = checkDataInLocalStorage('addedItems');
+  private storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
 
   private itemsOrder: number = 0;
 
@@ -86,7 +86,7 @@ export default class Cart extends BaseComponent {
 
   private appliedPromos: string[] = [];
 
-  constructor(public readonly header: Header) {
+  constructor(public readonly header: Header, private callback: (event: Event) => void) {
     super('div', 'cart-container cart');
     this.cartItems = this.header.headerInfo.cartItems;
     this.totalPrice = this.header.headerInfo.totalPrice;
@@ -126,10 +126,10 @@ export default class Cart extends BaseComponent {
     // items
     // проверяю количество товаров, чтобы понять, нужна ли пагинация
     if (this.addedItems.length <= this.itemsPerPage) {
-      this.createItemsCards(this.addedItems);
+      this.createItemsCards(this.addedItems, this.callback);
     } else if (this.addedItems.length > this.itemsPerPage) {
       // передаем первые два товара на первую страницу пагинации
-      this.createItemsCards(this.addedItems.slice(0, this.itemsPerPage));
+      this.createItemsCards(this.addedItems.slice(0, this.itemsPerPage), this.callback);
       // активируем кнопку и добавляем листенер
       this.activateRightButton();
     }
@@ -164,7 +164,7 @@ export default class Cart extends BaseComponent {
   }
 
   // функция создания карточек
-  private createItemsCards(array: number[]): void {
+  private createItemsCards(array: number[], callback: (event: Event) => void): void {
     cardsData.products.forEach((data) => {
       for (let i: number = 0; i < array.length; i += 1) {
         if (data.id === array[i]) {
@@ -174,7 +174,7 @@ export default class Cart extends BaseComponent {
           this.slideBack = false;
           this.itemsNumberChange = false;
           this.itemsOrder += 1;
-          const card = new CartCard(data, this.itemsOrder);
+          const card = new CartCard(data, this.itemsOrder, callback);
           card.attachObserver(this.header);
           card.attachObserver(this);
           this.cartContainer?.append(card.element);
@@ -198,12 +198,12 @@ export default class Cart extends BaseComponent {
     this.startIdx += this.itemsPerPage;
     this.endIdx = this.startIdx + this.itemsPerPage;
     if (this.addedItems.slice(this.startIdx).length <= this.itemsPerPage) {
-      this.createItemsCards(this.addedItems.slice(this.startIdx));
+      this.createItemsCards(this.addedItems.slice(this.startIdx), this.callback);
       if (this.currentPage === this.pagesNumber && this.rightArrowBtn) {
         this.deactivateRightButton();
       }
     } else {
-      this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
+      this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx), this.callback);
     }
   };
 
@@ -224,7 +224,7 @@ export default class Cart extends BaseComponent {
     // проверяем, на какой мы странице и создаем новые карточки
     this.endIdx = this.startIdx;
     this.startIdx -= this.itemsPerPage;
-    this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
+    this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx), this.callback);
     if (this.currentPage === 1) {
       if (this.leftArrowBtn) {
         this.deactivateLeftButton();
@@ -433,16 +433,16 @@ export default class Cart extends BaseComponent {
     if (this.currentPage === 1) {
       this.startIdx = 0;
       this.endIdx = this.startIdx + this.itemsPerPage;
-      this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
+      this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx), this.callback);
       this.deactivateLeftButton();
       if (this.pagesNumber === 1) {
         this.deactivateRightButton();
       }
     } else if (this.currentPage === this.pagesNumber) {
-      this.createItemsCards(this.addedItems.slice(this.startIdx));
+      this.createItemsCards(this.addedItems.slice(this.startIdx), this.callback);
       this.deactivateRightButton();
     } else {
-      this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx));
+      this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx), this.callback);
     }
   }
 
@@ -567,7 +567,7 @@ export default class Cart extends BaseComponent {
         this.cartContainer?.remove();
         this.summaryContainer?.remove();
         this.showEmptyCart();
-        localStorage.removeItem('addedItems');
+        localStorage.removeItem('addedPosters');
       }
     }
   }

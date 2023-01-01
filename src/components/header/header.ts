@@ -7,6 +7,7 @@ import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/loca
 import { HeaderInfoType } from './header.types';
 import { JsonObj } from '../../utils/localStorage.types';
 import CartCard from '../shopping-cart/card-cart';
+import ProductPage from '../product-page/product-page';
 
 export default class Header extends BaseComponent {
   public totalPriceElement: HTMLElement | null = null;
@@ -69,12 +70,10 @@ export default class Header extends BaseComponent {
     // если это ново-добавленный элемент, добавляю его цену к тотал и увеличиваю кол-во в корзине
     if (subject instanceof Card) {
       if (subject.element.classList.contains('added')) {
-        this.headerInfo.totalPrice += subject.price;
-        this.headerInfo.cartItems += 1;
+        this.increaseNumbers(subject.price);
       } else if (!subject.element.classList.contains('added')) {
         // если нет, наоборот
-        this.headerInfo.totalPrice -= subject.price;
-        this.headerInfo.cartItems -= 1;
+        this.decreaseNumbers(subject.price);
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
@@ -82,11 +81,19 @@ export default class Header extends BaseComponent {
     // обсервер на увеличение количество отдельных товаров в корзине
     if (subject instanceof CartCard) {
       if (subject.plus === true && subject.cartItemInfo.itemAmount <= subject.stock) {
-        this.headerInfo.totalPrice += subject.price;
-        this.headerInfo.cartItems += 1;
+        this.increaseNumbers(subject.price);
       } else if (subject.minus === true && subject.cartItemInfo.itemAmount >= 0) {
-        this.headerInfo.totalPrice -= subject.price;
-        this.headerInfo.cartItems -= 1;
+        this.decreaseNumbers(subject.price);
+      }
+      setDataToLocalStorage(this.headerInfo, 'headerInfo');
+    }
+
+    // обсервер на увеличение количество отдельных товаров в корзине
+    if (subject instanceof ProductPage) {
+      if (subject.isAdded === true) {
+        this.increaseNumbers(subject.price);
+      } else if (subject.isAdded === false) {
+        this.decreaseNumbers(subject.price);
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
@@ -96,6 +103,16 @@ export default class Header extends BaseComponent {
       this.totalPriceElement.textContent = `${this.headerInfo.totalPrice}`;
       this.cartItemsElement.textContent = `${this.headerInfo.cartItems}`;
     }
+  }
+
+  private increaseNumbers(price: number): void {
+    this.headerInfo.totalPrice += price;
+    this.headerInfo.cartItems += 1;
+  }
+
+  private decreaseNumbers(price: number): void {
+    this.headerInfo.totalPrice -= price;
+    this.headerInfo.cartItems -= 1;
   }
 
   private checkLocalStorage(): void {
