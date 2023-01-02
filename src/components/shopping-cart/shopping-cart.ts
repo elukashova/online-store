@@ -5,13 +5,15 @@ import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
 import CartCard from './card-cart';
 import Header from '../header/header';
-import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
+import { checkDataInLocalStorage, checkPromoDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
 import { PosterStorageInfoType } from '../../utils/localStorage.types';
 import { ObservedSubject } from '../card/card.types';
 import { PromoInputs, PromoValues } from './shopping-cart.types';
 
 export default class Cart extends BaseComponent {
   private storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
+
+  private promoStorageInfo: string[] | null = checkPromoDataInLocalStorage('appliedPromo');
 
   private itemsOrder: number = 0;
 
@@ -95,6 +97,16 @@ export default class Cart extends BaseComponent {
       // считаю количество страниц в пагинации
       this.pagesNumber = Math.ceil(this.addedItems.length / this.itemsPerPage);
       this.render();
+      // проверяем, было ли уже применены скидки
+      if (this.promoStorageInfo !== null) {
+        this.appliedPromos = this.promoStorageInfo.slice();
+        this.appliedPromos.forEach((promo) => {
+          const name: string = promo;
+          const key: number = this.choosePromoValue(name);
+          this.afterPromoPrice = this.calculateNewPrice();
+          this.createElementsForAppliedPromo(name, key);
+        });
+      }
     } else {
       this.showEmptyCart();
     }
@@ -294,6 +306,14 @@ export default class Cart extends BaseComponent {
     }
   }
 
+  private createDropBlock(value: string, key: number, action: string): void {
+    this.promoDropWrapper = this.createAplyOrDropPromoBlock(value, key, action);
+    //  подвешиваем drop
+    if (this.appliedPromosElement) {
+      this.appliedPromosElement.append(this.promoDropWrapper);
+    }
+  }
+
   // создание блока для применения или сброса прокомода
   private createAplyOrDropPromoBlock(value: string, key: number, action?: string): HTMLElement {
     const newBlock: HTMLElement = document.createElement('div');
@@ -320,16 +340,21 @@ export default class Cart extends BaseComponent {
     const key: number | null = value ? this.choosePromoValue(value) : null;
     // сохраняем инфо о премененном коде
     this.appliedPromos.push(value);
+    setDataToLocalStorage(this.appliedPromos, 'appliedPromo');
     // оставляем описание промо под input, но без кнопки
     if (value && key) {
       this.createApplyBlock(value, key);
+      this.afterPromoPrice = this.calculateNewPrice();
+      this.createElementsForAppliedPromo(value, key);
     }
-    this.afterPromoPrice = this.calculateNewPrice();
+  };
+
+  private createElementsForAppliedPromo(value: string, key: number): void {
     if (this.totalSumContainer && key && value) {
       // запоминаем будущего родителя новых элементов
       const parent: ParentNode | null = this.totalSumContainer.parentNode;
       // если это первый код
-      if (this.appliedPromos.length === 1) {
+      if (!this.totalSumContainer.classList.contains('old-price')) {
         // перечеркиваем старую цену
         this.totalSumContainer.classList.add('old-price');
         // создаем блок с новой ценой
@@ -353,16 +378,12 @@ export default class Cart extends BaseComponent {
           parent.insertBefore(this.appliedPromosElement, this.promocodeContainer);
         }
       } else if (this.newPriceElement) {
-        this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
+        this.newPriceElement.textContent = `$ ${this.afterPromoPrice.toLocaleString('en-US')}`;
       }
       // создание блока с drop
-      this.promoDropWrapper = this.createAplyOrDropPromoBlock(value, key, 'drop');
-      //  подвешиваем drop
-      if (this.appliedPromosElement) {
-        this.appliedPromosElement.append(this.promoDropWrapper);
-      }
+      this.createDropBlock(value, key, 'drop');
     }
-  };
+  }
 
   // колбэк при удаления промокода
   private dropPromoCallback = (e: Event): void => {
@@ -373,12 +394,13 @@ export default class Cart extends BaseComponent {
       if (promo) {
         const idx: number = this.appliedPromos.indexOf(promo);
         this.appliedPromos.splice(idx, 1);
+        setDataToLocalStorage(this.appliedPromos, 'appliedPromo');
       }
       // пересчитываем цену и удаляем блок с экрана
       if (this.appliedPromos.length !== 0) {
         this.afterPromoPrice = this.calculateNewPrice();
         if (this.newPriceElement) {
-          this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
+          this.newPriceElement.textContent = `$ ${this.afterPromoPrice.toLocaleString('en-US')}`;
         }
         const elementToRemove: ParentNode | null = e.target.parentNode;
         if (this.appliedPromosElement && elementToRemove) {
@@ -542,7 +564,7 @@ export default class Cart extends BaseComponent {
             this.addedItems[i].quantity += 1;
           }
         }
-        setDataToLocalStorage(this.addedItems);
+        setDataToLocalStorage(this.addedItems, 'addedPosters');
       } else if (subject.minus === true && subject.itemAmount >= 0) {
         this.totalPrice -= subject.price;
         this.cartItems -= 1;
@@ -553,7 +575,7 @@ export default class Cart extends BaseComponent {
             this.addedItems[i].quantity -= 1;
           }
         }
-        setDataToLocalStorage(this.addedItems); // обновляю инфу о добавленных в корзину
+        setDataToLocalStorage(this.addedItems, 'addedPosters'); // обновляю инфу о добавленных в корзину
         this.checkIfZero(subject);
       }
     }
@@ -561,7 +583,7 @@ export default class Cart extends BaseComponent {
 
   private updateSummaryContent(): void {
     if (this.totalPriceElement && this.cartItemsElement) {
-      this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
+      this.totalPriceElement.textContent = `$ ${this.totalPrice.toLocaleString('en-US')}`;
       this.cartItemsElement.textContent = `${this.cartItems}`;
     }
   }
@@ -569,7 +591,7 @@ export default class Cart extends BaseComponent {
   private updatePromoPrice(): void {
     if (this.newPriceElement) {
       this.afterPromoPrice = this.calculateNewPrice();
-      this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
+      this.newPriceElement.textContent = `$ ${this.afterPromoPrice.toLocaleString('en-US')}`;
     }
   }
 
@@ -580,7 +602,7 @@ export default class Cart extends BaseComponent {
       const index = this.addedItems.findIndex((i) => i.id === subject.id);
       this.addedItems.splice(index, 1);
       if (this.addedItems.length > 0) {
-        setDataToLocalStorage(this.addedItems);
+        setDataToLocalStorage(this.addedItems, 'addedPosters');
         this.updatePaginationAfterChange();
         // если у меня ноль товара на странице, надо вывести страницу пустой корзины
       } else {

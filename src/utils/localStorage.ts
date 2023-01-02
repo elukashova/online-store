@@ -26,13 +26,20 @@ export const checkHeaderDataInLocalStorage = (key: string): JsonObj | null => {
   return result;
 };
 
-export const setDataToLocalStorage = (data: DataToSet, key?: string): void => {
-  if (Array.isArray(data)) {
-    localStorage.removeItem('addedPosters');
-
-    localStorage.setItem('addedPosters', JSON.stringify(data));
-  } else if (key) {
-    localStorage.removeItem(key);
-    localStorage.setItem(key, JSON.stringify(data));
+export const checkPromoDataInLocalStorage = (key: string): string[] | null => {
+  const response: string | null = localStorage.getItem(key);
+  let result: string[] | null = null;
+  if (response) {
+    try {
+      result = JSON.parse(response);
+    } catch (e) {
+      console.log(e);
+    }
   }
+  return result;
+};
+
+export const setDataToLocalStorage = (data: DataToSet, key: string): void => {
+  localStorage.removeItem(key);
+  localStorage.setItem(key, JSON.stringify(data));
 };

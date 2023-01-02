@@ -282,14 +282,14 @@ export default class CardsField extends BaseComponent {
       info.id = subject.id;
       info.quantity += 1;
       this.addedItems.push(info);
-      setDataToLocalStorage(this.addedItems);
+      setDataToLocalStorage(this.addedItems, 'addedPosters');
     }
 
     if (subject instanceof Card && !subject.element.classList.contains('added')) {
       const index = this.addedItems.findIndex((i) => i.id === subject.id);
       this.addedItems.splice(index, 1);
       if (this.addedItems.length > 0) {
-        setDataToLocalStorage(this.addedItems);
+        setDataToLocalStorage(this.addedItems, 'addedPosters');
       } else {
         localStorage.removeItem('addedPosters');
       }

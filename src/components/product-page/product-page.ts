@@ -155,7 +155,7 @@ export default class ProductPage extends BaseComponent {
       this.totalAmount = 1;
       this.isAdded = true;
       this.addItemToLocalStorage();
-      setDataToLocalStorage(this.addedItems);
+      setDataToLocalStorage(this.addedItems, 'addedPosters');
     }
     this.notifyObserver();
   };
@@ -228,14 +228,14 @@ export default class ProductPage extends BaseComponent {
     info.id = this.id;
     info.quantity += 1;
     this.addedItems.push(info);
-    setDataToLocalStorage(this.addedItems);
+    setDataToLocalStorage(this.addedItems, 'addedPosters');
   }
 
   private removeItemFromLocalStorage(): void {
     const index = this.addedItems.findIndex((i) => i.id === this.id);
     this.addedItems.splice(index, 1);
     if (this.addedItems.length > 0) {
-      setDataToLocalStorage(this.addedItems);
+      setDataToLocalStorage(this.addedItems, 'addedPosters');
     } else {
       localStorage.removeItem('addedPosters');
     }
