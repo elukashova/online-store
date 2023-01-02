@@ -18,24 +18,33 @@
   display: flex;
   align-items: center;
   color: #65635F;
-  justify-content: space-around;
+  justify-content: center;
   width: 70%;
   background-color: #DDDDDD;
   align-self: baseline;
+  gap: 5%;
 }
 
 
 .cart-items__info_items {
   display: flex;
-  width: 20%;
-  gap: 10%;
+  align-items: center;
+  width: 45%;
+  gap: 5%;
 }
 
 .cart-items__info_pages {
   display: flex;
-  width: 20%;
+  width: 30%;
+  gap: 5%;
+  justify-content: right;
+  align-items: center;
+}
+
+.info-pages__btns {
+  width: 60%;
+  display: flex;
   justify-content: space-between;
-  gap: 15%;
 }
 
 .info-items__number {
@@ -197,6 +206,7 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 1%;
+  width: 100%;
 }
 
 .cart-total-items__text,

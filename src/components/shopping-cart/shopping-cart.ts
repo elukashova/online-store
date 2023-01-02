@@ -105,7 +105,7 @@ export default class Cart extends BaseComponent {
     this.cartContainer = rendered('div', this.element, 'cart__items_container cart-items');
     const cartInfoContainer: HTMLElement = rendered('div', this.cartContainer, 'cart-items__info');
     const totalNumWrapper: HTMLElement = rendered('div', cartInfoContainer, 'cart-items__info_items info-items');
-    rendered('span', totalNumWrapper, 'info-items__text', 'Items:');
+    rendered('span', totalNumWrapper, 'info-items__text', 'Items on page:');
     this.itemsPerPageElement = rendered('input', totalNumWrapper, 'info-items__number', '', {
       type: 'text',
       placeholder: '2',
@@ -114,11 +114,13 @@ export default class Cart extends BaseComponent {
     });
     this.itemsPerPageElement.addEventListener('change', this.itemsNumberInputCallback);
     const totalPagesWrapper: HTMLElement = rendered('div', cartInfoContainer, 'cart-items__info_pages info-pages');
-    this.leftArrowBtn = rendered('img', totalPagesWrapper, 'info-pages__btn-left disabled', '', {
+    rendered('span', totalPagesWrapper, 'cart-items__info_pages_text', 'Pages:');
+    const buttonsWrapper: HTMLElement = rendered('div', totalPagesWrapper, 'info-pages__btns');
+    this.leftArrowBtn = rendered('img', buttonsWrapper, 'info-pages__btn-left disabled', '', {
       src: 'assets/icons/cart-btn__left.svg',
     });
-    this.currentPageElement = rendered('span', totalPagesWrapper, 'info-pages__pages-total', `${this.currentPage}`);
-    this.rightArrowBtn = rendered('img', totalPagesWrapper, 'info-pages__btn-right disabled', '', {
+    this.currentPageElement = rendered('span', buttonsWrapper, 'info-pages__pages-total', `${this.currentPage}`);
+    this.rightArrowBtn = rendered('img', buttonsWrapper, 'info-pages__btn-right disabled', '', {
       src: 'assets/icons/cart-btn__right.svg',
     });
 
@@ -145,7 +147,12 @@ export default class Cart extends BaseComponent {
     this.cartItemsElement = rendered('span', totalItemsContainer, 'cart-total-items__num', `${this.cartItems}`);
     this.totalSumContainer = rendered('div', this.summaryContainer, 'cart-summary__total-sum_container total-sum');
     rendered('span', this.totalSumContainer, 'cart-total-sum__text', 'Total:');
-    this.totalPriceElement = rendered('span', this.totalSumContainer, 'cart-total-sum__num', `$ ${this.totalPrice}`);
+    this.totalPriceElement = rendered(
+      'span',
+      this.totalSumContainer,
+      'cart-total-sum__num',
+      `$ ${this.totalPrice.toLocaleString('en-US')}`,
+    );
     this.promocodeContainer = rendered('div', this.summaryContainer, 'cart-summary__promocode cart-promocode');
     this.promoInputElement = rendered('input', this.promocodeContainer, 'cart-promocode__input', '', {
       type: 'search',

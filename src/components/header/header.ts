@@ -43,7 +43,12 @@ export default class Header extends BaseComponent {
     const totalPrice: HTMLElement = rendered('li', menu, 'menu__item total-price', 'Total:');
     const priceWrapper: HTMLElement = rendered('div', totalPrice, 'total-price__container');
     rendered('span', priceWrapper, 'total-price__currency', '$');
-    this.totalPriceElement = rendered('span', priceWrapper, 'total-price__sum', `${this.headerInfo.totalPrice}`);
+    this.totalPriceElement = rendered(
+      'span',
+      priceWrapper,
+      'total-price__sum',
+      `${this.headerInfo.totalPrice.toLocaleString('en-US')}`,
+    );
     const shoppingCart: HTMLElement = rendered('li', menu, 'menu__item cart');
     const shoppingCartLink: HTMLElement = rendered('a', shoppingCart, 'cart__link', '', { href: '/cart' });
     rendered('img', shoppingCartLink, 'cart__icon', '', {
@@ -127,7 +132,7 @@ export default class Header extends BaseComponent {
 
   private updateInfoInHeader(): void {
     if (this.totalPriceElement && this.cartItemsElement) {
-      this.totalPriceElement.textContent = `${this.headerInfo.totalPrice}`;
+      this.totalPriceElement.textContent = `${this.headerInfo.totalPrice.toLocaleString('en-US')}`;
       this.cartItemsElement.textContent = `${this.headerInfo.cartItems}`;
     }
   }

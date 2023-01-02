@@ -112,7 +112,12 @@ export default class CartCard extends BaseComponent {
 
     const itemPriceContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__price-container');
     rendered('span', itemPriceContainer, 'cart-amount__price-text', '$');
-    this.priceForItemElement = rendered('span', itemPriceContainer, 'cart-amount__price-num', `${this.totalPrice}`);
+    this.priceForItemElement = rendered(
+      'span',
+      itemPriceContainer,
+      'cart-amount__price-num',
+      `${this.totalPrice.toLocaleString('en-US')}`,
+    );
   }
 
   private productPageCallback = (e: Event): void => {
