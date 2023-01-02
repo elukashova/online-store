@@ -3,18 +3,15 @@ import BaseComponent from '../base-component/base-component';
 import cardsData from '../../assets/json/data';
 import './product-page.styles.css';
 import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
-import { JsonObj } from '../../utils/localStorage.types';
-// import Header from '../header/header';
+import { PosterStorageInfoType } from '../../utils/localStorage.types';
 import { Observer } from '../card/card.types';
-// import { BreadcrumbProps } from './product-page.types';
-// import { CardDataType } from '../card/card.types';
 
 export default class ProductPage extends BaseComponent {
   private observers: Observer[] = [];
 
-  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
 
-  private addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
+  private addedItems: PosterStorageInfoType[] = [];
 
   private id: number = 0;
 
@@ -36,6 +33,10 @@ export default class ProductPage extends BaseComponent {
 
   private images: string[] = [];
 
+  public totalAmount: number = 0;
+
+  public totalPrice: number = 0;
+
   private storeAnchorElement: HTMLElement | null = null;
 
   private chosenImg: HTMLElement | null = null;
@@ -47,8 +48,6 @@ export default class ProductPage extends BaseComponent {
   private addToCartBtn: HTMLElement | null = null;
 
   private buyNowBtn: HTMLElement | null = null;
-
-  private addToCartBtnIcon: HTMLElement | null = null;
 
   public isAdded: boolean = false;
 
@@ -69,10 +68,8 @@ export default class ProductPage extends BaseComponent {
         this.images = item.images.slice();
       }
     });
-    /* this.breadcrumpsProps.push('Store', this.category,
-    this.size, this.title); */
-    this.render();
     this.checkLocalStorage();
+    this.render();
   }
 
   // eslint-disable-next-line max-lines-per-function
@@ -90,7 +87,6 @@ export default class ProductPage extends BaseComponent {
     rendered('span', breadCrumbsContainer, 'breadcrump__size', `${this.size}`);
     rendered('span', breadCrumbsContainer, 'breadcrump__breadcrumps', '>>');
     rendered('span', breadCrumbsContainer, 'breadcrump__title', `${this.title}`);
-    // this.createBreadCrumps(breadCrumbsContainer, this.breadcrumpsProps);
 
     const imagesContainer: HTMLElement = rendered('div', imagesCrumbsContainer, 'product__imgs-container');
     const miniImagesWrapper: HTMLElement = rendered('div', imagesContainer, 'product__mini-imgs-wrapper product-img');
@@ -136,12 +132,7 @@ export default class ProductPage extends BaseComponent {
   // создаем кнопку добавления в корзину, в зависимости от того, добавлен ли уже постер
   private createAddToCartBtn(container: HTMLElement): void {
     // проверяем local storage, добавлена ли этот товар в корзину
-    let values: number[] = [];
-    if (this.storageInfo !== null) {
-      values = Object.values(this.storageInfo);
-    }
-
-    if (values.length !== 0 && values.includes(this.id)) {
+    if (this.addedItems.length !== 0 && this.addedItems.find((i) => i.id === this.id)) {
       this.addToCartBtn = rendered('button', container, 'product-info__add-to-cart-btn', 'remove item');
       this.addToCartBtn.classList.add('in-cart');
       this.isAdded = true;
@@ -154,20 +145,16 @@ export default class ProductPage extends BaseComponent {
     e.preventDefault();
     if (e.target instanceof HTMLButtonElement && e.target.classList.contains('in-cart')) {
       e.target.classList.remove('in-cart');
-      const child: ChildNode | null = e.target.firstChild;
-      if (child) {
-        e.target.removeChild(child);
-      }
       e.target.textContent = 'add to cart';
       this.isAdded = false;
-      const index = this.addedItems.indexOf(this.id);
-      this.addedItems.splice(index, 1);
-      setDataToLocalStorage(this.addedItems);
+      this.removeItemFromLocalStorage();
     } else if (e.target instanceof HTMLButtonElement && !e.target.classList.contains('in-cart')) {
       e.target.classList.add('in-cart');
       e.target.textContent = 'remove item';
+      this.totalPrice = this.price;
+      this.totalAmount = 1;
       this.isAdded = true;
-      this.addedItems.push(this.id);
+      this.addItemToLocalStorage();
       setDataToLocalStorage(this.addedItems);
     }
     this.notifyObserver();
@@ -179,10 +166,9 @@ export default class ProductPage extends BaseComponent {
     const { target } = e;
     if (target instanceof HTMLButtonElement) {
       // добавление в корзину и local storage, если товар до этого не был добавлен в козину
-      if (!this.addedItems.includes(this.id)) {
+      if (!this.addedItems.find((i) => i.id === this.id)) {
         this.isAdded = true;
-        this.addedItems.push(this.id);
-        setDataToLocalStorage(this.addedItems);
+        this.addItemToLocalStorage();
         this.notifyObserver();
       }
       // переход в козину
@@ -224,8 +210,34 @@ export default class ProductPage extends BaseComponent {
 
   private checkLocalStorage(): void {
     if (this.storageInfo !== null) {
-      const values: number[] = Object.values(this.storageInfo);
-      this.addedItems = values.slice();
+      this.addedItems = this.storageInfo.slice();
+      for (let i: number = 0; i < this.addedItems.length; i += 1) {
+        if (this.addedItems[i].id === this.id) {
+          this.totalAmount = this.addedItems[i].quantity;
+          this.totalPrice = this.totalAmount * this.price;
+        }
+      }
+    }
+  }
+
+  private addItemToLocalStorage(): void {
+    const info: PosterStorageInfoType = {
+      id: 0,
+      quantity: 0,
+    };
+    info.id = this.id;
+    info.quantity += 1;
+    this.addedItems.push(info);
+    setDataToLocalStorage(this.addedItems);
+  }
+
+  private removeItemFromLocalStorage(): void {
+    const index = this.addedItems.findIndex((i) => i.id === this.id);
+    this.addedItems.splice(index, 1);
+    if (this.addedItems.length > 0) {
+      setDataToLocalStorage(this.addedItems);
+    } else {
+      localStorage.removeItem('addedPosters');
     }
   }
 

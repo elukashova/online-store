@@ -9,7 +9,7 @@ import Filter from '../filter/filter';
 import Header from '../header/header';
 import { ObservedSubject } from '../card/card.types';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
-import { JsonObj } from '../../utils/localStorage.types';
+import { PosterStorageInfoType } from '../../utils/localStorage.types';
 
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = []; // все карточки
@@ -18,7 +18,7 @@ export default class CardsField extends BaseComponent {
 
   public visibleCards: Card[] = []; // текущие видимые карточки (для сортировки)
 
-  public addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
+  public addedItems: PosterStorageInfoType[] = []; // для сохранения id добавленных товаров в local storage
 
   public cardsContainer: HTMLElement | null = null;
 
@@ -32,8 +32,7 @@ export default class CardsField extends BaseComponent {
 
   public selectInput: HTMLElement | null = null;
 
-  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
-
+  private readonly storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
 
   constructor(public readonly header: Header, private callback: (event: Event) => void) {
     super('div', 'content__container');
@@ -276,14 +275,24 @@ export default class CardsField extends BaseComponent {
     чтобы сохранять добавленные товары в local storage */
   public update(subject: ObservedSubject): void {
     if (subject instanceof Card && subject.element.classList.contains('added')) {
-      this.addedItems.push(subject.id);
+      const info: PosterStorageInfoType = {
+        id: 0,
+        quantity: 0,
+      };
+      info.id = subject.id;
+      info.quantity += 1;
+      this.addedItems.push(info);
       setDataToLocalStorage(this.addedItems);
     }
 
     if (subject instanceof Card && !subject.element.classList.contains('added')) {
-      const index = this.addedItems.indexOf(subject.id);
+      const index = this.addedItems.findIndex((i) => i.id === subject.id);
       this.addedItems.splice(index, 1);
-      setDataToLocalStorage(this.addedItems);
+      if (this.addedItems.length > 0) {
+        setDataToLocalStorage(this.addedItems);
+      } else {
+        localStorage.removeItem('addedPosters');
+      }
     }
   }
 
@@ -291,8 +300,7 @@ export default class CardsField extends BaseComponent {
     не обнулялись данные о добавленных товарах */
   private checkLocalStorage(): void {
     if (this.storageInfo !== null) {
-      const values: number[] = Object.values(this.storageInfo);
-      this.addedItems = values.slice();
+      this.addedItems = this.storageInfo.slice();
     }
   }
 }

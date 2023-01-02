@@ -6,16 +6,16 @@ import rendered from '../../utils/render/render';
 import CartCard from './card-cart';
 import Header from '../header/header';
 import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
-import { JsonObj } from '../../utils/localStorage.types';
+import { PosterStorageInfoType } from '../../utils/localStorage.types';
 import { ObservedSubject } from '../card/card.types';
 import { PromoInputs, PromoValues } from './shopping-cart.types';
 
 export default class Cart extends BaseComponent {
-  private storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
+  private storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
 
   private itemsOrder: number = 0;
 
-  private addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
+  private addedItems: PosterStorageInfoType[] = [];
 
   private cartItems: number;
 
@@ -57,7 +57,6 @@ export default class Cart extends BaseComponent {
   private itemsNumberChange: boolean = false;
 
   // элементы для промокода
-
   private promocodeContainer: HTMLElement | null = null;
 
   private promoInputElement: HTMLElement | null = null;
@@ -91,8 +90,8 @@ export default class Cart extends BaseComponent {
     this.cartItems = this.header.headerInfo.cartItems;
     this.totalPrice = this.header.headerInfo.totalPrice;
     if (this.storageInfo !== null) {
-      // сохраняю id из local storage для создания карточек
-      this.addedItems = Object.values(this.storageInfo);
+      // сохраняю инфу из local storage для создания карточек
+      this.addedItems = this.storageInfo.slice();
       // считаю количество страниц в пагинации
       this.pagesNumber = Math.ceil(this.addedItems.length / this.itemsPerPage);
       this.render();
@@ -164,10 +163,10 @@ export default class Cart extends BaseComponent {
   }
 
   // функция создания карточек
-  private createItemsCards(array: number[], callback: (event: Event) => void): void {
+  private createItemsCards(array: PosterStorageInfoType[], callback: (event: Event) => void): void {
     cardsData.products.forEach((data) => {
       for (let i: number = 0; i < array.length; i += 1) {
-        if (data.id === array[i]) {
+        if (data.id === array[i].id) {
           if (this.slideBack === true || this.itemsNumberChange === true) {
             this.itemsOrder = this.addedItems.indexOf(array[0]);
           }
@@ -240,7 +239,7 @@ export default class Cart extends BaseComponent {
       this.activateBothButtons();
       this.itemsPerPageElement.textContent = e.target.value;
       this.itemsPerPage = Number(e.target.value);
-      this.updateAfterChange();
+      this.updatePaginationAfterChange();
       // проверить, единственная ли у нас страница
       // eslint-disable-next-line max-len
       if (this.itemsPerPage === this.addedItems.length || Number(e.target.value) > this.addedItems.length) {
@@ -422,7 +421,7 @@ export default class Cart extends BaseComponent {
   }
 
   // повторяющийся код, который использую при пагинации и удалении
-  private updateAfterChange(): void {
+  private updatePaginationAfterChange(): void {
     this.itemsNumberChange = true;
     this.deleteCards();
     this.pagesNumber = Math.ceil(this.addedItems.length / this.itemsPerPage);
@@ -526,44 +525,58 @@ export default class Cart extends BaseComponent {
   // функция обсервера
   public update(subject: ObservedSubject): void {
     if (subject instanceof CartCard) {
-      if (subject.plus === true && subject.cartItemInfo.itemAmount <= subject.stock) {
+      if (subject.plus === true && subject.itemAmount <= subject.stock) {
         this.totalPrice += subject.price;
         this.cartItems += 1;
-        if (this.totalPriceElement && this.cartItemsElement) {
-          this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
-          this.cartItemsElement.textContent = `${this.cartItems}`;
+        this.updateSummaryContent();
+        this.updatePromoPrice();
+        for (let i: number = 0; i < this.addedItems.length; i += 1) {
+          if (this.addedItems[i].id === subject.id) {
+            this.addedItems[i].quantity += 1;
+          }
         }
-        if (this.newPriceElement) {
-          this.afterPromoPrice = this.calculateNewPrice();
-          this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
-        }
-      } else if (subject.minus === true && subject.cartItemInfo.itemAmount >= 0) {
+        setDataToLocalStorage(this.addedItems);
+      } else if (subject.minus === true && subject.itemAmount >= 0) {
         this.totalPrice -= subject.price;
         this.cartItems -= 1;
-        if (this.totalPriceElement && this.cartItemsElement) {
-          this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
-          this.cartItemsElement.textContent = `${this.cartItems}`;
+        this.updateSummaryContent();
+        this.updatePromoPrice();
+        for (let i: number = 0; i < this.addedItems.length; i += 1) {
+          if (this.addedItems[i].id === subject.id) {
+            this.addedItems[i].quantity -= 1;
+          }
         }
-        if (this.newPriceElement) {
-          this.afterPromoPrice = this.calculateNewPrice();
-          this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
-        }
+        setDataToLocalStorage(this.addedItems); // обновляю инфу о добавленных в корзину
         this.checkIfZero(subject);
       }
+    }
+  }
+
+  private updateSummaryContent(): void {
+    if (this.totalPriceElement && this.cartItemsElement) {
+      this.totalPriceElement.textContent = `$ ${this.totalPrice}`;
+      this.cartItemsElement.textContent = `${this.cartItems}`;
+    }
+  }
+
+  private updatePromoPrice(): void {
+    if (this.newPriceElement) {
+      this.afterPromoPrice = this.calculateNewPrice();
+      this.newPriceElement.textContent = `$ ${this.afterPromoPrice}`;
     }
   }
 
   /* проверить, является ли количество одного продукта нулевым
   и последующее удаление */
   private checkIfZero(subject: ObservedSubject): void {
-    if (subject instanceof CartCard && subject.cartItemInfo.itemAmount === 0) {
-      localStorage.removeItem(`${subject.id}`); // удаляю из local storage
-      const index = this.addedItems.indexOf(subject.id); // удаляю из массива добавленных в корзину
+    if (subject instanceof CartCard && subject.itemAmount === 0) {
+      const index = this.addedItems.findIndex((i) => i.id === subject.id);
       this.addedItems.splice(index, 1);
-      setDataToLocalStorage(this.addedItems); // обновляю инфу о добавленных в корзину
-      this.updateAfterChange();
-      // если у меня ноль товара на странице, надо вывести страницу пустой корзины
-      if (this.addedItems.length === 0) {
+      if (this.addedItems.length > 0) {
+        setDataToLocalStorage(this.addedItems);
+        this.updatePaginationAfterChange();
+        // если у меня ноль товара на странице, надо вывести страницу пустой корзины
+      } else {
         this.cartContainer?.remove();
         this.summaryContainer?.remove();
         this.showEmptyCart();

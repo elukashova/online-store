@@ -1,12 +1,13 @@
 import rendered from '../../utils/render/render';
 import { CardDataType, Observer } from '../card/card.types';
 import BaseComponent from '../base-component/base-component';
-import { ItemInfoType } from './shopping-cart.types';
-import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
-import { JsonObj } from '../../utils/localStorage.types';
+import { checkDataInLocalStorage } from '../../utils/localStorage';
+import { PosterStorageInfoType } from '../../utils/localStorage.types';
 
 export default class CartCard extends BaseComponent {
-  private readonly storageInfo: JsonObj | null;
+  private storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
+
+  private addedItems: PosterStorageInfoType[] | null = [];
 
   public id: number;
 
@@ -26,6 +27,8 @@ export default class CartCard extends BaseComponent {
 
   public price: number;
 
+  public totalPrice: number = 0;
+
   public discount: number;
 
   public minusBtn: HTMLElement | null = null;
@@ -38,11 +41,9 @@ export default class CartCard extends BaseComponent {
 
   private observers: Observer[] = [];
 
-  public cartItemInfo: ItemInfoType = {
-    itemOrder: 0,
-    itemAmount: 0,
-    itemTotalPrice: 0,
-  };
+  public itemAmount: number = 0;
+
+  public itemInfo: PosterStorageInfoType | null = null;
 
   // эти два указателя мне нужны для обсервера на клик на + и -
   public minus: boolean = false;
@@ -50,10 +51,9 @@ export default class CartCard extends BaseComponent {
   public plus: boolean = false;
 
   // eslint-disable-next-line max-len
-  constructor(private data: CardDataType, private itemsOrder: number, private callback: (event: Event) => void) {
+  constructor(private data: CardDataType, private itemOrder: number, private callback: (event: Event) => void) {
     super('div', 'cart-items__item cart-item');
     this.id = this.data.id;
-    this.storageInfo = checkDataInLocalStorage(`${this.id}`);
     this.title = this.data.title;
     this.category = this.data.category;
     this.rating = this.data.rating;
@@ -63,14 +63,12 @@ export default class CartCard extends BaseComponent {
     this.stock = this.data.stock;
     this.price = this.data.price;
     this.discount = this.data.discountPercentage;
-    if (this.storageInfo === null) {
-      this.cartItemInfo.itemTotalPrice = this.price;
-      this.cartItemInfo.itemOrder = this.itemsOrder;
-      this.cartItemInfo.itemAmount = 1;
-    } else {
-      this.cartItemInfo.itemTotalPrice = this.storageInfo.itemTotalPrice;
-      this.cartItemInfo.itemOrder = this.storageInfo.itemOrder;
-      this.cartItemInfo.itemAmount = this.storageInfo.itemAmount;
+    if (this.storageInfo !== null) {
+      this.addedItems = this.storageInfo.slice();
+      const idx = this.addedItems.findIndex((i) => i.id === this.id);
+      this.itemInfo = this.storageInfo[idx];
+      this.itemAmount = this.itemInfo.quantity;
+      this.totalPrice = this.itemAmount * this.price;
     }
     this.render();
   }
@@ -82,7 +80,7 @@ export default class CartCard extends BaseComponent {
       id: `crd${this.id}`,
     });
     itemCard.addEventListener('click', this.productPageCallback);
-    rendered('span', itemCard, 'cart-item__order', `${this.cartItemInfo.itemOrder}`);
+    rendered('span', itemCard, 'cart-item__order', `${this.itemOrder}`);
     rendered('img', itemCard, 'cart-item__img', '', {
       src: this.images[0],
     });
@@ -103,12 +101,7 @@ export default class CartCard extends BaseComponent {
       src: 'assets/icons/cart-btn__minus.svg',
     });
     this.minusBtn.addEventListener('click', this.minusBtnCallback);
-    this.itemAmountElement = rendered(
-      'span',
-      changeAmountContainer,
-      'cart-amount__amount',
-      `${this.cartItemInfo.itemAmount}`,
-    );
+    this.itemAmountElement = rendered('span', changeAmountContainer, 'cart-amount__amount', `${this.itemAmount}`);
     this.plusBtn = rendered('img', changeAmountContainer, 'cart-amount__btn-plus', '', {
       src: 'assets/icons/cart-btn__plus.svg',
     });
@@ -119,12 +112,7 @@ export default class CartCard extends BaseComponent {
 
     const itemPriceContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__price-container');
     rendered('span', itemPriceContainer, 'cart-amount__price-text', '$');
-    this.priceForItemElement = rendered(
-      'span',
-      itemPriceContainer,
-      'cart-amount__price-num',
-      `${this.cartItemInfo.itemTotalPrice}`,
-    );
+    this.priceForItemElement = rendered('span', itemPriceContainer, 'cart-amount__price-num', `${this.totalPrice}`);
   }
 
   private productPageCallback = (e: Event): void => {
@@ -136,14 +124,13 @@ export default class CartCard extends BaseComponent {
   private minusBtnCallback = (): void => {
     this.minus = true;
     this.plus = false;
-    if (this.cartItemInfo.itemAmount > 0) {
-      this.cartItemInfo.itemTotalPrice -= this.price;
-      this.cartItemInfo.itemAmount -= 1;
+    if (this.itemAmount > 0) {
+      this.totalPrice -= this.price;
+      this.itemAmount -= 1;
       if (this.priceForItemElement && this.itemAmountElement) {
-        this.priceForItemElement.textContent = `${this.cartItemInfo.itemTotalPrice}`;
-        this.itemAmountElement.textContent = `${this.cartItemInfo.itemAmount}`;
+        this.priceForItemElement.textContent = `${this.totalPrice}`;
+        this.itemAmountElement.textContent = `${this.itemAmount}`;
       }
-      setDataToLocalStorage(this.cartItemInfo, `${this.id}`);
       this.notifyObserver();
     }
   };
@@ -152,22 +139,16 @@ export default class CartCard extends BaseComponent {
     this.plus = true;
     this.minus = false;
     // невозможность добавить больше, чем есть на стоке
-    if (this.cartItemInfo.itemAmount < this.stock) {
-      this.cartItemInfo.itemTotalPrice += this.price;
-      this.cartItemInfo.itemAmount += 1;
+    if (this.itemAmount < this.stock) {
+      this.totalPrice += this.price;
+      this.itemAmount += 1;
       if (this.priceForItemElement && this.itemAmountElement) {
-        this.priceForItemElement.textContent = `${this.cartItemInfo.itemTotalPrice}`;
-        this.itemAmountElement.textContent = `${this.cartItemInfo.itemAmount}`;
+        this.priceForItemElement.textContent = `${this.totalPrice}`;
+        this.itemAmountElement.textContent = `${this.itemAmount}`;
       }
-      setDataToLocalStorage(this.cartItemInfo, `${this.id}`);
       this.notifyObserver();
     }
   };
-
-  // //обновить порядок после удаления
-  // public updateOrder() {
-
-  // }
 
   // три метода, нужные для обсервера
   public attachObserver(observer: Observer): void {
