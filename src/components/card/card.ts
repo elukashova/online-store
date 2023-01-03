@@ -3,7 +3,7 @@ import rendered from '../../utils/render/render';
 import { CardDataType, Observer } from './card.types';
 import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
-import { JsonObj } from '../../utils/localStorage.types';
+import { PosterStorageInfoType } from '../../utils/localStorage.types';
 
 export default class Card extends BaseComponent {
   public id: number;
@@ -32,11 +32,9 @@ export default class Card extends BaseComponent {
 
   public totalPrice: number = 0;
 
-  public totalItems: number = 0;
-
   private observers: Observer[] = [];
 
-  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
 
   constructor(data: CardDataType, private callback: (event: Event) => void) {
     super('div', 'cards__item card');
@@ -77,9 +75,11 @@ export default class Card extends BaseComponent {
     productPageBtn.addEventListener('click', this.productPageBtnCallback);
     // проверяем local storage, добавлена ли этот товар в корзину
     if (this.storageInfo !== null) {
-      const values: number[] = Object.values(this.storageInfo);
-      for (let i: number = 0; i < values.length; i += 1) {
-        if (values[i] === this.id) {
+      const posters: PosterStorageInfoType[] = this.storageInfo.slice();
+      for (let i: number = 0; i < posters.length; i += 1) {
+        if (posters[i].id === this.id) {
+          this.totalPrice = posters[i].quantity * this.price;
+          this.itemQuantity = posters[i].quantity;
           this.element.classList.add('added');
         }
       }

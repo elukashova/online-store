@@ -9,7 +9,7 @@ import Filter from '../filter/filter';
 import Header from '../header/header';
 import { ObservedSubject } from '../card/card.types';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
-import { JsonObj } from '../../utils/localStorage.types';
+import { PosterStorageInfoType } from '../../utils/localStorage.types';
 
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = []; // все карточки
@@ -18,7 +18,7 @@ export default class CardsField extends BaseComponent {
 
   public visibleCards: Card[] = []; // текущие видимые карточки (для сортировки)
 
-  public addedItems: number[] = []; // для сохранения id добавленных товаров в local storage
+  public addedItems: PosterStorageInfoType[] = []; // для сохранения id добавленных товаров в local storage
 
   public cardsContainer: HTMLElement | null = null;
 
@@ -32,7 +32,7 @@ export default class CardsField extends BaseComponent {
 
   public selectInput: HTMLElement | null = null;
 
-  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
 
   constructor(public readonly header: Header, private callback: (event: Event) => void) {
     super('div', 'content__container');
@@ -106,19 +106,6 @@ export default class CardsField extends BaseComponent {
       if (this.cardsContainer) this.cardsContainer.append(card.element);
     });
 
-    // и в добавлении слушателя тоже стоило бы избавиться от проверки ивент таргета и ифа, а просто при создании selectInput добавлять листенер, там где у тебя точно известно какое поле ты создаёшь
-    /* if (!this.visibleCards.length) {
-      this.selectInput.addEventListener('change', (event) => {
-        if (event.target && event.target instanceof HTMLSelectElement) {
-          if (event.target.value === 'price') {
-            const sorting = this.sortByField(this.cardsAll, 'price');
-            console.log(sorting);
-          } else {
-            this.sortByField(this.cardsAll, 'rating');
-          }
-        }
-      });
-    } else { */
     this.selectInput.addEventListener('change', () => {
       if (this.cardsContainer) this.cardsContainer.innerHTML = '';
       if (this.selectInput instanceof HTMLSelectElement) {
@@ -205,8 +192,6 @@ export default class CardsField extends BaseComponent {
         visibleCard.element.classList.remove('hidden');
       });
     }
-
-    // this.addSortListener(this.visibleCards);
     if (this.postersFound) this.postersFound.textContent = `Found: ${this.visibleCards.length}`;
   }
 
@@ -242,29 +227,6 @@ export default class CardsField extends BaseComponent {
   public sortByField(arr: Card[], field: string): Card[] {
     return arr.sort((a, b) => (field === 'price' ? a.price - b.price : b.rating - a.rating));
   }
-
-  /* {public fillContainer(cards: Card[]): void {
-    console.log(cards);
-    cards.forEach((card) => {
-      if (this.visibleCards.length) {
-        if (this.cardsContainer) {
-          this.cardsContainer.removeChild(card.element);
-          this.cardsContainer.removeChild(card.element);
-        } }}); const card: Card = new Card(data);
-      card.attachObserver(this.header);
-      card.attachObserver(this);
-      console.log(this.visibleCards.length);
-      if (this.visibleCards.length) {
-        if (this.cardsContainer) {
-          this.cardsContainer.removeChild(card.element);
-          this.cardsContainer.removeChild(card.element);
-        }
-      } else {
-        this.cardsAll.push(card);
-        if (this.cardsContainer) this.cardsContainer.append(card.element);
-      }
-    });
-  } */
 
   // сброс классов
   public resetClasses(activeFilters: string[], cards: Card[]): void {
@@ -304,14 +266,24 @@ export default class CardsField extends BaseComponent {
     чтобы сохранять добавленные товары в local storage */
   public update(subject: ObservedSubject): void {
     if (subject instanceof Card && subject.element.classList.contains('added')) {
-      this.addedItems.push(subject.id);
-      setDataToLocalStorage(this.addedItems);
+      const info: PosterStorageInfoType = {
+        id: 0,
+        quantity: 0,
+      };
+      info.id = subject.id;
+      info.quantity += 1;
+      this.addedItems.push(info);
+      setDataToLocalStorage(this.addedItems, 'addedPosters');
     }
 
     if (subject instanceof Card && !subject.element.classList.contains('added')) {
-      const index = this.addedItems.indexOf(subject.id);
+      const index = this.addedItems.findIndex((i) => i.id === subject.id);
       this.addedItems.splice(index, 1);
-      setDataToLocalStorage(this.addedItems);
+      if (this.addedItems.length > 0) {
+        setDataToLocalStorage(this.addedItems, 'addedPosters');
+      } else {
+        localStorage.removeItem('addedPosters');
+      }
     }
   }
 
@@ -319,8 +291,7 @@ export default class CardsField extends BaseComponent {
     не обнулялись данные о добавленных товарах */
   private checkLocalStorage(): void {
     if (this.storageInfo !== null) {
-      const values: number[] = Object.values(this.storageInfo);
-      this.addedItems = values.slice();
+      this.addedItems = this.storageInfo.slice();
     }
   }
 }

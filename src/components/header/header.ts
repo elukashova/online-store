@@ -3,7 +3,7 @@ import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
 import { ObservedSubject } from '../card/card.types';
 import Card from '../card/card';
-import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
+import { setDataToLocalStorage, checkHeaderDataInLocalStorage } from '../../utils/localStorage';
 import { HeaderInfoType } from './header.types';
 import { JsonObj } from '../../utils/localStorage.types';
 import CartCard from '../shopping-cart/card-cart';
@@ -14,7 +14,7 @@ export default class Header extends BaseComponent {
 
   public cartItemsElement: HTMLElement | null = null;
 
-  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('headerInfo');
+  private readonly storageInfo: JsonObj | null = checkHeaderDataInLocalStorage('headerInfo');
 
   public headerInfo: HeaderInfoType = {
     cartItems: 0,
@@ -43,7 +43,12 @@ export default class Header extends BaseComponent {
     const totalPrice: HTMLElement = rendered('li', menu, 'menu__item total-price', 'Total:');
     const priceWrapper: HTMLElement = rendered('div', totalPrice, 'total-price__container');
     rendered('span', priceWrapper, 'total-price__currency', '$');
-    this.totalPriceElement = rendered('span', priceWrapper, 'total-price__sum', `${this.headerInfo.totalPrice}`);
+    this.totalPriceElement = rendered(
+      'span',
+      priceWrapper,
+      'total-price__sum',
+      `${this.headerInfo.totalPrice.toLocaleString('en-US')}`,
+    );
     const shoppingCart: HTMLElement = rendered('li', menu, 'menu__item cart');
     const shoppingCartLink: HTMLElement = rendered('a', shoppingCart, 'cart__link', '', { href: '/cart' });
     rendered('img', shoppingCartLink, 'cart__icon', '', {
@@ -73,17 +78,21 @@ export default class Header extends BaseComponent {
         this.increaseNumbers(subject.price);
       } else if (!subject.element.classList.contains('added')) {
         // если нет, наоборот
-        this.decreaseNumbers(subject.price);
+        if (subject.totalPrice !== 0) {
+          this.decreaseNumbers(subject.totalPrice, subject.itemQuantity);
+        } else {
+          this.decreaseNumbers(subject.price, 1);
+        }
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
 
     // обсервер на увеличение количество отдельных товаров в корзине
     if (subject instanceof CartCard) {
-      if (subject.plus === true && subject.cartItemInfo.itemAmount <= subject.stock) {
+      if (subject.plus === true && subject.itemAmount <= subject.stock) {
         this.increaseNumbers(subject.price);
-      } else if (subject.minus === true && subject.cartItemInfo.itemAmount >= 0) {
-        this.decreaseNumbers(subject.price);
+      } else if (subject.minus === true && subject.itemAmount >= 0) {
+        this.decreaseNumbers(subject.price, 1);
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
@@ -93,16 +102,13 @@ export default class Header extends BaseComponent {
       if (subject.isAdded === true) {
         this.increaseNumbers(subject.price);
       } else if (subject.isAdded === false) {
-        this.decreaseNumbers(subject.price);
+        this.decreaseNumbers(subject.totalPrice, subject.totalAmount);
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
 
     // обновляю информацию в хедере
-    if (this.totalPriceElement && this.cartItemsElement) {
-      this.totalPriceElement.textContent = `${this.headerInfo.totalPrice}`;
-      this.cartItemsElement.textContent = `${this.headerInfo.cartItems}`;
-    }
+    this.updateInfoInHeader();
   }
 
   private increaseNumbers(price: number): void {
@@ -110,15 +116,24 @@ export default class Header extends BaseComponent {
     this.headerInfo.cartItems += 1;
   }
 
-  private decreaseNumbers(price: number): void {
+  private decreaseNumbers(price: number, count?: number): void {
     this.headerInfo.totalPrice -= price;
-    this.headerInfo.cartItems -= 1;
+    if (count) {
+      this.headerInfo.cartItems -= count;
+    }
   }
 
   private checkLocalStorage(): void {
     if (this.storageInfo !== null) {
       this.headerInfo.cartItems = this.storageInfo.cartItems;
       this.headerInfo.totalPrice = this.storageInfo.totalPrice;
+    }
+  }
+
+  private updateInfoInHeader(): void {
+    if (this.totalPriceElement && this.cartItemsElement) {
+      this.totalPriceElement.textContent = `${this.headerInfo.totalPrice.toLocaleString('en-US')}`;
+      this.cartItemsElement.textContent = `${this.headerInfo.cartItems}`;
     }
   }
 }
