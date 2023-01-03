@@ -105,6 +105,22 @@ export default class CardsField extends BaseComponent {
       this.cardsAll.push(card);
       if (this.cardsContainer) this.cardsContainer.append(card.element);
     });
+
+    this.selectInput.addEventListener('change', () => {
+      if (this.cardsContainer) this.cardsContainer.innerHTML = '';
+      if (this.selectInput instanceof HTMLSelectElement) {
+        if (this.selectInput.value === 'price') {
+          this.sortByField(this.cardsAll, 'price');
+        } else {
+          this.sortByField(this.cardsAll, 'rating');
+        }
+      }
+      this.cardsAll.forEach((card) => {
+        if (this.cardsContainer) {
+          this.cardsContainer.append(card.element);
+        }
+      });
+    });
   }
 
   // функция reset всех фильтров
@@ -176,8 +192,6 @@ export default class CardsField extends BaseComponent {
         visibleCard.element.classList.remove('hidden');
       });
     }
-
-    // this.addSortListener(this.visibleCards);
     if (this.postersFound) this.postersFound.textContent = `Found: ${this.visibleCards.length}`;
   }
 
@@ -213,29 +227,6 @@ export default class CardsField extends BaseComponent {
   public sortByField(arr: Card[], field: string): Card[] {
     return arr.sort((a, b) => (field === 'price' ? a.price - b.price : b.rating - a.rating));
   }
-
-  /* {public fillContainer(cards: Card[]): void {
-    console.log(cards);
-    cards.forEach((card) => {
-      if (this.visibleCards.length) {
-        if (this.cardsContainer) {
-          this.cardsContainer.removeChild(card.element);
-          this.cardsContainer.removeChild(card.element);
-        } }}); const card: Card = new Card(data);
-      card.attachObserver(this.header);
-      card.attachObserver(this);
-      console.log(this.visibleCards.length);
-      if (this.visibleCards.length) {
-        if (this.cardsContainer) {
-          this.cardsContainer.removeChild(card.element);
-          this.cardsContainer.removeChild(card.element);
-        }
-      } else {
-        this.cardsAll.push(card);
-        if (this.cardsContainer) this.cardsContainer.append(card.element);
-      }
-    });
-  } */
 
   // сброс классов
   public resetClasses(activeFilters: string[], cards: Card[]): void {
