@@ -1,8 +1,8 @@
-import { DataToSet, JsonObj, PosterStorageInfoType } from './localStorage.types';
+import { DataToSet, JsonObj, PosterStorageType } from './localStorage.types';
 
-export const checkDataInLocalStorage = (key: string): PosterStorageInfoType[] | null => {
+export const checkProductDataInLocalStorage = (key: string): PosterStorageType[] | null => {
   const response: string | null = localStorage.getItem(key);
-  let result: PosterStorageInfoType[] | null = null;
+  let result: PosterStorageType[] | null = null;
   if (response) {
     try {
       result = JSON.parse(response);
@@ -13,7 +13,7 @@ export const checkDataInLocalStorage = (key: string): PosterStorageInfoType[] | 
   return result;
 };
 
-export const checkHeaderDataInLocalStorage = (key: string): JsonObj | null => {
+export const checkHeaderCheckoutDataInLocalStorage = (key: string): JsonObj | null => {
   const response: string | null = localStorage.getItem(key);
   let result: JsonObj | null = null;
   if (response) {

@@ -2,16 +2,18 @@ import rendered from '../../utils/render/render';
 import BaseComponent from '../base-component/base-component';
 import cardsData from '../../assets/json/data';
 import './product-page.styles.css';
-import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
-import { PosterStorageInfoType } from '../../utils/localStorage.types';
+import { checkProductDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
+import { PosterStorageType } from '../../utils/localStorage.types';
 import { Observer } from '../card/card.types';
+import { Callback } from '../shopping-cart/shopping-cart.types';
+import { IsCheckoutType } from './product-page.types';
 
 export default class ProductPage extends BaseComponent {
   private observers: Observer[] = [];
 
-  private readonly storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
 
-  private addedItems: PosterStorageInfoType[] = [];
+  private addedItems: PosterStorageType[] = [];
 
   private id: number = 0;
 
@@ -51,8 +53,12 @@ export default class ProductPage extends BaseComponent {
 
   public isAdded: boolean = false;
 
+  private isCheckout: IsCheckoutType = {
+    yes: 0,
+  };
+
   // TODO: сюда надо будет передать данные из локал сторадж о том, добавлен ли товар в корзину
-  constructor(id: number, private callback: (event: Event) => void) {
+  constructor(id: number, private callback: Callback) {
     super('div', 'product__container product');
     cardsData.products.forEach((item) => {
       if (item.id === id) {
@@ -163,6 +169,9 @@ export default class ProductPage extends BaseComponent {
   // колбэк быстрой покупки
   private buyNowCallback = (e: Event): void => {
     e.preventDefault();
+    this.isCheckout.yes = 1;
+    setDataToLocalStorage(this.isCheckout, 'isCheckout');
+
     const { target } = e;
     if (target instanceof HTMLButtonElement) {
       // добавление в корзину и local storage, если товар до этого не был добавлен в козину
@@ -171,7 +180,7 @@ export default class ProductPage extends BaseComponent {
         this.addItemToLocalStorage();
         this.notifyObserver();
       }
-      // переход в козину
+      // переход в корзину
       // TODO: еще нет модального окна оформления покупки
       window.location.href = '/cart';
       this.callback(e);
@@ -221,7 +230,7 @@ export default class ProductPage extends BaseComponent {
   }
 
   private addItemToLocalStorage(): void {
-    const info: PosterStorageInfoType = {
+    const info: PosterStorageType = {
       id: 0,
       quantity: 0,
     };

@@ -3,8 +3,8 @@ import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
 import { ObservedSubject } from '../card/card.types';
 import Card from '../card/card';
-import { setDataToLocalStorage, checkHeaderDataInLocalStorage } from '../../utils/localStorage';
-import { HeaderInfoType } from './header.types';
+import { setDataToLocalStorage, checkHeaderCheckoutDataInLocalStorage } from '../../utils/localStorage';
+import { HeaderType } from './header.types';
 import { JsonObj } from '../../utils/localStorage.types';
 import CartCard from '../shopping-cart/card-cart';
 import ProductPage from '../product-page/product-page';
@@ -14,9 +14,9 @@ export default class Header extends BaseComponent {
 
   public cartItemsElement: HTMLElement | null = null;
 
-  private readonly storageInfo: JsonObj | null = checkHeaderDataInLocalStorage('headerInfo');
+  private readonly storageInfo: JsonObj | null = checkHeaderCheckoutDataInLocalStorage('headerInfo');
 
-  public headerInfo: HeaderInfoType = {
+  public headerInfo: HeaderType = {
     cartItems: 0,
     totalPrice: 0,
   };
@@ -71,6 +71,7 @@ export default class Header extends BaseComponent {
   };
 
   // метод для обсервера
+  // eslint-disable-next-line max-lines-per-function
   public update(subject: ObservedSubject): void {
     // если это ново-добавленный элемент, добавляю его цену к тотал и увеличиваю кол-во в корзине
     if (subject instanceof Card) {
@@ -86,7 +87,6 @@ export default class Header extends BaseComponent {
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
-
     // обсервер на увеличение количество отдельных товаров в корзине
     if (subject instanceof CartCard) {
       if (subject.plus === true && subject.itemAmount <= subject.stock) {
@@ -96,7 +96,6 @@ export default class Header extends BaseComponent {
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
-
     // обсервер на увеличение количество отдельных товаров в корзине
     if (subject instanceof ProductPage) {
       if (subject.isAdded === true) {
@@ -106,7 +105,6 @@ export default class Header extends BaseComponent {
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
-
     // обновляю информацию в хедере
     this.updateInfoInHeader();
   }

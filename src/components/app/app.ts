@@ -25,7 +25,6 @@ export default class App {
     this.routes = {
       store: new CardsField(this.header, this.route),
     };
-    this.init();
   }
 
   public init(): void {
@@ -39,12 +38,14 @@ export default class App {
   public route = (event: Event): void => {
     const e: Event = event || window.event;
     e.preventDefault();
+
     if (e.target instanceof HTMLAnchorElement) {
       window.history.pushState({}, '', e.target.href);
     } else {
       const { href } = window.location;
       window.history.pushState({}, '', href);
     }
+
     this.locationHandler();
   };
 
@@ -60,20 +61,19 @@ export default class App {
 
     switch (location) {
       case '/cart':
-        this.routes.cart = new Cart(this.header, this.route);
+        this.routes.cart = new Cart(this.header, this.route, this.rootElement);
         this.component = this.routes.cart.element;
         break;
       case '/':
         this.routes.store = new CardsField(this.header, this.route);
         this.component = this.routes.store.element;
         break;
-      // TODO: решить проблему с рефрешем страницы
       case `/${this.productID}`:
         this.routes.productPage = new ProductPage(Number(this.productID), this.route);
         this.routes.productPage.attachObserver(this.header);
         this.component = this.routes.productPage.element;
         break;
-      default: // TODO: строки для теста, будут заменены 404
+      default:
         this.routes.notfound = new Page404(this.route);
         this.component = this.routes.notfound.element;
         this.rootElement.removeChild(this.header.element);
