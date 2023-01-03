@@ -21,7 +21,11 @@ export default class Header extends BaseComponent {
     totalPrice: 0,
   };
 
-  private anchorElements: HTMLElement[] = [];
+  private storeLink: HTMLElement | null = null;
+
+  private aboutLink: HTMLElement | null = null;
+
+  private shoppingCartLink: HTMLElement | null = null;
 
   constructor(private callback: (event: Event) => void) {
     super('header', 'header', 'header');
@@ -38,8 +42,8 @@ export default class Header extends BaseComponent {
     const menu: HTMLElement = rendered('ul', container, 'header__menu menu');
     const storePage: HTMLElement = rendered('li', menu, 'menu__item menu__item_current');
     const aboutPage: HTMLElement = rendered('li', menu, 'menu__item');
-    const storeLink: HTMLElement = rendered('a', storePage, 'menu__link store-link', 'Store', { href: '/' });
-    const aboutLink: HTMLElement = rendered('a', aboutPage, 'menu__link about-link', 'About us', { href: '/about' });
+    this.storeLink = rendered('a', storePage, 'menu__link store-link', 'Store', { href: '/' });
+    this.aboutLink = rendered('a', aboutPage, 'menu__link about-link', 'About us', { href: '/about' });
     const totalPrice: HTMLElement = rendered('li', menu, 'menu__item total-price', 'Total:');
     const priceWrapper: HTMLElement = rendered('div', totalPrice, 'total-price__container');
     rendered('span', priceWrapper, 'total-price__currency', '$');
@@ -50,15 +54,23 @@ export default class Header extends BaseComponent {
       `${this.headerInfo.totalPrice.toLocaleString('en-US')}`,
     );
     const shoppingCart: HTMLElement = rendered('li', menu, 'menu__item cart');
-    const shoppingCartLink: HTMLElement = rendered('a', shoppingCart, 'cart__link', '', { href: '/cart' });
-    rendered('img', shoppingCartLink, 'cart__icon', '', {
+    this.shoppingCartLink = rendered('a', shoppingCart, 'cart__link', '', { href: '/cart' });
+    rendered('img', this.shoppingCartLink, 'cart__icon', '', {
       src: 'assets/icons/cart.svg',
     });
-    this.cartItemsElement = rendered('span', shoppingCart, 'cart__items-number', `${this.headerInfo.cartItems}`);
-    this.anchorElements.push(logoLink, storeLink, aboutLink, shoppingCartLink);
-    this.anchorElements.forEach((link) => {
-      link.addEventListener('click', this.navLinkCallback);
-    });
+    this.cartItemsElement = rendered(
+      'span',
+      this.shoppingCartLink,
+      'cart__items-number',
+      `${this.headerInfo.cartItems}`,
+    );
+    this.storeLink.addEventListener('click', this.navLinkCallback);
+    this.aboutLink.addEventListener('click', this.navLinkCallback);
+    logoLink.addEventListener('click', this.imageLinkCallback);
+    this.shoppingCartLink.addEventListener('click', this.navLinkCallback);
+    this.cartItemsElement.addEventListener('click', this.imageLinkCallback);
+
+    this.updateInfoInHeader();
   }
 
   // колбэк для рутинга
@@ -67,8 +79,39 @@ export default class Header extends BaseComponent {
     const { target } = e;
     if (target && target instanceof HTMLAnchorElement) {
       this.callback(e);
+      if (this.storeLink && this.aboutLink && this.shoppingCartLink) {
+        this.deleteClass(this.storeLink);
+        this.deleteClass(this.aboutLink);
+        this.deleteClass(this.shoppingCartLink);
+      }
+      target.classList.add('active-link');
     }
   };
+
+  private imageLinkCallback = (e: Event): void => {
+    e.preventDefault();
+    const { target } = e;
+    if (target && target instanceof HTMLAnchorElement) {
+      this.callback(e);
+    }
+    if (target && target instanceof HTMLSpanElement) {
+      if (this.storeLink && this.aboutLink) {
+        this.deleteClass(this.storeLink);
+        this.deleteClass(this.aboutLink);
+      }
+      if (this.shoppingCartLink) {
+        this.shoppingCartLink.classList.add('active-link');
+      }
+      window.history.pushState({}, '', '/cart');
+      this.callback(e);
+    }
+  };
+
+  private deleteClass(element: HTMLElement): void {
+    if (element.classList.contains('active-link')) {
+      element.classList.remove('active-link');
+    }
+  }
 
   // метод для обсервера
   // eslint-disable-next-line max-lines-per-function
@@ -128,10 +171,17 @@ export default class Header extends BaseComponent {
     }
   }
 
+  private checkSize(): void {
+    if (this.headerInfo.cartItems > 99 && this.cartItemsElement) {
+      this.cartItemsElement.style.width = '1.6rem';
+    }
+  }
+
   private updateInfoInHeader(): void {
     if (this.totalPriceElement && this.cartItemsElement) {
       this.totalPriceElement.textContent = `${this.headerInfo.totalPrice.toLocaleString('en-US')}`;
       this.cartItemsElement.textContent = `${this.headerInfo.cartItems}`;
+      this.checkSize();
     }
   }
 }
