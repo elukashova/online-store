@@ -89,7 +89,9 @@
 .pers-data__phone-input::placeholder,
 .pers-data__address-input::placeholder,
 .pers-data__email-input::placeholder,
-.card-data__number-input::placeholder {
+.card-data__number-input::placeholder,
+.card-data__expiration-input::placeholder,
+.card-data__cvv-input::placeholder {
   font-size: 1.2rem;
   font-weight: 300;
   color: #FF7D15;
