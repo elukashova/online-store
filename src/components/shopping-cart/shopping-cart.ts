@@ -41,11 +41,11 @@ export default class Cart extends BaseComponent {
 
   private itemsPerPageElement: HTMLElement | null = null;
 
-  private itemsPerPage: number = 2;
+  private itemsPerPage: number = Number(this.getQueryParams('limit')) ? Number(this.getQueryParams('limit')) : 2;
 
   private pagesNumber: number = 0;
 
-  private currentPage: number = 1;
+  private currentPage: number = Number(this.getQueryParams('page')) ? Number(this.getQueryParams('page')) : 1;
 
   // индексы, которые мне нужны для создания карточек при перелистывании
   private startIdx: number = 0;
@@ -56,7 +56,7 @@ export default class Cart extends BaseComponent {
   private slideBack: boolean = false;
 
   // и для обновления количества товара на странице
-  private itemsNumberChange: boolean = false;
+  private itemsNumChange: boolean = false;
 
   // элементы для промокода
   private promocodeContainer: HTMLElement | null = null;
@@ -120,7 +120,7 @@ export default class Cart extends BaseComponent {
     rendered('span', totalNumWrapper, 'info-items__text', 'Items on page:');
     this.itemsPerPageElement = rendered('input', totalNumWrapper, 'info-items__number', '', {
       type: 'text',
-      placeholder: '2',
+      placeholder: `${this.itemsPerPage}`,
       minlength: '1',
       maxlength: '4',
     });
@@ -140,11 +140,14 @@ export default class Cart extends BaseComponent {
     // проверяю количество товаров, чтобы понять, нужна ли пагинация
     if (this.addedItems.length <= this.itemsPerPage) {
       this.createItemsCards(this.addedItems, this.callback);
-    } else if (this.addedItems.length > this.itemsPerPage) {
+    } else if (this.addedItems.length > this.itemsPerPage && this.currentPage === 1) {
       // передаем первые два товара на первую страницу пагинации
       this.createItemsCards(this.addedItems.slice(0, this.itemsPerPage), this.callback);
       // активируем кнопку и добавляем листенер
       this.activateRightButton();
+    } else if (this.addedItems.length > this.itemsPerPage && this.currentPage !== 1) {
+      this.itemsNumChange = true;
+      this.showNotFirstPage();
     }
 
     // summary
@@ -181,16 +184,31 @@ export default class Cart extends BaseComponent {
     rendered('button', this.summaryContainer, 'cart-total-sum__buy-btn', 'buy now');
   }
 
+  // метод для сохранения query параметров
+  private setQueryParams(key: string, value: string): void {
+    const searchParams: URLSearchParams = new URLSearchParams(window.location.search);
+    searchParams.set(key, value);
+    const newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
+    window.history.pushState(null, '', newRelativePathQuery);
+  }
+
+  // метод для чтения query параметров
+  private getQueryParams(key: string): string | null {
+    const params: URLSearchParams = new URLSearchParams(window.location.search);
+    const value: string | null = params.get(key);
+    return value;
+  }
+
   // функция создания карточек
   private createItemsCards(array: PosterStorageInfoType[], callback: (event: Event) => void): void {
     cardsData.products.forEach((data) => {
       for (let i: number = 0; i < array.length; i += 1) {
         if (data.id === array[i].id) {
-          if (this.slideBack === true || this.itemsNumberChange === true) {
+          if (this.slideBack === true || this.itemsNumChange === true) {
             this.itemsOrder = this.addedItems.indexOf(array[0]);
           }
           this.slideBack = false;
-          this.itemsNumberChange = false;
+          this.itemsNumChange = false;
           this.itemsOrder += 1;
           const card = new CartCard(data, this.itemsOrder, callback);
           card.attachObserver(this.header);
@@ -207,6 +225,7 @@ export default class Cart extends BaseComponent {
     e.preventDefault();
     // меняем номер страницы
     this.currentPage += 1;
+    this.setQueryParams('page', `${this.currentPage}`);
     this.updatePageNumber();
     // активируем левую кнопку и вешаем слушатель
     this.activateLeftButton();
@@ -225,12 +244,26 @@ export default class Cart extends BaseComponent {
     }
   };
 
+  // создание карточек после чтения query с номером страницы, которая не равна 1
+  private showNotFirstPage(): void {
+    this.activateLeftButton();
+    if (this.currentPage === this.pagesNumber && this.rightArrowBtn) {
+      this.deactivateRightButton();
+    } else {
+      this.activateRightButton();
+    }
+    this.startIdx = this.currentPage * this.itemsPerPage - this.itemsPerPage;
+    this.endIdx = this.startIdx + this.itemsPerPage;
+    this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx), this.callback);
+  }
+
   // колбэк для левой стрелки (пагинация)
   private leftBtnCallback = (e: Event): void => {
     e.preventDefault();
     this.slideBack = true;
     // меняем номер страницы
     this.currentPage -= 1;
+    this.setQueryParams('page', `${this.currentPage}`);
     this.updatePageNumber();
     // активируем правую кнопку, если речь о предпоследней странице
     if (this.rightArrowBtn && this.currentPage === this.pagesNumber - 1) {
@@ -264,7 +297,9 @@ export default class Cart extends BaseComponent {
       if (this.itemsPerPage === this.addedItems.length || Number(e.target.value) > this.addedItems.length) {
         this.currentPage = 1;
         this.deactivateBothButtons();
+        this.setQueryParams('page', `${this.currentPage}`);
       }
+      this.setQueryParams('limit', `${this.itemsPerPage}`);
     }
   };
 
@@ -451,7 +486,7 @@ export default class Cart extends BaseComponent {
 
   // повторяющийся код, который использую при пагинации и удалении
   private updatePaginationAfterChange(): void {
-    this.itemsNumberChange = true;
+    this.itemsNumChange = true;
     this.deleteCards();
     this.pagesNumber = Math.ceil(this.addedItems.length / this.itemsPerPage);
     // обновить нумерацию страниц и создать новые карточки
@@ -481,6 +516,7 @@ export default class Cart extends BaseComponent {
       if (this.currentPage > this.pagesNumber) {
         this.currentPage = this.pagesNumber;
         this.currentPageElement.textContent = `${this.pagesNumber}`;
+        this.setQueryParams('page', `${this.currentPage}`);
         if (this.rightArrowBtn) {
           this.deactivateRightButton();
         }
