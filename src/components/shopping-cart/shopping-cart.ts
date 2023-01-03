@@ -118,11 +118,11 @@ export default class Cart extends BaseComponent {
     const cartInfoContainer: HTMLElement = rendered('div', this.cartContainer, 'cart-items__info');
     const totalNumWrapper: HTMLElement = rendered('div', cartInfoContainer, 'cart-items__info_items info-items');
     rendered('span', totalNumWrapper, 'info-items__text', 'Items on page:');
-    this.itemsPerPageElement = rendered('input', totalNumWrapper, 'info-items__number', '', {
-      type: 'text',
-      placeholder: `${this.itemsPerPage}`,
-      minlength: '1',
-      maxlength: '4',
+    this.itemsPerPageElement = rendered('input', totalNumWrapper, 'info-items__number-input', '', {
+      type: 'number',
+      value: `${this.itemsPerPage}`,
+      min: '1',
+      max: `${this.addedItems.length}`,
     });
     this.itemsPerPageElement.addEventListener('change', this.itemsNumberInputCallback);
     const totalPagesWrapper: HTMLElement = rendered('div', cartInfoContainer, 'cart-items__info_pages info-pages');
@@ -286,7 +286,7 @@ export default class Cart extends BaseComponent {
   // колбэк для смены количества айтемов на странице
   private itemsNumberInputCallback = (e: Event): void => {
     e.preventDefault();
-    if (this.itemsPerPageElement && e.target instanceof HTMLInputElement) {
+    if (this.itemsPerPageElement && e.target instanceof HTMLInputElement && e.target.value !== '0') {
       // проверка, нужно ли реактивировать кнопки
       this.activateBothButtons();
       this.itemsPerPageElement.textContent = e.target.value;
