@@ -167,6 +167,7 @@ export default class ProductPage extends BaseComponent {
   private buyNowCallback = (e: Event): void => {
     e.preventDefault();
     this.isCheckout = true;
+    this.notifyObserver();
 
     const { target } = e;
     if (target instanceof HTMLButtonElement) {
@@ -181,6 +182,7 @@ export default class ProductPage extends BaseComponent {
       window.history.pushState({}, '', '/cart');
       this.callback(e, this.isCheckout);
     }
+    this.isCheckout = false;
   };
 
   // возврат на главную страницу

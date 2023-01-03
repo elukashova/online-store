@@ -43,6 +43,7 @@ export default class Header extends BaseComponent {
     const storePage: HTMLElement = rendered('li', menu, 'menu__item menu__item_current');
     const aboutPage: HTMLElement = rendered('li', menu, 'menu__item');
     this.storeLink = rendered('a', storePage, 'menu__link store-link', 'Store', { href: '/' });
+    this.storeLink.classList.add('active-link');
     this.aboutLink = rendered('a', aboutPage, 'menu__link about-link', 'About us', { href: '/about' });
     const totalPrice: HTMLElement = rendered('li', menu, 'menu__item total-price', 'Total:');
     const priceWrapper: HTMLElement = rendered('div', totalPrice, 'total-price__container');
@@ -95,13 +96,7 @@ export default class Header extends BaseComponent {
       this.callback(e);
     }
     if (target && target instanceof HTMLSpanElement) {
-      if (this.storeLink && this.aboutLink) {
-        this.deleteClass(this.storeLink);
-        this.deleteClass(this.aboutLink);
-      }
-      if (this.shoppingCartLink) {
-        this.shoppingCartLink.classList.add('active-link');
-      }
+      this.activateCartLink();
       window.history.pushState({}, '', '/cart');
       this.callback(e);
     }
@@ -110,6 +105,16 @@ export default class Header extends BaseComponent {
   private deleteClass(element: HTMLElement): void {
     if (element.classList.contains('active-link')) {
       element.classList.remove('active-link');
+    }
+  }
+
+  private activateCartLink(): void {
+    if (this.storeLink && this.aboutLink) {
+      this.deleteClass(this.storeLink);
+      this.deleteClass(this.aboutLink);
+    }
+    if (this.shoppingCartLink) {
+      this.shoppingCartLink.classList.add('active-link');
     }
   }
 
@@ -145,6 +150,9 @@ export default class Header extends BaseComponent {
         this.increaseNumbers(subject.price);
       } else if (subject.isAdded === false) {
         this.decreaseNumbers(subject.totalPrice, subject.totalAmount);
+      }
+      if (subject.isCheckout === true) {
+        this.activateCartLink();
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }

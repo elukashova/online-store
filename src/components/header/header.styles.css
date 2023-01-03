@@ -13,13 +13,13 @@
 }
 
 .logo__img {
-  width: 40%;
+  width: 35%;
   pointer-events: none;
 }
 
 .header__menu {
   display: flex;
-  width: 30%;
+  width: 40%;
   justify-content: space-between;
   align-items: center;
 }
@@ -68,7 +68,7 @@
 
 .cart__link {
   pointer-events: all;
-  width: 2em;
+  width: 2rem;
   text-align: center;
   display: flex;
 }
