@@ -20,6 +20,8 @@ export default class App {
 
   private component: Element | null = null;
 
+  private isCheckout: boolean = false;
+
   constructor(private readonly rootElement: HTMLElement) {
     this.header = new Header(this.route);
     this.routes = {
@@ -35,15 +37,16 @@ export default class App {
     this.locationHandler();
   }
 
-  public route = (event: Event): void => {
+  public route = (event: Event, checkout?: boolean): void => {
     const e: Event = event || window.event;
     e.preventDefault();
 
+    if (checkout && checkout === true) {
+      this.isCheckout = true;
+    }
+
     if (e.target instanceof HTMLAnchorElement) {
       window.history.pushState({}, '', e.target.href);
-    } else {
-      const { href } = window.location;
-      window.history.pushState({}, '', href);
     }
 
     this.locationHandler();
@@ -61,7 +64,8 @@ export default class App {
 
     switch (location) {
       case '/cart':
-        this.routes.cart = new Cart(this.header, this.route, this.rootElement);
+        this.routes.cart = new Cart(this.header, this.route, this.rootElement, this.isCheckout);
+        this.isCheckout = false;
         this.component = this.routes.cart.element;
         break;
       case '/':

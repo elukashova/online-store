@@ -22,7 +22,7 @@ export default class Page404 extends BaseComponent {
 
   private toStoreBtnCallback = (e: Event): void => {
     e.preventDefault();
-    window.location.href = '/';
+    window.history.pushState({}, '', '/');
     this.callback(e);
   };
 }

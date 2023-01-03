@@ -8,10 +8,9 @@ import Header from '../header/header';
 import {
   checkProductDataInLocalStorage,
   checkPromoDataInLocalStorage,
-  checkHeaderCheckoutDataInLocalStorage,
   setDataToLocalStorage,
 } from '../../utils/localStorage';
-import { JsonObj, PosterStorageType } from '../../utils/localStorage.types';
+import { PosterStorageType } from '../../utils/localStorage.types';
 import { ObservedSubject } from '../card/card.types';
 import { Callback, PromoInputs, PromoValues } from './shopping-cart.types';
 import ModalWindow from '../modal-window/modal-window';
@@ -20,8 +19,6 @@ export default class Cart extends BaseComponent {
   private storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
 
   private promoStorageInfo: string[] | null = checkPromoDataInLocalStorage('appliedPromo');
-
-  private checkoutStorageInfo: JsonObj | null = checkHeaderCheckoutDataInLocalStorage('isCheckout');
 
   private itemsOrder: number = 0;
 
@@ -97,9 +94,14 @@ export default class Cart extends BaseComponent {
 
   private appliedPromos: string[] = [];
 
+  private isCheckout: boolean = false;
+
   // eslint-disable-next-line max-len
-  constructor(private header: Header, private callback: Callback, private root: HTMLElement) {
+  constructor(private header: Header, private callback: Callback, private root: HTMLElement, checkout?: boolean) {
     super('div', 'cart-container cart');
+    if (checkout && checkout === true) {
+      this.isCheckout = true;
+    }
     this.cartItems = this.header.headerInfo.cartItems;
     this.totalPrice = this.header.headerInfo.totalPrice;
     if (this.storageInfo !== null) {
@@ -195,9 +197,9 @@ export default class Cart extends BaseComponent {
     this.buyNowButton = rendered('button', this.summaryContainer, 'cart-total-sum__buy-btn', 'buy now');
     this.buyNowButton.addEventListener('click', this.buyNowBtnCallback);
     // открываем модалку, если корзина открыта через product page
-    if (this.checkoutStorageInfo !== null && this.checkoutStorageInfo.yes === 1) {
+    if (this.isCheckout === true) {
       this.openModalCheckout();
-      localStorage.removeItem('isCheckout');
+      this.isCheckout = false;
     }
   }
 

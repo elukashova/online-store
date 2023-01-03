@@ -122,7 +122,7 @@ export default class CartCard extends BaseComponent {
 
   private productPageCallback = (e: Event): void => {
     e.preventDefault();
-    window.location.href = `${this.id}`;
+    window.history.pushState({}, '', `${this.id}`);
     this.callback(e);
   };
 
