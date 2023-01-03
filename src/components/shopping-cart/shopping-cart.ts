@@ -8,7 +8,8 @@ import Header from '../header/header';
 import { checkDataInLocalStorage, checkPromoDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
 import { PosterStorageInfoType } from '../../utils/localStorage.types';
 import { ObservedSubject } from '../card/card.types';
-import { PromoInputs, PromoValues } from './shopping-cart.types';
+import { Callback, PromoInputs, PromoValues } from './shopping-cart.types';
+import ModalWindow from '../modal-window/modal-window';
 
 export default class Cart extends BaseComponent {
   private storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
@@ -40,6 +41,8 @@ export default class Cart extends BaseComponent {
   private currentPageElement: HTMLElement | null = null;
 
   private itemsPerPageElement: HTMLElement | null = null;
+
+  private buyNowButton: HTMLElement | null = null;
 
   private itemsPerPage: number = Number(this.getQueryParams('limit')) ? Number(this.getQueryParams('limit')) : 2;
 
@@ -87,7 +90,7 @@ export default class Cart extends BaseComponent {
 
   private appliedPromos: string[] = [];
 
-  constructor(public readonly header: Header, private callback: (event: Event) => void) {
+  constructor(private header: Header, private callback: Callback, private root: HTMLElement) {
     super('div', 'cart-container cart');
     this.cartItems = this.header.headerInfo.cartItems;
     this.totalPrice = this.header.headerInfo.totalPrice;
@@ -181,7 +184,8 @@ export default class Cart extends BaseComponent {
       "Active promo codes: 'BEHAPPY', 'SMILE'",
     );
     rendered('div', this.summaryContainer, 'cart-total-sum__line');
-    rendered('button', this.summaryContainer, 'cart-total-sum__buy-btn', 'buy now');
+    this.buyNowButton = rendered('button', this.summaryContainer, 'cart-total-sum__buy-btn', 'buy now');
+    this.buyNowButton.addEventListener('click', this.buyNowBtnCallback);
   }
 
   // метод для сохранения query параметров
@@ -218,6 +222,13 @@ export default class Cart extends BaseComponent {
       }
     });
   }
+
+  // колбэк для кнопки покупки
+  private buyNowBtnCallback = (e: Event): void => {
+    e.preventDefault();
+    const modal: ModalWindow = new ModalWindow(this.root);
+    this.root.insertBefore(modal.element, this.header.element);
+  };
 
   // колбэк для правой стрелки (пагинация)
   private rightBtnCallback = (e: Event): void => {

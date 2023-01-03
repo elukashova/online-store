@@ -60,7 +60,7 @@ export default class App {
 
     switch (location) {
       case '/cart':
-        this.routes.cart = new Cart(this.header, this.route);
+        this.routes.cart = new Cart(this.header, this.route, this.rootElement);
         this.component = this.routes.cart.element;
         break;
       case '/':
