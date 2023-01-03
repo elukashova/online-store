@@ -5,20 +5,27 @@ import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
 import CartCard from './card-cart';
 import Header from '../header/header';
-import { checkDataInLocalStorage, checkPromoDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
-import { PosterStorageInfoType } from '../../utils/localStorage.types';
+import {
+  checkProductDataInLocalStorage,
+  checkPromoDataInLocalStorage,
+  checkHeaderCheckoutDataInLocalStorage,
+  setDataToLocalStorage,
+} from '../../utils/localStorage';
+import { JsonObj, PosterStorageType } from '../../utils/localStorage.types';
 import { ObservedSubject } from '../card/card.types';
 import { Callback, PromoInputs, PromoValues } from './shopping-cart.types';
 import ModalWindow from '../modal-window/modal-window';
 
 export default class Cart extends BaseComponent {
-  private storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
+  private storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
 
   private promoStorageInfo: string[] | null = checkPromoDataInLocalStorage('appliedPromo');
 
+  private checkoutStorageInfo: JsonObj | null = checkHeaderCheckoutDataInLocalStorage('isCheckout');
+
   private itemsOrder: number = 0;
 
-  private addedItems: PosterStorageInfoType[] = [];
+  private addedItems: PosterStorageType[] = [];
 
   private cartItems: number;
 
@@ -90,6 +97,7 @@ export default class Cart extends BaseComponent {
 
   private appliedPromos: string[] = [];
 
+  // eslint-disable-next-line max-len
   constructor(private header: Header, private callback: Callback, private root: HTMLElement) {
     super('div', 'cart-container cart');
     this.cartItems = this.header.headerInfo.cartItems;
@@ -186,6 +194,11 @@ export default class Cart extends BaseComponent {
     rendered('div', this.summaryContainer, 'cart-total-sum__line');
     this.buyNowButton = rendered('button', this.summaryContainer, 'cart-total-sum__buy-btn', 'buy now');
     this.buyNowButton.addEventListener('click', this.buyNowBtnCallback);
+    // открываем модалку, если корзина открыта через product page
+    if (this.checkoutStorageInfo !== null && this.checkoutStorageInfo.yes === 1) {
+      this.openModalCheckout();
+      localStorage.removeItem('isCheckout');
+    }
   }
 
   // метод для сохранения query параметров
@@ -204,7 +217,7 @@ export default class Cart extends BaseComponent {
   }
 
   // функция создания карточек
-  private createItemsCards(array: PosterStorageInfoType[], callback: (event: Event) => void): void {
+  private createItemsCards(array: PosterStorageType[], callback: (event: Event) => void): void {
     cardsData.products.forEach((data) => {
       for (let i: number = 0; i < array.length; i += 1) {
         if (data.id === array[i].id) {
@@ -226,9 +239,13 @@ export default class Cart extends BaseComponent {
   // колбэк для кнопки покупки
   private buyNowBtnCallback = (e: Event): void => {
     e.preventDefault();
+    this.openModalCheckout();
+  };
+
+  private openModalCheckout(): void {
     const modal: ModalWindow = new ModalWindow(this.root);
     this.root.insertBefore(modal.element, this.header.element);
-  };
+  }
 
   // колбэк для правой стрелки (пагинация)
   private rightBtnCallback = (e: Event): void => {
