@@ -34,7 +34,6 @@ export default class CardsField extends BaseComponent {
 
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('addedPosters');
 
-
   constructor(public readonly header: Header, private callback: (event: Event) => void) {
     super('div', 'content__container');
     this.checkLocalStorage();
@@ -105,6 +104,35 @@ export default class CardsField extends BaseComponent {
       card.attachObserver(this);
       this.cardsAll.push(card);
       if (this.cardsContainer) this.cardsContainer.append(card.element);
+    });
+
+    // и в добавлении слушателя тоже стоило бы избавиться от проверки ивент таргета и ифа, а просто при создании selectInput добавлять листенер, там где у тебя точно известно какое поле ты создаёшь
+    /* if (!this.visibleCards.length) {
+      this.selectInput.addEventListener('change', (event) => {
+        if (event.target && event.target instanceof HTMLSelectElement) {
+          if (event.target.value === 'price') {
+            const sorting = this.sortByField(this.cardsAll, 'price');
+            console.log(sorting);
+          } else {
+            this.sortByField(this.cardsAll, 'rating');
+          }
+        }
+      });
+    } else { */
+    this.selectInput.addEventListener('change', () => {
+      if (this.cardsContainer) this.cardsContainer.innerHTML = '';
+      if (this.selectInput instanceof HTMLSelectElement) {
+        if (this.selectInput.value === 'price') {
+          this.sortByField(this.cardsAll, 'price');
+        } else {
+          this.sortByField(this.cardsAll, 'rating');
+        }
+      }
+      this.cardsAll.forEach((card) => {
+        if (this.cardsContainer) {
+          this.cardsContainer.append(card.element);
+        }
+      });
     });
   }
 
