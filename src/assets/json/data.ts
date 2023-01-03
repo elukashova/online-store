@@ -2,7 +2,7 @@ const posters = {
   products: [
     {
       id: 1,
-      title: 'Lorem Ipsum',
+      title: 'Red',
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nisl sem, hendrerit vitae convallis sed, interdum nec risus.',
       price: 82,
@@ -15,7 +15,7 @@ const posters = {
     },
     {
       id: 2,
-      title: 'Lorem Ipsum',
+      title: 'White',
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nisl sem, hendrerit vitae convallis sed, interdum nec risus.',
       price: 103,
@@ -28,7 +28,7 @@ const posters = {
     },
     {
       id: 3,
-      title: 'Lorem Ipsum',
+      title: 'Green',
       description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nisl sem, hendrerit vitae convallis sed, interdum nec risus.',
       price: 79,

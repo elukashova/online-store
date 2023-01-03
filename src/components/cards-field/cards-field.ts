@@ -22,15 +22,13 @@ export default class CardsField extends BaseComponent {
 
   public cardsContainer: HTMLElement | null = null;
 
-  public sortByPriceElement: HTMLElement | null = null;
-
-  public sortByRatingElement: HTMLElement | null = null;
-
   public notFoundText: HTMLElement | null = null;
 
   public postersFound: HTMLElement | null = null;
 
   public selectInput: HTMLElement | null = null;
+
+  public searchInput: HTMLElement | null = null;
 
   private readonly storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
 
@@ -75,23 +73,53 @@ export default class CardsField extends BaseComponent {
       disabled: '',
       selected: '',
     });
-    this.sortByPriceElement = rendered('option', this.selectInput, 'cards__sort-by-price', 'Sort by price', {
-      value: 'price',
+    rendered('option', this.selectInput, 'cards__sort-by-price-asc', 'Sort by price asc', {
+      value: 'price-asc',
     });
-    this.sortByRatingElement = rendered('option', this.selectInput, 'cards__sort-by-rating', 'Sort by rating', {
-      value: 'rating',
+    rendered('option', this.selectInput, 'cards__sort-by-price-desc', 'Sort by price desc', {
+      value: 'price-desc',
+    });
+    rendered('option', this.selectInput, 'cards__sort-by-rating-asc', 'Sort by rating asc', {
+      value: 'rating-asc',
+    });
+    rendered('option', this.selectInput, 'cards__sort-by-rating-desc', 'Sort by rating desc', {
+      value: 'rating-desc',
     });
     this.postersFound = rendered('div', sortWrapper, 'cards__found-count', 'Found: 24');
     const searchInputWrapper = rendered('div', sortWrapper, 'cards__search-wrapper');
-    rendered('input', searchInputWrapper, 'cards__search', '', {
+    const searchInput = rendered('input', searchInputWrapper, 'cards__search', '', {
       type: 'search',
       placeholder: 'Search poster',
+      id: 'search',
+    });
+    searchInput.addEventListener('input', () => {
+      if (searchInput instanceof HTMLInputElement) {
+        const val = searchInput.value.trim().toUpperCase();
+        if (val !== '') {
+          this.cardsAll.forEach((card) => {
+            if (card.element instanceof HTMLElement) {
+              if (card.element.innerText.toUpperCase().search(val)) {
+                card.element.classList.add('visible');
+                card.element.classList.remove('hidden');
+                console.log(card.element);
+              } else {
+                card.element.classList.add('hidden');
+                card.element.classList.remove('visible');
+              }
+            }
+          });
+        } else {
+          this.cardsAll.forEach((card) => {
+            if (card.element instanceof HTMLElement) card.element.classList.remove('hidden');
+          });
+        }
+      }
     });
     rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg' });
     const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
     rendered('img', viewTypes, 'cards__view-line', '', { src: 'assets/icons/list-line.png' });
     rendered('img', viewTypes, 'cards__view-block', '', { src: 'assets/icons/list-block.png' });
-    this.cardsContainer = rendered('div', contentContainer, 'cards__container', '', {
+    this.cardsContainer = rendered('div', contentContainer, 'cards__container search', '', {
       id: 'cards__container',
     });
     this.notFoundText = rendered('p', this.cardsContainer, 'cards__not-found hidden', 'Product not found', {
@@ -107,19 +135,30 @@ export default class CardsField extends BaseComponent {
     });
 
     this.selectInput.addEventListener('change', () => {
-      if (this.cardsContainer) this.cardsContainer.innerHTML = '';
       if (this.selectInput instanceof HTMLSelectElement) {
-        if (this.selectInput.value === 'price') {
-          this.sortByField(this.cardsAll, 'price');
-        } else {
-          this.sortByField(this.cardsAll, 'rating');
-        }
+        console.log(this.sortByField(this.cardsAll, this.selectInput.value));
+        this.sortByField(this.cardsAll, this.selectInput.value);
       }
       this.cardsAll.forEach((card) => {
         if (this.cardsContainer) {
           this.cardsContainer.append(card.element);
         }
       });
+    });
+  }
+
+  // функция сортировки
+  public sortByField(arr: Card[], field: string): Card[] {
+    // return arr.sort((a, b) => (field === 'price' ? a.price - b.price : b.rating - a.rating));
+    return arr.sort((a, b): number => {
+      if (field.includes('asc')) {
+        if (field.includes('price')) return a.price - b.price;
+        return a.rating - b.rating;
+      }
+      if (field.includes('desc')) {
+        if (field.includes('price')) return b.price - a.price;
+      }
+      return b.rating - a.rating;
     });
   }
 
@@ -171,6 +210,8 @@ export default class CardsField extends BaseComponent {
     });
     if (!!byCategory.length || !!bySize.length || !!byPrice.length || !!byCount.length) {
       this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount);
+    } else {
+      this.visibleCards.length = 0;
     }
 
     if (this.visibleCards.length === 0 && this.activeFilters.length !== 0) {
@@ -192,10 +233,20 @@ export default class CardsField extends BaseComponent {
         visibleCard.element.classList.remove('hidden');
       });
     }
-    if (this.postersFound) this.postersFound.textContent = `Found: ${this.visibleCards.length}`;
+    this.changeFoundItem();
   }
 
   public getFilterType = (value: string, index: number): string => value.split(',')[index];
+
+  public changeFoundItem(): void {
+    if (this.postersFound) {
+      if (this.activeFilters.length === 0) {
+        this.postersFound.textContent = `Found: ${this.cardsAll.length}`;
+      } else if (this.visibleCards.length >= 0) {
+        this.postersFound.textContent = `Found: ${this.visibleCards.length}`;
+      }
+    }
+  }
 
   // функция принимает отфильтрованные значения категории, размера, цены и остатка
   // на складе в виде массивов карточек, проверяет, что массивы не пустые и в зависимости
@@ -206,7 +257,7 @@ export default class CardsField extends BaseComponent {
     return result;
   }
 
-  public addSortListener(arr: Card[]): void {
+  /*   public addSortListener(arr: Card[]): void {
     console.log(arr);
     if (this.selectInput) {
       this.selectInput.addEventListener('change', (event) => {
@@ -221,12 +272,18 @@ export default class CardsField extends BaseComponent {
       });
       console.log(arr);
     }
-  }
+  } */
 
-  // функция сортировки
+  /*   // функция сортировки
   public sortByField(arr: Card[], field: string): Card[] {
-    return arr.sort((a, b) => (field === 'price' ? a.price - b.price : b.rating - a.rating));
-  }
+    // return arr.sort((a, b) => (field === 'price' ? a.price - b.price : b.rating - a.rating));
+    return arr.sort((a, b): number => {
+      if (field === 'price-asc' || field === 'rating-asc') {
+        return field === 'price-asc' ? a.price - b.price : a.rating - b.rating;
+      }
+      return field === 'price-decs' ? b.price - a.price : b.rating - a.rating;
+    });
+  } */
 
   // сброс классов
   public resetClasses(activeFilters: string[], cards: Card[]): void {
