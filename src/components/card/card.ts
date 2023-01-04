@@ -81,9 +81,7 @@ export default class Card extends BaseComponent {
       for (let i: number = 0; i < posters.length; i += 1) {
         if (posters[i].id === this.id) {
           this.totalPrice = posters[i].quantity * this.price;
-          console.log('🚀 ~ file: card.ts:82 ~ Card ~ render ~ this.totalPrice', this.totalPrice);
           this.itemQuantity = posters[i].quantity;
-          console.log('🚀 ~ file: card.ts:84 ~ Card ~ render ~ this.itemQuantity', this.itemQuantity);
           this.element.classList.add('added');
           this.wasAdded = true;
         }

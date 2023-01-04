@@ -18,10 +18,5 @@ export default class Page404 extends BaseComponent {
     rendered('img', this.element, 'page-not-found__background', '', {
       src: 'assets/images/404-background-right.png',
     });
-    // rendered('span', textWrapper, 'page-not-found__title', 'Ooops...');
-    // rendered('span', textWrapper, 'page-not-found__text', 'Page not found');
-    // rendered('img', contentWrapper, 'page-not-found__background', '', {
-    //   src: 'assets/images/404-background.png',
-    // });
   }
 }
