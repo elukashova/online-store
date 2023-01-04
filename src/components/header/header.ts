@@ -116,6 +116,14 @@ export default class Header extends BaseComponent {
     }
   }
 
+  public deleteActiveClass(): void {
+    if (this.storeLink && this.aboutLink && this.shoppingCartLink) {
+      this.deleteClass(this.storeLink);
+      this.deleteClass(this.aboutLink);
+      this.deleteClass(this.shoppingCartLink);
+    }
+  }
+
   // метод для обсервера
   // eslint-disable-next-line max-lines-per-function
   public update(subject: ObservedSubject): void {

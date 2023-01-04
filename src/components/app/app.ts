@@ -54,11 +54,9 @@ export default class App {
   public locationHandler = async (checkout?: boolean): Promise<void> => {
     const location: string = window.location.pathname.length === 0 ? '/' : window.location.pathname;
 
-    if (Number(location.slice(1))) {
+    if (Number(location.slice(1)) <= 24) {
       this.productID = location.slice(1);
     }
-    // footer и header удаляюься на 404, поэтому надо проверить, не надо ли их снова повесить
-    this.appendHeaderFooter(this.header.element, this.footer.element);
 
     switch (location) {
       case '/cart':
@@ -77,8 +75,7 @@ export default class App {
       default:
         this.routes.notfound = new Page404(this.route);
         this.component = this.routes.notfound.element;
-        this.rootElement.removeChild(this.header.element);
-        this.rootElement.removeChild(this.footer.element);
+        this.header.deleteActiveClass();
     }
 
     if (!this.mainContainer.element.hasChildNodes()) {
