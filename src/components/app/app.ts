@@ -62,15 +62,18 @@ export default class App {
       case '/cart':
         this.routes.cart = new Cart(this.header, this.route, this.rootElement, checkout);
         this.component = this.routes.cart.element;
+        this.header.activateCartLink();
         break;
       case '/':
         this.routes.store = new CardsField(this.header, this.route);
         this.component = this.routes.store.element;
+        this.header.activateStoreLink();
         break;
       case `/${this.productID}`:
         this.routes.productPage = new ProductPage(Number(this.productID), this.route);
         this.routes.productPage.attachObserver(this.header);
         this.component = this.routes.productPage.element;
+        this.header.activateStoreLink();
         break;
       default:
         this.routes.notfound = new Page404(this.route);

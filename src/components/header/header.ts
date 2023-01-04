@@ -53,7 +53,7 @@ export default class Header extends BaseComponent {
       `$ ${this.headerInfo.totalPrice.toLocaleString('en-US')}`,
     );
     const shoppingCart: HTMLElement = rendered('div', menu, 'menu__item cart');
-    this.shoppingCartLink = rendered('a', shoppingCart, 'cart__link', '', { href: '/cart' });
+    this.shoppingCartLink = rendered('a', shoppingCart, 'cart__link cart-hover', '', { href: '/cart' });
     rendered('img', this.shoppingCartLink, 'cart__icon', '', {
       src: 'assets/icons/cart.svg',
     });
@@ -78,12 +78,6 @@ export default class Header extends BaseComponent {
     const { target } = e;
     if (target && target instanceof HTMLAnchorElement) {
       this.callback(e);
-      if (this.storeLink && this.aboutLink && this.shoppingCartLink) {
-        this.deleteClass(this.storeLink);
-        this.deleteClass(this.aboutLink);
-        this.deleteClass(this.shoppingCartLink);
-      }
-      target.classList.add('active-link');
     }
   };
 
@@ -106,13 +100,36 @@ export default class Header extends BaseComponent {
     }
   }
 
-  private activateCartLink(): void {
+  public activateCartLink(): void {
     if (this.storeLink && this.aboutLink) {
       this.deleteClass(this.storeLink);
       this.deleteClass(this.aboutLink);
     }
     if (this.shoppingCartLink) {
+      this.shoppingCartLink.classList.remove('cart-hover');
       this.shoppingCartLink.classList.add('active-link');
+    }
+  }
+
+  public activateStoreLink(): void {
+    if (this.shoppingCartLink && this.aboutLink) {
+      this.deleteClass(this.shoppingCartLink);
+      this.deleteClass(this.aboutLink);
+      this.shoppingCartLink.classList.add('cart-hover');
+    }
+    if (this.storeLink) {
+      this.storeLink.classList.add('active-link');
+    }
+  }
+
+  public activateAboutLink(): void {
+    if (this.shoppingCartLink && this.storeLink) {
+      this.deleteClass(this.shoppingCartLink);
+      this.deleteClass(this.storeLink);
+      this.shoppingCartLink.classList.add('cart-hover');
+    }
+    if (this.aboutLink) {
+      this.aboutLink.classList.add('active-link');
     }
   }
 
@@ -121,6 +138,7 @@ export default class Header extends BaseComponent {
       this.deleteClass(this.storeLink);
       this.deleteClass(this.aboutLink);
       this.deleteClass(this.shoppingCartLink);
+      this.shoppingCartLink.classList.add('cart-hover');
     }
   }
 

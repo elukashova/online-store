@@ -45,6 +45,7 @@
 
 .active-link {
   border-bottom: 2px solid #FF7D15;
+  pointer-events: none;
 }
 
 .total-price,
@@ -90,7 +91,7 @@
   display: flex;
 }
 
-.cart__link:hover .cart__icon {
+.cart-hover:hover .cart__icon {
   transform: scale(1.2);
 }
 
