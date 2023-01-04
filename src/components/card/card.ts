@@ -34,6 +34,8 @@ export default class Card extends BaseComponent {
 
   private observers: Observer[] = [];
 
+  private wasAdded: boolean = false;
+
   private readonly storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
 
   constructor(data: CardDataType, private callback: (event: Event) => void) {
@@ -79,8 +81,11 @@ export default class Card extends BaseComponent {
       for (let i: number = 0; i < posters.length; i += 1) {
         if (posters[i].id === this.id) {
           this.totalPrice = posters[i].quantity * this.price;
+          console.log('🚀 ~ file: card.ts:82 ~ Card ~ render ~ this.totalPrice', this.totalPrice);
           this.itemQuantity = posters[i].quantity;
+          console.log('🚀 ~ file: card.ts:84 ~ Card ~ render ~ this.itemQuantity', this.itemQuantity);
           this.element.classList.add('added');
+          this.wasAdded = true;
         }
       }
     }
@@ -114,6 +119,11 @@ export default class Card extends BaseComponent {
       this.element.classList.remove('added');
       this.buyButton?.setAttribute('src', 'assets/icons/button-buy.svg');
       this.notifyObserver();
+      if (this.wasAdded === true) {
+        this.wasAdded = false;
+        this.totalPrice = 0;
+        this.itemQuantity = 0;
+      }
     }
   };
 
