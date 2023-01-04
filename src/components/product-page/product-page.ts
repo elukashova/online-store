@@ -166,11 +166,10 @@ export default class ProductPage extends BaseComponent {
   // колбэк быстрой покупки
   private buyNowCallback = (e: Event): void => {
     e.preventDefault();
-    this.isCheckout = true;
-    this.notifyObserver();
 
     const { target } = e;
     if (target instanceof HTMLButtonElement) {
+      this.isCheckout = true;
       // добавление в корзину и local storage, если товар до этого не был добавлен в козину
       if (!this.addedItems.find((i) => i.id === this.id)) {
         this.isAdded = true;
@@ -229,11 +228,9 @@ export default class ProductPage extends BaseComponent {
 
   private addItemToLocalStorage(): void {
     const info: PosterStorageType = {
-      id: 0,
-      quantity: 0,
+      id: this.id,
+      quantity: 1,
     };
-    info.id = this.id;
-    info.quantity += 1;
     this.addedItems.push(info);
     setDataToLocalStorage(this.addedItems, 'addedPosters');
   }
