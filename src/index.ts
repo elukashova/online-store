@@ -9,3 +9,7 @@ window.onload = (): void => {
   // localStorage.clear();
   app.init();
 };
+
+window.onpopstate = (): void => {
+  app.locationHandler();
+};

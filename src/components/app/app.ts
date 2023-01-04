@@ -35,49 +35,50 @@ export default class App {
     this.locationHandler();
   }
 
-  public route = (event: Event): void => {
+  public route = (event: Event, checkout?: boolean): void => {
     const e: Event = event || window.event;
     e.preventDefault();
 
     if (e.target instanceof HTMLAnchorElement) {
       window.history.pushState({}, '', e.target.href);
-    } else {
-      const { href } = window.location;
-      window.history.pushState({}, '', href);
     }
 
-    this.locationHandler();
+    if (checkout && checkout === true) {
+      this.locationHandler(checkout);
+    } else {
+      this.locationHandler();
+    }
   };
 
   // eslint-disable-next-line max-lines-per-function
-  public locationHandler = async (): Promise<void> => {
+  public locationHandler = async (checkout?: boolean): Promise<void> => {
     const location: string = window.location.pathname.length === 0 ? '/' : window.location.pathname;
 
-    if (Number(location.slice(1))) {
+    if (Number(location.slice(1)) <= 24) {
       this.productID = location.slice(1);
     }
-    // footer и header удаляюься на 404, поэтому надо проверить, не надо ли их снова повесить
-    this.appendHeaderFooter(this.header.element, this.footer.element);
 
     switch (location) {
       case '/cart':
-        this.routes.cart = new Cart(this.header, this.route, this.rootElement);
+        this.routes.cart = new Cart(this.header, this.route, this.rootElement, checkout);
         this.component = this.routes.cart.element;
+        this.header.activateCartLink();
         break;
       case '/':
         this.routes.store = new CardsField(this.header, this.route);
         this.component = this.routes.store.element;
+        this.header.activateStoreLink();
         break;
       case `/${this.productID}`:
         this.routes.productPage = new ProductPage(Number(this.productID), this.route);
         this.routes.productPage.attachObserver(this.header);
         this.component = this.routes.productPage.element;
+        this.header.activateStoreLink();
         break;
       default:
         this.routes.notfound = new Page404(this.route);
         this.component = this.routes.notfound.element;
-        this.rootElement.removeChild(this.header.element);
-        this.rootElement.removeChild(this.footer.element);
+        this.header.deleteActiveClass();
     }
 
     if (!this.mainContainer.element.hasChildNodes()) {

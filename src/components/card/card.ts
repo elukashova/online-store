@@ -34,6 +34,8 @@ export default class Card extends BaseComponent {
 
   private observers: Observer[] = [];
 
+  private wasAdded: boolean = false;
+
   private readonly storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
 
   constructor(data: CardDataType, private callback: (event: Event) => void) {
@@ -81,6 +83,7 @@ export default class Card extends BaseComponent {
           this.totalPrice = posters[i].quantity * this.price;
           this.itemQuantity = posters[i].quantity;
           this.element.classList.add('added');
+          this.wasAdded = true;
         }
       }
     }
@@ -101,7 +104,7 @@ export default class Card extends BaseComponent {
   // колбэк для рутинга
   private productPageBtnCallback = (e: Event): void => {
     e.preventDefault();
-    window.location.href = `${this.id}`;
+    window.history.pushState({}, '', `${this.id}`);
     this.callback(e);
   };
 
@@ -114,6 +117,11 @@ export default class Card extends BaseComponent {
       this.element.classList.remove('added');
       this.buyButton?.setAttribute('src', 'assets/icons/button-buy.svg');
       this.notifyObserver();
+      if (this.wasAdded === true) {
+        this.wasAdded = false;
+        this.totalPrice = 0;
+        this.itemQuantity = 0;
+      }
     }
   };
 

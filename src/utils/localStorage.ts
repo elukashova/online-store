@@ -13,7 +13,7 @@ export const checkProductDataInLocalStorage = (key: string): PosterStorageType[]
   return result;
 };
 
-export const checkHeaderCheckoutDataInLocalStorage = (key: string): JsonObj | null => {
+export const checkHeaderDataInLocalStorage = (key: string): JsonObj | null => {
   const response: string | null = localStorage.getItem(key);
   let result: JsonObj | null = null;
   if (response) {

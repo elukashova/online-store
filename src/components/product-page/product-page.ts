@@ -6,7 +6,6 @@ import { checkProductDataInLocalStorage, setDataToLocalStorage } from '../../uti
 import { PosterStorageType } from '../../utils/localStorage.types';
 import { Observer } from '../card/card.types';
 import { Callback } from '../shopping-cart/shopping-cart.types';
-import { IsCheckoutType } from './product-page.types';
 
 export default class ProductPage extends BaseComponent {
   private observers: Observer[] = [];
@@ -53,9 +52,7 @@ export default class ProductPage extends BaseComponent {
 
   public isAdded: boolean = false;
 
-  private isCheckout: IsCheckoutType = {
-    yes: 0,
-  };
+  public isCheckout: boolean = false;
 
   // TODO: сюда надо будет передать данные из локал сторадж о том, добавлен ли товар в корзину
   constructor(id: number, private callback: Callback) {
@@ -169,11 +166,10 @@ export default class ProductPage extends BaseComponent {
   // колбэк быстрой покупки
   private buyNowCallback = (e: Event): void => {
     e.preventDefault();
-    this.isCheckout.yes = 1;
-    setDataToLocalStorage(this.isCheckout, 'isCheckout');
 
     const { target } = e;
     if (target instanceof HTMLButtonElement) {
+      this.isCheckout = true;
       // добавление в корзину и local storage, если товар до этого не был добавлен в козину
       if (!this.addedItems.find((i) => i.id === this.id)) {
         this.isAdded = true;
@@ -182,9 +178,10 @@ export default class ProductPage extends BaseComponent {
       }
       // переход в корзину
       // TODO: еще нет модального окна оформления покупки
-      window.location.href = '/cart';
-      this.callback(e);
+      window.history.pushState({}, '', '/cart');
+      this.callback(e, this.isCheckout);
     }
+    this.isCheckout = false;
   };
 
   // возврат на главную страницу
@@ -231,11 +228,9 @@ export default class ProductPage extends BaseComponent {
 
   private addItemToLocalStorage(): void {
     const info: PosterStorageType = {
-      id: 0,
-      quantity: 0,
+      id: this.id,
+      quantity: 1,
     };
-    info.id = this.id;
-    info.quantity += 1;
     this.addedItems.push(info);
     setDataToLocalStorage(this.addedItems, 'addedPosters');
   }

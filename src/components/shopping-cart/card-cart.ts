@@ -122,7 +122,7 @@ export default class CartCard extends BaseComponent {
 
   private productPageCallback = (e: Event): void => {
     e.preventDefault();
-    window.location.href = `${this.id}`;
+    window.history.pushState({}, '', `${this.id}`);
     this.callback(e);
   };
 
@@ -133,7 +133,7 @@ export default class CartCard extends BaseComponent {
       this.totalPrice -= this.price;
       this.itemAmount -= 1;
       if (this.priceForItemElement && this.itemAmountElement) {
-        this.priceForItemElement.textContent = `${this.totalPrice}`;
+        this.priceForItemElement.textContent = `${this.totalPrice.toLocaleString('en-US')}`;
         this.itemAmountElement.textContent = `${this.itemAmount}`;
       }
       this.notifyObserver();
@@ -148,7 +148,7 @@ export default class CartCard extends BaseComponent {
       this.totalPrice += this.price;
       this.itemAmount += 1;
       if (this.priceForItemElement && this.itemAmountElement) {
-        this.priceForItemElement.textContent = `${this.totalPrice}`;
+        this.priceForItemElement.textContent = `${this.totalPrice.toLocaleString('en-US')}`;
         this.itemAmountElement.textContent = `${this.itemAmount}`;
       }
       this.notifyObserver();

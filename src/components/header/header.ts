@@ -3,7 +3,7 @@ import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
 import { ObservedSubject } from '../card/card.types';
 import Card from '../card/card';
-import { setDataToLocalStorage, checkHeaderCheckoutDataInLocalStorage } from '../../utils/localStorage';
+import { setDataToLocalStorage, checkHeaderDataInLocalStorage } from '../../utils/localStorage';
 import { HeaderType } from './header.types';
 import { JsonObj } from '../../utils/localStorage.types';
 import CartCard from '../shopping-cart/card-cart';
@@ -14,14 +14,18 @@ export default class Header extends BaseComponent {
 
   public cartItemsElement: HTMLElement | null = null;
 
-  private readonly storageInfo: JsonObj | null = checkHeaderCheckoutDataInLocalStorage('headerInfo');
+  private readonly storageInfo: JsonObj | null = checkHeaderDataInLocalStorage('headerInfo');
 
   public headerInfo: HeaderType = {
     cartItems: 0,
     totalPrice: 0,
   };
 
-  private anchorElements: HTMLElement[] = [];
+  private storeLink: HTMLElement | null = null;
+
+  private aboutLink: HTMLElement | null = null;
+
+  private shoppingCartLink: HTMLElement | null = null;
 
   constructor(private callback: (event: Event) => void) {
     super('header', 'header', 'header');
@@ -35,30 +39,37 @@ export default class Header extends BaseComponent {
     rendered('img', logoLink, 'logo__img', '', {
       src: 'assets/icons/logo-placeholder.svg',
     });
-    const menu: HTMLElement = rendered('ul', container, 'header__menu menu');
-    const storePage: HTMLElement = rendered('li', menu, 'menu__item menu__item_current');
-    const aboutPage: HTMLElement = rendered('li', menu, 'menu__item');
-    const storeLink: HTMLElement = rendered('a', storePage, 'menu__link store-link', 'Store', { href: '/' });
-    const aboutLink: HTMLElement = rendered('a', aboutPage, 'menu__link about-link', 'About us', { href: '/about' });
-    const totalPrice: HTMLElement = rendered('li', menu, 'menu__item total-price', 'Total:');
-    const priceWrapper: HTMLElement = rendered('div', totalPrice, 'total-price__container');
-    rendered('span', priceWrapper, 'total-price__currency', '$');
+    const menu: HTMLElement = rendered('div', container, 'header__menu menu');
+    this.storeLink = rendered('a', menu, 'menu__link store-link', 'Store', { href: '/' });
+    this.storeLink.classList.add('active-link');
+    this.aboutLink = rendered('a', menu, 'menu__link about-link', 'About us', { href: '/about' });
+    const priceContainer: HTMLElement = rendered('div', menu, 'total-price__container');
+    rendered('span', priceContainer, 'total-price', 'Total:');
+    const priceNumber: HTMLElement = rendered('div', priceContainer, 'total-price__text');
     this.totalPriceElement = rendered(
       'span',
-      priceWrapper,
+      priceNumber,
       'total-price__sum',
-      `${this.headerInfo.totalPrice.toLocaleString('en-US')}`,
+      `$ ${this.headerInfo.totalPrice.toLocaleString('en-US')}`,
     );
-    const shoppingCart: HTMLElement = rendered('li', menu, 'menu__item cart');
-    const shoppingCartLink: HTMLElement = rendered('a', shoppingCart, 'cart__link', '', { href: '/cart' });
-    rendered('img', shoppingCartLink, 'cart__icon', '', {
+    const shoppingCart: HTMLElement = rendered('div', menu, 'menu__item cart');
+    this.shoppingCartLink = rendered('a', shoppingCart, 'cart__link cart-hover', '', { href: '/cart' });
+    rendered('img', this.shoppingCartLink, 'cart__icon', '', {
       src: 'assets/icons/cart.svg',
     });
-    this.cartItemsElement = rendered('span', shoppingCart, 'cart__items-number', `${this.headerInfo.cartItems}`);
-    this.anchorElements.push(logoLink, storeLink, aboutLink, shoppingCartLink);
-    this.anchorElements.forEach((link) => {
-      link.addEventListener('click', this.navLinkCallback);
-    });
+    this.cartItemsElement = rendered(
+      'span',
+      this.shoppingCartLink,
+      'cart__items-number',
+      `${this.headerInfo.cartItems}`,
+    );
+    this.storeLink.addEventListener('click', this.navLinkCallback);
+    this.aboutLink.addEventListener('click', this.navLinkCallback);
+    logoLink.addEventListener('click', this.imageLinkCallback);
+    this.shoppingCartLink.addEventListener('click', this.navLinkCallback);
+    this.cartItemsElement.addEventListener('click', this.imageLinkCallback);
+
+    this.updateInfoInHeader();
   }
 
   // колбэк для рутинга
@@ -69,6 +80,67 @@ export default class Header extends BaseComponent {
       this.callback(e);
     }
   };
+
+  private imageLinkCallback = (e: Event): void => {
+    e.preventDefault();
+    const { target } = e;
+    if (target && target instanceof HTMLAnchorElement) {
+      this.callback(e);
+    }
+    if (target && target instanceof HTMLSpanElement) {
+      this.activateCartLink();
+      window.history.pushState({}, '', '/cart');
+      this.callback(e);
+    }
+  };
+
+  private deleteClass(element: HTMLElement): void {
+    if (element.classList.contains('active-link')) {
+      element.classList.remove('active-link');
+    }
+  }
+
+  public activateCartLink(): void {
+    if (this.storeLink && this.aboutLink) {
+      this.deleteClass(this.storeLink);
+      this.deleteClass(this.aboutLink);
+    }
+    if (this.shoppingCartLink) {
+      this.shoppingCartLink.classList.remove('cart-hover');
+      this.shoppingCartLink.classList.add('active-link');
+    }
+  }
+
+  public activateStoreLink(): void {
+    if (this.shoppingCartLink && this.aboutLink) {
+      this.deleteClass(this.shoppingCartLink);
+      this.deleteClass(this.aboutLink);
+      this.shoppingCartLink.classList.add('cart-hover');
+    }
+    if (this.storeLink) {
+      this.storeLink.classList.add('active-link');
+    }
+  }
+
+  public activateAboutLink(): void {
+    if (this.shoppingCartLink && this.storeLink) {
+      this.deleteClass(this.shoppingCartLink);
+      this.deleteClass(this.storeLink);
+      this.shoppingCartLink.classList.add('cart-hover');
+    }
+    if (this.aboutLink) {
+      this.aboutLink.classList.add('active-link');
+    }
+  }
+
+  public deleteActiveClass(): void {
+    if (this.storeLink && this.aboutLink && this.shoppingCartLink) {
+      this.deleteClass(this.storeLink);
+      this.deleteClass(this.aboutLink);
+      this.deleteClass(this.shoppingCartLink);
+      this.shoppingCartLink.classList.add('cart-hover');
+    }
+  }
 
   // метод для обсервера
   // eslint-disable-next-line max-lines-per-function
@@ -103,6 +175,9 @@ export default class Header extends BaseComponent {
       } else if (subject.isAdded === false) {
         this.decreaseNumbers(subject.totalPrice, subject.totalAmount);
       }
+      if (subject.isCheckout === true) {
+        this.activateCartLink();
+      }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
     // обновляю информацию в хедере
@@ -128,10 +203,20 @@ export default class Header extends BaseComponent {
     }
   }
 
+  private checkSize(): void {
+    if (this.headerInfo.cartItems > 99 && this.cartItemsElement) {
+      this.cartItemsElement.style.width = '1.6rem';
+    }
+    if (this.headerInfo.cartItems > 999 && this.cartItemsElement) {
+      this.cartItemsElement.style.width = '2rem';
+    }
+  }
+
   private updateInfoInHeader(): void {
     if (this.totalPriceElement && this.cartItemsElement) {
-      this.totalPriceElement.textContent = `${this.headerInfo.totalPrice.toLocaleString('en-US')}`;
+      this.totalPriceElement.textContent = `$ ${this.headerInfo.totalPrice.toLocaleString('en-US')}`;
       this.cartItemsElement.textContent = `${this.headerInfo.cartItems}`;
+      this.checkSize();
     }
   }
 }
