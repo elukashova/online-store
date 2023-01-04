@@ -9,20 +9,19 @@ export default class Page404 extends BaseComponent {
   }
 
   private render(): void {
-    const contentWrapper: HTMLElement = rendered('div', this.element, 'page-not-found__content-wrapper');
-    const textWrapper: HTMLElement = rendered('div', contentWrapper, 'page-not-found__text-wrapper');
-    rendered('span', textWrapper, 'page-not-found__title', 'Ooops...');
-    rendered('span', textWrapper, 'page-not-found__text', 'Page not found');
-    rendered('img', contentWrapper, 'page-not-found__background', '', {
-      src: 'assets/images/404-background.png',
+    rendered('img', this.element, 'page-not-found__background', '', {
+      src: 'assets/images/404-background-left.png',
     });
-    const toStoreBtn: HTMLElement = rendered('button', contentWrapper, 'page-not-found__to-store-btn', 'Take me away');
-    toStoreBtn.addEventListener('click', this.toStoreBtnCallback);
+    const textWrapper: HTMLElement = rendered('div', this.element, 'page-not-found__text-wrapper');
+    rendered('h2', textWrapper, 'page-not-found__title', 'Ooops...');
+    rendered('span', textWrapper, 'page-not-found__text', 'Page not found');
+    rendered('img', this.element, 'page-not-found__background', '', {
+      src: 'assets/images/404-background-right.png',
+    });
+    // rendered('span', textWrapper, 'page-not-found__title', 'Ooops...');
+    // rendered('span', textWrapper, 'page-not-found__text', 'Page not found');
+    // rendered('img', contentWrapper, 'page-not-found__background', '', {
+    //   src: 'assets/images/404-background.png',
+    // });
   }
-
-  private toStoreBtnCallback = (e: Event): void => {
-    e.preventDefault();
-    window.history.pushState({}, '', '/');
-    this.callback(e);
-  };
 }
