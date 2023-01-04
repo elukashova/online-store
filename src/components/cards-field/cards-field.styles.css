@@ -99,6 +99,10 @@
   gap: 30px;
 }
 
+.cards__container.change-type .card__info {
+  width: 100%;
+}
+
 .cards__container.change-type .cards__item {
   display: grid;
   grid-template-columns: 40% 50%;
@@ -110,8 +114,13 @@
 }
 
 .cards__container.change-type .card__description {
-  margin-top: 5%;
+  margin-top: 1%;
   display: inline-block;
+}
+
+.cards__container.change-type .card__btn_open-card,
+.cards__container.change-type .card__btn_buy {
+  width: 40%;
 }
 
 .cards__not-found {
@@ -121,10 +130,7 @@
   font-size: 1.2em;
 }
 
+.cards__container.change-type .cards__item.hidden,
 .hidden {
   display: none;
-}
-
-.visible {
-  display: flex;
 }

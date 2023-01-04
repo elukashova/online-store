@@ -14,6 +14,7 @@
   flex-direction: column;
   justify-content: space-between;
   background-color: aliceblue;
+  gap: 5%;
 }
 
 .card__info_wrapper {
@@ -23,6 +24,7 @@
 }
 
 .card__btns {
+  align-self: end;
   display: flex;
   flex-direction: row;
   justify-content: space-between;

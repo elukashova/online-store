@@ -240,20 +240,16 @@ export default class CardsField extends BaseComponent {
 
     if (this.visibleCards.length === 0 && this.activeFilters.length !== 0) {
       if (this.notFoundText) {
-        this.notFoundText.classList.add('visible');
         this.notFoundText.classList.remove('hidden');
         this.cardsAll.forEach((card) => {
           card.element.classList.add('hidden');
-          card.element.classList.remove('visible');
         });
       }
     } else {
       this.visibleCards.forEach((visibleCard) => {
         if (this.notFoundText) {
           this.notFoundText.classList.add('hidden');
-          this.notFoundText.classList.remove('visible');
         }
-        visibleCard.element.classList.add('visible');
         visibleCard.element.classList.remove('hidden');
       });
     }
@@ -286,11 +282,9 @@ export default class CardsField extends BaseComponent {
     cards.forEach((card) => {
       if (activeFilters.length === 0) {
         // если массив пустой делаем все карточки видимыми
-        card.element.classList.add('visible');
         card.element.classList.remove('hidden');
       } else {
         card.element.classList.add('hidden');
-        card.element.classList.remove('visible');
       }
     });
   }
