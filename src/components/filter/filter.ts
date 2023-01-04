@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import './filter.styles.css';
 import rendered from '../../utils/render/render';
 import cardsData from '../../assets/json/data';
@@ -77,7 +76,6 @@ export default class Filter {
     return filterWrapper;
   }
 
-  // eslint-disable-next-line max-len
   public addListenerToRange(lowestInput: HTMLElement, highestInput: HTMLElement): void {
     if (lowestInput instanceof HTMLInputElement && highestInput instanceof HTMLInputElement) {
       lowestInput.addEventListener('input', (e) => {

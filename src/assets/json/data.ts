@@ -3,8 +3,7 @@ const posters = {
     {
       id: 1,
       title: 'Red',
-      description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nisl sem, hendrerit vitae convallis sed, interdum nec risus.',
+      description: 'Test',
       price: 82,
       discountPercentage: 12.52,
       rating: 4.73,
@@ -16,8 +15,7 @@ const posters = {
     {
       id: 2,
       title: 'White',
-      description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nisl sem, hendrerit vitae convallis sed, interdum nec risus.',
+      description: 'Test2',
       price: 103,
       discountPercentage: 18.46,
       rating: 4.49,
