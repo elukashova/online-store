@@ -20,8 +20,6 @@ export default class App {
 
   private component: Element | null = null;
 
-  private isCheckout: boolean = false;
-
   constructor(private readonly rootElement: HTMLElement) {
     this.header = new Header(this.route);
     this.routes = {
@@ -41,19 +39,19 @@ export default class App {
     const e: Event = event || window.event;
     e.preventDefault();
 
-    if (checkout && checkout === true) {
-      this.isCheckout = true;
-    }
-
     if (e.target instanceof HTMLAnchorElement) {
       window.history.pushState({}, '', e.target.href);
     }
 
-    this.locationHandler();
+    if (checkout && checkout === true) {
+      this.locationHandler(checkout);
+    } else {
+      this.locationHandler();
+    }
   };
 
   // eslint-disable-next-line max-lines-per-function
-  public locationHandler = async (): Promise<void> => {
+  public locationHandler = async (checkout?: boolean): Promise<void> => {
     const location: string = window.location.pathname.length === 0 ? '/' : window.location.pathname;
 
     if (Number(location.slice(1))) {
@@ -64,8 +62,7 @@ export default class App {
 
     switch (location) {
       case '/cart':
-        this.routes.cart = new Cart(this.header, this.route, this.rootElement, this.isCheckout);
-        this.isCheckout = false;
+        this.routes.cart = new Cart(this.header, this.route, this.rootElement, checkout);
         this.component = this.routes.cart.element;
         break;
       case '/':
