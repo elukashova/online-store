@@ -68,6 +68,9 @@ export default class CardsField extends BaseComponent {
     const contentContainer: HTMLElement = rendered('div', this.element, 'cards__content');
     const sortWrapper = rendered('div', contentContainer, 'cards__sort-wrapper');
     this.selectInput = rendered('select', sortWrapper, 'cards__sort-products');
+    this.cardsContainer = rendered('div', contentContainer, 'cards__container search', '', {
+      id: 'cards__container',
+    });
     rendered('option', this.selectInput, 'cards__sort-standart-value', 'Sort posters', {
       value: 'no-sort',
       disabled: '',
@@ -85,7 +88,7 @@ export default class CardsField extends BaseComponent {
     rendered('option', this.selectInput, 'cards__sort-by-rating-desc', 'Sort by rating desc', {
       value: 'rating-desc',
     });
-    this.postersFound = rendered('div', sortWrapper, 'cards__found-count', 'Found: 24');
+    this.postersFound = rendered('div', sortWrapper, 'cards__found-count', `Found: ${cardsData.products.length}`);
     const searchInputWrapper = rendered('div', sortWrapper, 'cards__search-wrapper');
     const searchInput = rendered('input', searchInputWrapper, 'cards__search', '', {
       type: 'search',
@@ -101,10 +104,18 @@ export default class CardsField extends BaseComponent {
     });
     rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg' });
     const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
-    rendered('img', viewTypes, 'cards__view-line', '', { src: 'assets/icons/list-line.png' });
-    rendered('img', viewTypes, 'cards__view-block', '', { src: 'assets/icons/list-block.png' });
-    this.cardsContainer = rendered('div', contentContainer, 'cards__container search', '', {
-      id: 'cards__container',
+
+    const viewFourProducts = rendered('img', viewTypes, 'cards__view-four', '', { src: 'assets/icons/block4.png' });
+    const viewTwoProducts = rendered('img', viewTypes, 'cards__view-two', '', { src: 'assets/icons/block2.png' });
+    viewTwoProducts.addEventListener('click', () => {
+      this.cardsContainer?.classList.add('change-type');
+      viewTwoProducts.classList.add('change-type');
+      viewFourProducts.classList.remove('change-type');
+    });
+    viewFourProducts.addEventListener('click', () => {
+      this.cardsContainer?.classList.remove('change-type');
+      viewFourProducts.classList.add('change-type');
+      viewTwoProducts.classList.remove('change-type');
     });
     this.notFoundText = rendered('p', this.cardsContainer, 'cards__not-found hidden', 'Product not found', {
       id: 'cards__not-found',
@@ -133,7 +144,6 @@ export default class CardsField extends BaseComponent {
 
   // функция сортировки
   public sortByField(arr: Card[], field: string): Card[] {
-    // return arr.sort((a, b) => (field === 'price' ? a.price - b.price : b.rating - a.rating));
     return arr.sort((a, b): number => {
       if (field.includes('asc')) {
         if (field.includes('price')) return a.price - b.price;
