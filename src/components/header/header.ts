@@ -39,22 +39,20 @@ export default class Header extends BaseComponent {
     rendered('img', logoLink, 'logo__img', '', {
       src: 'assets/icons/logo-placeholder.svg',
     });
-    const menu: HTMLElement = rendered('ul', container, 'header__menu menu');
-    const storePage: HTMLElement = rendered('li', menu, 'menu__item menu__item_current');
-    const aboutPage: HTMLElement = rendered('li', menu, 'menu__item');
-    this.storeLink = rendered('a', storePage, 'menu__link store-link', 'Store', { href: '/' });
+    const menu: HTMLElement = rendered('div', container, 'header__menu menu');
+    this.storeLink = rendered('a', menu, 'menu__link store-link', 'Store', { href: '/' });
     this.storeLink.classList.add('active-link');
-    this.aboutLink = rendered('a', aboutPage, 'menu__link about-link', 'About us', { href: '/about' });
-    const totalPrice: HTMLElement = rendered('li', menu, 'menu__item total-price', 'Total:');
-    const priceWrapper: HTMLElement = rendered('div', totalPrice, 'total-price__container');
-    rendered('span', priceWrapper, 'total-price__currency', '$');
+    this.aboutLink = rendered('a', menu, 'menu__link about-link', 'About us', { href: '/about' });
+    const priceContainer: HTMLElement = rendered('div', menu, 'total-price__container');
+    rendered('span', priceContainer, 'total-price', 'Total:');
+    const priceNumber: HTMLElement = rendered('div', priceContainer, 'total-price__text');
     this.totalPriceElement = rendered(
       'span',
-      priceWrapper,
+      priceNumber,
       'total-price__sum',
-      `${this.headerInfo.totalPrice.toLocaleString('en-US')}`,
+      `$ ${this.headerInfo.totalPrice.toLocaleString('en-US')}`,
     );
-    const shoppingCart: HTMLElement = rendered('li', menu, 'menu__item cart');
+    const shoppingCart: HTMLElement = rendered('div', menu, 'menu__item cart');
     this.shoppingCartLink = rendered('a', shoppingCart, 'cart__link', '', { href: '/cart' });
     rendered('img', this.shoppingCartLink, 'cart__icon', '', {
       src: 'assets/icons/cart.svg',
@@ -183,11 +181,14 @@ export default class Header extends BaseComponent {
     if (this.headerInfo.cartItems > 99 && this.cartItemsElement) {
       this.cartItemsElement.style.width = '1.6rem';
     }
+    if (this.headerInfo.cartItems > 999 && this.cartItemsElement) {
+      this.cartItemsElement.style.width = '2rem';
+    }
   }
 
   private updateInfoInHeader(): void {
     if (this.totalPriceElement && this.cartItemsElement) {
-      this.totalPriceElement.textContent = `${this.headerInfo.totalPrice.toLocaleString('en-US')}`;
+      this.totalPriceElement.textContent = `$ ${this.headerInfo.totalPrice.toLocaleString('en-US')}`;
       this.cartItemsElement.textContent = `${this.headerInfo.cartItems}`;
       this.checkSize();
     }

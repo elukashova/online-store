@@ -22,6 +22,7 @@
   width: 40%;
   justify-content: space-between;
   align-items: center;
+  min-width: 25rem;
 }
 
 .menu__link {
@@ -29,6 +30,9 @@
   color: #161412;
   cursor: pointer;
   transition: color .3s;
+  text-align: center;
+  margin-left: 1.9rem;
+  margin-right: 1.9rem;
 }
 
 .menu__link:hover {
@@ -43,7 +47,8 @@
   border-bottom: 2px solid #FF7D15;
 }
 
-.total-price {
+.total-price,
+.total-price__text {
   display: flex;
   justify-content: space-between;
   flex-wrap: nowrap;
@@ -53,7 +58,19 @@
   color: #9a9191;
 }
 
-.total-price__container,
+.total-price__text {
+  width: 4.9rem;
+  text-align: center;
+}
+
+.total-price__container {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.3rem;
+  width: 8rem;
+  justify-content: center;
+}
+
 .cart {
   display: flex;
   flex-wrap: nowrap;
