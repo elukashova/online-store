@@ -85,7 +85,6 @@
 }
 
 .cart__link {
-  pointer-events: all;
   width: 2rem;
   text-align: center;
   display: flex;
@@ -93,6 +92,7 @@
 
 .cart-hover:hover .cart__icon {
   transform: scale(1.2);
+  cursor: pointer;
 }
 
 .cart__items-number {
@@ -105,7 +105,7 @@
   transform: translate(+1.1rem, -0.3rem);
   line-height: 1.4em;
   font-size: 0.9em;
-  cursor: pointer;
+  pointer-events: none;
   position: absolute;
 }
 

@@ -6,6 +6,7 @@ import CardsField from '../cards-field/cards-field';
 import Cart from '../shopping-cart/shopping-cart';
 import ProductPage from '../product-page/product-page';
 import Page404 from '../404/404';
+import AboutPage from '../about-page/about-page';
 
 export default class App {
   private readonly header: Header;
@@ -59,15 +60,20 @@ export default class App {
     }
 
     switch (location) {
-      case '/cart':
-        this.routes.cart = new Cart(this.header, this.route, this.rootElement, checkout);
-        this.component = this.routes.cart.element;
-        this.header.activateCartLink();
-        break;
       case '/':
         this.routes.store = new CardsField(this.header, this.route);
         this.component = this.routes.store.element;
         this.header.activateStoreLink();
+        break;
+      case '/about':
+        this.routes.about = new AboutPage(this.route);
+        this.component = this.routes.about.element;
+        this.header.activateAboutLink();
+        break;
+      case '/cart':
+        this.routes.cart = new Cart(this.header, this.route, this.rootElement, checkout);
+        this.component = this.routes.cart.element;
+        this.header.activateCartLink();
         break;
       case `/${this.productID}`:
         this.routes.productPage = new ProductPage(Number(this.productID), this.route);
