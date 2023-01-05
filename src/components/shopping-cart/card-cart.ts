@@ -1,13 +1,13 @@
 import rendered from '../../utils/render/render';
 import { CardDataType, Observer } from '../card/card.types';
 import BaseComponent from '../base-component/base-component';
-import { checkDataInLocalStorage } from '../../utils/localStorage';
-import { PosterStorageInfoType } from '../../utils/localStorage.types';
+import { checkProductDataInLocalStorage } from '../../utils/localStorage';
+import { PosterStorageType } from '../../utils/localStorage.types';
 
 export default class CartCard extends BaseComponent {
-  private storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
+  private storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
 
-  private addedItems: PosterStorageInfoType[] | null = [];
+  private addedItems: PosterStorageType[] | null = [];
 
   public id: number;
 
@@ -43,7 +43,7 @@ export default class CartCard extends BaseComponent {
 
   public itemAmount: number = 0;
 
-  public itemInfo: PosterStorageInfoType | null = null;
+  public itemInfo: PosterStorageType | null = null;
 
   // эти два указателя мне нужны для обсервера на клик на + и -
   public minus: boolean = false;
@@ -122,7 +122,7 @@ export default class CartCard extends BaseComponent {
 
   private productPageCallback = (e: Event): void => {
     e.preventDefault();
-    window.location.href = `${this.id}`;
+    window.history.pushState({}, '', `${this.id}`);
     this.callback(e);
   };
 
@@ -133,7 +133,7 @@ export default class CartCard extends BaseComponent {
       this.totalPrice -= this.price;
       this.itemAmount -= 1;
       if (this.priceForItemElement && this.itemAmountElement) {
-        this.priceForItemElement.textContent = `${this.totalPrice}`;
+        this.priceForItemElement.textContent = `${this.totalPrice.toLocaleString('en-US')}`;
         this.itemAmountElement.textContent = `${this.itemAmount}`;
       }
       this.notifyObserver();
@@ -148,7 +148,7 @@ export default class CartCard extends BaseComponent {
       this.totalPrice += this.price;
       this.itemAmount += 1;
       if (this.priceForItemElement && this.itemAmountElement) {
-        this.priceForItemElement.textContent = `${this.totalPrice}`;
+        this.priceForItemElement.textContent = `${this.totalPrice.toLocaleString('en-US')}`;
         this.itemAmountElement.textContent = `${this.itemAmount}`;
       }
       this.notifyObserver();

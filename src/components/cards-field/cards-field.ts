@@ -8,9 +8,9 @@ import Card from '../card/card';
 import Filter from '../filter/filter';
 import Header from '../header/header';
 import { ObservedSubject } from '../card/card.types';
-import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
-import { PosterStorageInfoType } from '../../utils/localStorage.types';
 import findCountOfCurrentProducts from './utils/find.current.count';
+import { setDataToLocalStorage, checkProductDataInLocalStorage } from '../../utils/localStorage';
+import { PosterStorageType } from '../../utils/localStorage.types';
 
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = []; // все карточки
@@ -19,7 +19,7 @@ export default class CardsField extends BaseComponent {
 
   public visibleCards: Card[] = []; // текущие видимые карточки (для сортировки)
 
-  public addedItems: PosterStorageInfoType[] = []; // для сохранения id добавленных товаров в local storage
+  public addedItems: PosterStorageType[] = []; // для сохранения id добавленных товаров в local storage
 
   public cardsContainer: HTMLElement | null = null;
 
@@ -39,7 +39,7 @@ export default class CardsField extends BaseComponent {
 
   public stockFilter: Filter | null = null;
 
-  private readonly storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
 
   constructor(public readonly header: Header, private callback: (event: Event) => void) {
     super('div', 'content__container');
@@ -398,7 +398,7 @@ export default class CardsField extends BaseComponent {
     чтобы сохранять добавленные товары в local storage */
   public update(subject: ObservedSubject): void {
     if (subject instanceof Card && subject.element.classList.contains('added')) {
-      const info: PosterStorageInfoType = {
+      const info: PosterStorageType = {
         id: 0,
         quantity: 0,
       };

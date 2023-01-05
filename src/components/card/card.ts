@@ -2,8 +2,8 @@ import './card.styles.css';
 import rendered from '../../utils/render/render';
 import { CardDataType, Observer } from './card.types';
 import BaseComponent from '../base-component/base-component';
-import { checkDataInLocalStorage } from '../../utils/localStorage';
-import { PosterStorageInfoType } from '../../utils/localStorage.types';
+import { checkProductDataInLocalStorage } from '../../utils/localStorage';
+import { PosterStorageType } from '../../utils/localStorage.types';
 
 export default class Card extends BaseComponent {
   public id: number;
@@ -36,7 +36,9 @@ export default class Card extends BaseComponent {
 
   private observers: Observer[] = [];
 
-  private readonly storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
+  private wasAdded: boolean = false;
+
+  private readonly storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
 
   constructor(data: CardDataType, private callback: (event: Event) => void) {
     super('div', 'cards__item card');
@@ -79,12 +81,13 @@ export default class Card extends BaseComponent {
     productPageBtn.addEventListener('click', this.productPageBtnCallback);
     // проверяем local storage, добавлена ли этот товар в корзину
     if (this.storageInfo !== null) {
-      const posters: PosterStorageInfoType[] = this.storageInfo.slice();
+      const posters: PosterStorageType[] = this.storageInfo.slice();
       for (let i: number = 0; i < posters.length; i += 1) {
         if (posters[i].id === this.id) {
           this.totalPrice = posters[i].quantity * this.price;
           this.itemQuantity = posters[i].quantity;
           this.element.classList.add('added');
+          this.wasAdded = true;
         }
       }
     }
@@ -105,7 +108,7 @@ export default class Card extends BaseComponent {
   // колбэк для рутинга
   private productPageBtnCallback = (e: Event): void => {
     e.preventDefault();
-    window.location.href = `${this.id}`;
+    window.history.pushState({}, '', `${this.id}`);
     this.callback(e);
   };
 
@@ -118,6 +121,11 @@ export default class Card extends BaseComponent {
       this.element.classList.remove('added');
       this.buyButton?.setAttribute('src', 'assets/icons/button-buy.svg');
       this.notifyObserver();
+      if (this.wasAdded === true) {
+        this.wasAdded = false;
+        this.totalPrice = 0;
+        this.itemQuantity = 0;
+      }
     }
   };
 

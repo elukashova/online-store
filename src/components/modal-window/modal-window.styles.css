@@ -1,0 +1,118 @@
+.checkout-modal-container {
+  display: flex;
+  background-color: rgba(255,255,255,0.7);;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  transition: all ease 1s;
+}
+
+.checkout-modal {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  width: 30%;
+  height: 60%;
+  opacity: 1;
+  box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.checkout__pers-data_wrapper,
+.checkout__card-data_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.checkout__pers-data_wrapper {
+  height: 45%;
+}
+
+.checkout__card-data_wrapper {
+  height: 25%;
+}
+
+.pers-data__title,
+.card-data__title {
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.pers-data__input-wrapper,
+.card-data__input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 80%;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.card-data__input-wrapper {
+  height: 65%;
+}
+
+.pers-data__name-input,
+.pers-data__phone-input,
+.pers-data__address-input,
+.pers-data__email-input,
+.card-data__number-input,
+.card-data__expiration-input,
+.card-data__cvv-input {
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  width: 80%;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #65635F;
+  text-align: center;
+  line-height: 2rem;
+  padding: 0;
+  margin: 0;
+}
+
+.card-data__expiration-input,
+.card-data__cvv-input {
+  width: 49%;
+}
+
+.pers-data__name-input::placeholder,
+.pers-data__phone-input::placeholder,
+.pers-data__address-input::placeholder,
+.pers-data__email-input::placeholder,
+.card-data__number-input::placeholder,
+.card-data__expiration-input::placeholder,
+.card-data__cvv-input::placeholder {
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: #FF7D15;
+  text-align: center;
+  opacity: 70%;
+}
+
+.card-data__input-details-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%;
+}
+
+.checkout__confirm-btn {
+  cursor: pointer;
+  background-color: #FF7D15;
+  color: #FFF;
+  font-size: 1rem;
+  text-transform: uppercase;
+  height: 2rem;
+  width: 80%;
+  margin-bottom: 2rem;
+}

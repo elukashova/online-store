@@ -13,7 +13,3 @@ window.onload = (): void => {
 window.onpopstate = (): void => {
   app.locationHandler();
 };
-
-window.onhashchange = (): void => {
-  app.locationHandler();
-};

@@ -2,16 +2,17 @@ import rendered from '../../utils/render/render';
 import BaseComponent from '../base-component/base-component';
 import cardsData from '../../assets/json/data';
 import './product-page.styles.css';
-import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
-import { PosterStorageInfoType } from '../../utils/localStorage.types';
+import { checkProductDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
+import { PosterStorageType } from '../../utils/localStorage.types';
 import { Observer } from '../card/card.types';
+import { Callback } from '../shopping-cart/shopping-cart.types';
 
 export default class ProductPage extends BaseComponent {
   private observers: Observer[] = [];
 
-  private readonly storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
 
-  private addedItems: PosterStorageInfoType[] = [];
+  private addedItems: PosterStorageType[] = [];
 
   private id: number = 0;
 
@@ -41,7 +42,7 @@ export default class ProductPage extends BaseComponent {
 
   private chosenImg: HTMLElement | null = null;
 
-  private notChosenImg: HTMLElement | null = null;
+  private imgWithListener: HTMLElement[] = [];
 
   private mainImage: HTMLElement | null = null;
 
@@ -51,8 +52,10 @@ export default class ProductPage extends BaseComponent {
 
   public isAdded: boolean = false;
 
+  public isCheckout: boolean = false;
+
   // TODO: сюда надо будет передать данные из локал сторадж о том, добавлен ли товар в корзину
-  constructor(id: number, private callback: (event: Event) => void) {
+  constructor(id: number, private callback: Callback) {
     super('div', 'product__container product');
     cardsData.products.forEach((item) => {
       if (item.id === id) {
@@ -93,10 +96,12 @@ export default class ProductPage extends BaseComponent {
     this.chosenImg = rendered('img', miniImagesWrapper, 'product-img__mini chosen', '', {
       src: this.images[0],
     });
-    this.notChosenImg = rendered('img', miniImagesWrapper, 'product-img__mini not-chosen', '', {
-      src: this.images[1],
-    });
-    this.notChosenImg.addEventListener('click', this.changeCurrentImgCallback);
+    for (let i: number = 1; i < this.images.length; i += 1) {
+      const img: HTMLElement = rendered('img', miniImagesWrapper, 'product-img__mini not-chosen', '', {
+        src: this.images[i],
+      });
+      img.addEventListener('click', this.changeCurrentImgCallback);
+    }
 
     const mainImgContainer: HTMLElement = rendered('div', imagesContainer, 'product__main-img-container');
     this.mainImage = rendered('img', mainImgContainer, 'product-img__main-img', '', {
@@ -116,7 +121,7 @@ export default class ProductPage extends BaseComponent {
     const productDescr: HTMLElement = rendered('div', productInfoContainer, 'product-info__description-block');
     rendered('span', productDescr, 'product-info__title', this.title);
     rendered('span', productDescr, 'product-info__category', this.category);
-    rendered('span', productDescr, 'product-info__size', `Size ${this.size}`);
+    rendered('span', productDescr, 'product-info__size', `Size: ${this.size}`);
     rendered('span', productDescr, 'product-info__rating', `Rating: ${this.rating}`);
     rendered('span', productDescr, 'product-info__stock', `Stock: ${this.stock}`);
     rendered('p', productDescr, 'product-info__text', this.description);
@@ -163,19 +168,22 @@ export default class ProductPage extends BaseComponent {
   // колбэк быстрой покупки
   private buyNowCallback = (e: Event): void => {
     e.preventDefault();
+
     const { target } = e;
     if (target instanceof HTMLButtonElement) {
+      this.isCheckout = true;
       // добавление в корзину и local storage, если товар до этого не был добавлен в козину
       if (!this.addedItems.find((i) => i.id === this.id)) {
         this.isAdded = true;
         this.addItemToLocalStorage();
         this.notifyObserver();
       }
-      // переход в козину
+      // переход в корзину
       // TODO: еще нет модального окна оформления покупки
-      window.location.href = '/cart';
-      this.callback(e);
+      window.history.pushState({}, '', '/cart');
+      this.callback(e, this.isCheckout);
     }
+    this.isCheckout = false;
   };
 
   // возврат на главную страницу
@@ -190,16 +198,16 @@ export default class ProductPage extends BaseComponent {
   // колбэк для клика на новую картинку
   private changeCurrentImgCallback = (e: Event): void => {
     e.preventDefault();
-    const { target } = e;
-    if (target instanceof HTMLImageElement && this.chosenImg && this.notChosenImg) {
+    let { target } = e;
+    if (target instanceof HTMLImageElement && this.chosenImg) {
       target.classList.remove('not-chosen');
       target.classList.add('chosen');
       this.chosenImg.classList.remove('chosen');
       this.chosenImg.classList.add('not-chosen');
       const temp: HTMLElement = this.chosenImg;
       this.chosenImg = target;
-      this.notChosenImg = temp;
-      this.notChosenImg.addEventListener('click', this.changeCurrentImgCallback);
+      target = temp;
+      target.addEventListener('click', this.changeCurrentImgCallback);
     }
     if (this.mainImage && this.mainImage instanceof HTMLImageElement) {
       if (this.chosenImg && this.chosenImg instanceof HTMLImageElement) {
@@ -221,12 +229,10 @@ export default class ProductPage extends BaseComponent {
   }
 
   private addItemToLocalStorage(): void {
-    const info: PosterStorageInfoType = {
-      id: 0,
-      quantity: 0,
+    const info: PosterStorageType = {
+      id: this.id,
+      quantity: 1,
     };
-    info.id = this.id;
-    info.quantity += 1;
     this.addedItems.push(info);
     setDataToLocalStorage(this.addedItems, 'addedPosters');
   }
