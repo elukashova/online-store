@@ -3,7 +3,7 @@ import rendered from '../../utils/render/render';
 import cardsData from '../../assets/json/data';
 import findMinAndMax from './utils/find.minmax';
 import RangeTypes from './enums.filter';
-import findCountOfProductsFromData from './utils/find.count';
+import findCountOfProductsFromData from './utils/find.initial.count';
 import { CardDataType } from '../card/card.types';
 
 export default class Filter {
@@ -12,6 +12,8 @@ export default class Filter {
   public countFrom: HTMLElement | null = null;
 
   public countTo: HTMLElement | null = null;
+
+  public allCountsFrom: HTMLElement[] | null = [];
 
   constructor(
     private readonly container: HTMLElement,
@@ -40,9 +42,13 @@ export default class Filter {
       rendered('label', inputWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${str}-${ind + 1}`,
       });
-      this.countFrom = rendered('span', inputWrapper, `${str}__out-from-${ind + 1}`, '1');
-      this.countTo = rendered('span', inputWrapper, `${str}__out-to-${ind + 1}`, '/5');
+      this.countFrom = rendered('span', inputWrapper, `${str}__out-from-${ind + 1}`, '1', {
+        id: `${item}`,
+      });
+      rendered('span', inputWrapper, `${str}__slash-${ind + 1}`, '/');
+      this.countTo = rendered('span', inputWrapper, `${str}__out-to-${ind + 1}`, '5');
       this.setInitialCount(cardsData.products, str, item);
+      if (this.allCountsFrom) this.allCountsFrom.push(this.countFrom);
       this.checkboxes.push(inputElement);
     });
     return filterWrapper;
@@ -52,9 +58,9 @@ export default class Filter {
     const dataObjects = findCountOfProductsFromData(data, field);
     dataObjects.forEach((elem) => {
       const { type, key, count } = elem;
-      console.log(type, key, count);
-      if (field === type && name === key && this.countTo) {
-        this.countTo.textContent = `/${count}`;
+      if (field === type && name === key && this.countTo && this.countFrom) {
+        this.countTo.textContent = `${count}`;
+        this.countFrom.textContent = `${count}`;
       }
     });
   }

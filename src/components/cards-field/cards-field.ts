@@ -10,6 +10,7 @@ import Header from '../header/header';
 import { ObservedSubject } from '../card/card.types';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageInfoType } from '../../utils/localStorage.types';
+import findCountOfCurrentProducts from './utils/find.current.count';
 
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = []; // все карточки
@@ -30,6 +31,14 @@ export default class CardsField extends BaseComponent {
 
   public searchInput: HTMLElement | null = null;
 
+  public categoryFilter: Filter | null = null;
+
+  public sizeFilter: Filter | null = null;
+
+  public priceFilter: Filter | null = null;
+
+  public stockFilter: Filter | null = null;
+
   private readonly storageInfo: PosterStorageInfoType[] | null = checkDataInLocalStorage('addedPosters');
 
   constructor(public readonly header: Header, private callback: (event: Event) => void) {
@@ -45,24 +54,24 @@ export default class CardsField extends BaseComponent {
     reset.addEventListener('click', this.resetFilters);
     rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
     // фильтр по категории
-    const categoryFilter: Filter = new Filter(filtersContainer, 'Category', this.updateActiveFilters);
+    this.categoryFilter = new Filter(filtersContainer, 'Category', this.updateActiveFilters);
     let uniqueCategories = cardsData.products.map((item) => item.category);
     uniqueCategories = Array.from(new Set(uniqueCategories));
-    const categoryNames: HTMLElement = categoryFilter.renderCheckbox(uniqueCategories, 'category');
+    const categoryNames: HTMLElement = this.categoryFilter.renderCheckbox(uniqueCategories, 'category');
     filtersContainer.append(categoryNames);
     // фильтр по размеру
-    const sizeFilter: Filter = new Filter(filtersContainer, 'Size', this.updateActiveFilters);
+    this.sizeFilter = new Filter(filtersContainer, 'Size', this.updateActiveFilters);
     let uniqueSize = cardsData.products.map((item) => item.size);
     uniqueSize = Array.from(new Set(uniqueSize));
-    const sizeNames: HTMLElement = sizeFilter.renderCheckbox(uniqueSize, 'size');
+    const sizeNames: HTMLElement = this.sizeFilter.renderCheckbox(uniqueSize, 'size');
     filtersContainer.append(sizeNames);
     // фильтр по цене
-    const priceFilter: Filter = new Filter(filtersContainer, 'Price', this.updateActiveFilters);
-    const pricesTitles: HTMLElement = priceFilter.renderInputRange('price');
+    this.priceFilter = new Filter(filtersContainer, 'Price', this.updateActiveFilters);
+    const pricesTitles: HTMLElement = this.priceFilter.renderInputRange('price');
     filtersContainer.append(pricesTitles);
     // фильтр по стоку
-    const stockFilter: Filter = new Filter(filtersContainer, 'Stock', this.updateActiveFilters);
-    const stockTitles: HTMLElement = stockFilter.renderInputRange('stock');
+    this.stockFilter = new Filter(filtersContainer, 'Stock', this.updateActiveFilters);
+    const stockTitles: HTMLElement = this.stockFilter.renderInputRange('stock');
     filtersContainer.append(stockTitles);
 
     const contentContainer: HTMLElement = rendered('div', this.element, 'cards__content');
@@ -108,12 +117,12 @@ export default class CardsField extends BaseComponent {
     const viewFourProducts = rendered('img', viewTypes, 'cards__view-four', '', { src: 'assets/icons/block4.png' });
     const viewTwoProducts = rendered('img', viewTypes, 'cards__view-two', '', { src: 'assets/icons/block2.png' });
     viewTwoProducts.addEventListener('click', () => {
-      this.cardsContainer?.classList.add('change-type');
+      if (this.cardsContainer) this.cardsContainer.classList.add('change-type');
       viewTwoProducts.classList.add('change-type');
       viewFourProducts.classList.remove('change-type');
     });
     viewFourProducts.addEventListener('click', () => {
-      this.cardsContainer?.classList.remove('change-type');
+      if (this.cardsContainer) this.cardsContainer.classList.remove('change-type');
       viewFourProducts.classList.add('change-type');
       viewTwoProducts.classList.remove('change-type');
     });
@@ -141,26 +150,6 @@ export default class CardsField extends BaseComponent {
       });
     });
   }
-
-  // функция сортировки
-  public sortByField(arr: Card[], field: string): Card[] {
-    return arr.sort((a, b): number => {
-      if (field.includes('asc')) {
-        if (field.includes('price')) return a.price - b.price;
-        return a.rating - b.rating;
-      }
-      if (field.includes('desc')) {
-        if (field.includes('price')) return b.price - a.price;
-      }
-      return b.rating - a.rating;
-    });
-  }
-
-  // функция reset всех фильтров
-  public resetFilters = (): void => {
-    this.activeFilters = [];
-    this.addClassesForCards(this.activeFilters, this.cardsAll);
-  };
 
   // Функция апдейта активных фильтров. В фильтры цены и стока приходят значения
   // в формате 'Price, 75, 125'. Проверяем есть ли значение, начинающееся на Price
@@ -238,22 +227,69 @@ export default class CardsField extends BaseComponent {
           card.element.classList.add('hidden');
         });
       }
+    } else if (this.visibleCards.length === 0 && this.activeFilters.length === 0) {
+      if (this.categoryFilter) this.changeStartValueOfCount('start', this.categoryFilter);
+      if (this.sizeFilter) this.changeStartValueOfCount('start', this.sizeFilter);
     } else {
+      if (this.categoryFilter) this.changeStartValueOfCount('change', this.categoryFilter);
+      if (this.sizeFilter) this.changeStartValueOfCount('change', this.sizeFilter);
       this.visibleCards.forEach((visibleCard) => {
         if (this.notFoundText) {
           this.notFoundText.classList.add('hidden');
         }
         visibleCard.element.classList.remove('hidden');
+        this.setCountFrom(this.visibleCards);
       });
     }
-
-    /* this.setCountFrom(this.visibleCards); */
     this.changeFoundItemsCount();
+  }
+
+  public changeStartValueOfCount(type: string, filter: Filter): void {
+    if (filter && filter.allCountsFrom) {
+      if (type === 'start') {
+        filter.allCountsFrom.forEach((elem) => {
+          const temp = elem;
+          if (filter && filter.countTo) {
+            temp.textContent = `${filter.countTo.textContent}`;
+          }
+        });
+      } else {
+        filter.allCountsFrom.forEach((elem) => {
+          const temp = elem;
+          temp.textContent = '0';
+        });
+      }
+    }
   }
 
   public getFilterType = (value: string, index: number): string => value.split(',')[index];
 
-  /* public setCountFrom(data: Card[]): void {} */
+  public setCountFrom(data: Card[]): void {
+    const category = findCountOfCurrentProducts(data, 'category');
+    const size = findCountOfCurrentProducts(data, 'size');
+    const allTypes = [...category, ...size];
+
+    allTypes.forEach((subtype) => {
+      console.log(subtype);
+      if (subtype.type === 'category') {
+        this.assignQuantity(this.categoryFilter, subtype.key, subtype.count);
+      } else {
+        this.assignQuantity(this.sizeFilter, subtype.key, subtype.count);
+      }
+    });
+  }
+
+  public assignQuantity(filter: Filter | null, key: string, count: number): void {
+    console.log(filter, key, count);
+    if (filter && filter.allCountsFrom) {
+      filter.allCountsFrom.forEach((elem) => {
+        const temp = elem;
+        if (elem.id === key) {
+          temp.textContent = `${count}`;
+        }
+      });
+    }
+  }
 
   public changeFoundItemsCount(): void {
     if (this.postersFound) {
@@ -303,6 +339,26 @@ export default class CardsField extends BaseComponent {
     });
     return result;
   }
+
+  // функция сортировки
+  public sortByField(arr: Card[], field: string): Card[] {
+    return arr.sort((a, b): number => {
+      if (field.includes('asc')) {
+        if (field.includes('price')) return a.price - b.price;
+        return a.rating - b.rating;
+      }
+      if (field.includes('desc')) {
+        if (field.includes('price')) return b.price - a.price;
+      }
+      return b.rating - a.rating;
+    });
+  }
+
+  // функция reset всех фильтров
+  public resetFilters = (): void => {
+    this.activeFilters = [];
+    this.addClassesForCards(this.activeFilters, this.cardsAll);
+  };
 
   /* функция обсервера, реагирующая на добавление карточек,
     чтобы сохранять добавленные товары в local storage */
