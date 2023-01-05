@@ -7,6 +7,7 @@ import Cart from '../shopping-cart/shopping-cart';
 import ProductPage from '../product-page/product-page';
 import Page404 from '../404/404';
 import AboutPage from '../about-page/about-page';
+import cardsData from '../../assets/json/data';
 
 export default class App {
   private readonly header: Header;
@@ -55,7 +56,7 @@ export default class App {
   public locationHandler = async (checkout?: boolean): Promise<void> => {
     const location: string = window.location.pathname.length === 0 ? '/' : window.location.pathname;
 
-    if (Number(location.slice(1)) <= 24) {
+    if (Number(location.slice(1)) <= cardsData.products.length) {
       this.productID = location.slice(1);
     }
 
@@ -79,7 +80,7 @@ export default class App {
         this.routes.productPage = new ProductPage(Number(this.productID), this.route);
         this.routes.productPage.attachObserver(this.header);
         this.component = this.routes.productPage.element;
-        this.header.activateStoreLink();
+        this.header.deleteActiveClass();
         break;
       default:
         this.routes.notfound = new Page404(this.route);
