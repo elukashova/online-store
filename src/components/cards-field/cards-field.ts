@@ -140,7 +140,6 @@ export default class CardsField extends BaseComponent {
     // слушатель для сортировки
     this.selectInput.addEventListener('change', () => {
       if (this.selectInput instanceof HTMLSelectElement) {
-        console.log(this.sortByField(this.cardsAll, this.selectInput.value));
         this.sortByField(this.cardsAll, this.selectInput.value);
       }
       this.cardsAll.forEach((card) => {
@@ -240,10 +239,43 @@ export default class CardsField extends BaseComponent {
           this.notFoundText.classList.add('hidden');
         }
         visibleCard.element.classList.remove('hidden');
-        this.setCountFrom(this.visibleCards);
       });
     }
+    this.setCountFrom(this.visibleCards);
+    this.setNewRange(this.visibleCards);
     this.changeFoundItemsCount();
+  }
+
+  public setNewRange(data: Card[]): void {
+    const [priceMin, priceMax] = this.getRange(data, 'price');
+    const [stockMin, stockMax] = this.getRange(data, 'stock');
+    if (this.priceFilter) {
+      if (this.priceFilter.lowestInput) {
+        this.priceFilter.lowestInput.setAttribute('value', `${priceMin}`);
+      }
+      if (this.priceFilter.highestInput) {
+        this.priceFilter.highestInput.setAttribute('value', `${priceMax}`);
+      }
+    }
+    if (this.stockFilter) {
+      if (this.stockFilter.lowestInput) {
+        this.stockFilter.lowestInput.setAttribute('value', `${stockMin}`);
+      }
+      if (this.stockFilter.highestInput) {
+        this.stockFilter.highestInput.setAttribute('value', `${stockMax}`);
+      }
+    }
+  }
+
+  public getRange(data: Card[], type: string): number[] {
+    const arrCopy = [...data];
+    const result = arrCopy.sort((a, b) => (type === 'price' ? a.price - b.price : a.stock - b.stock));
+    // eslint-disable-next-line operator-linebreak
+    const [resMin, resMax] =
+      type === 'price'
+        ? [result[0].price, result[result.length - 1].price]
+        : [result[0].stock, result[result.length - 1].stock];
+    return [resMin, resMax];
   }
 
   public changeStartValueOfCount(type: string, filter: Filter): void {
@@ -272,9 +304,8 @@ export default class CardsField extends BaseComponent {
   public getFilterType = (value: string, index: number): string => value.split(',')[index];
 
   public setCountFrom(data: Card[]): void {
-    const allTypes = [...findCountOfCurrentProducts(data, 'category'), ...findCountOfCurrentProducts(data, 'size')];
-    allTypes.forEach((subtype) => {
-      console.log(subtype);
+    const allCheckbox = [...findCountOfCurrentProducts(data, 'category'), ...findCountOfCurrentProducts(data, 'size')];
+    allCheckbox.forEach((subtype) => {
       this.assignQuantity(
         subtype.type === 'category' ? this.categoryFilter : this.sizeFilter,
         subtype.key,
@@ -284,7 +315,6 @@ export default class CardsField extends BaseComponent {
   }
 
   public assignQuantity(filter: Filter | null, key: string, count: number): void {
-    console.log(filter, key, count);
     if (filter && filter.allCountsFrom) {
       filter.allCountsFrom.forEach((elem) => {
         const temp = elem;

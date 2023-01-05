@@ -25,9 +25,6 @@
   cursor: pointer;
 }
 
-/* .cards__content {
-} */
-
 .cards__sort-wrapper {
   display: flex;
   justify-content: space-between;

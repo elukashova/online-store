@@ -13,6 +13,10 @@ export default class Filter {
 
   public countTo: HTMLElement | null = null;
 
+  public lowestInput: HTMLElement | null = null;
+
+  public highestInput: HTMLElement | null = null;
+
   public allCountsFrom: HTMLElement[] | null = [];
 
   constructor(
@@ -81,7 +85,7 @@ export default class Filter {
     });
     rendered('span', valueWrapper, `${str}-value__to`, `${valuePrefix}${maxValue}`, { id: `to-${str}-value` });
 
-    const lowestInput: HTMLElement = rendered('input', sliderWrapper, `filters__${str}_lowest`, '', {
+    this.lowestInput = rendered('input', sliderWrapper, `filters__${str}_lowest`, '', {
       id: `from-${str}`,
       type: 'range',
       min: minValue,
@@ -89,7 +93,7 @@ export default class Filter {
       value: minValue,
       step: '1',
     });
-    const highestInput: HTMLElement = rendered('input', sliderWrapper, `filters__${str}_highest`, '', {
+    this.highestInput = rendered('input', sliderWrapper, `filters__${str}_highest`, '', {
       id: `to-${str}`,
       type: 'range',
       min: minValue,
@@ -97,7 +101,7 @@ export default class Filter {
       value: maxValue,
       step: '1',
     });
-    this.addListenerToRange(lowestInput, highestInput); // вешаем функцию слушатель
+    this.addListenerToRange(this.lowestInput, this.highestInput); // вешаем функцию слушатель
     return filterWrapper;
   }
 
