@@ -227,6 +227,8 @@ export default class CardsField extends BaseComponent {
           card.element.classList.add('hidden');
         });
       }
+      if (this.categoryFilter) this.changeStartValueOfCount('remove', this.categoryFilter);
+      if (this.sizeFilter) this.changeStartValueOfCount('remove', this.sizeFilter);
     } else if (this.visibleCards.length === 0 && this.activeFilters.length === 0) {
       if (this.categoryFilter) this.changeStartValueOfCount('start', this.categoryFilter);
       if (this.sizeFilter) this.changeStartValueOfCount('start', this.sizeFilter);
@@ -253,6 +255,11 @@ export default class CardsField extends BaseComponent {
             temp.textContent = `${filter.countTo.textContent}`;
           }
         });
+      } else if (type === 'remove') {
+        filter.allCountsFrom.forEach((elem) => {
+          const temp = elem;
+          temp.textContent = '0';
+        });
       } else {
         filter.allCountsFrom.forEach((elem) => {
           const temp = elem;
@@ -265,17 +272,14 @@ export default class CardsField extends BaseComponent {
   public getFilterType = (value: string, index: number): string => value.split(',')[index];
 
   public setCountFrom(data: Card[]): void {
-    const category = findCountOfCurrentProducts(data, 'category');
-    const size = findCountOfCurrentProducts(data, 'size');
-    const allTypes = [...category, ...size];
-
+    const allTypes = [...findCountOfCurrentProducts(data, 'category'), ...findCountOfCurrentProducts(data, 'size')];
     allTypes.forEach((subtype) => {
       console.log(subtype);
-      if (subtype.type === 'category') {
-        this.assignQuantity(this.categoryFilter, subtype.key, subtype.count);
-      } else {
-        this.assignQuantity(this.sizeFilter, subtype.key, subtype.count);
-      }
+      this.assignQuantity(
+        subtype.type === 'category' ? this.categoryFilter : this.sizeFilter,
+        subtype.key,
+        subtype.count,
+      );
     });
   }
 
