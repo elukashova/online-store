@@ -197,11 +197,9 @@ export default class CardsField extends BaseComponent {
       pushToActive(this.activeFilters, filter);
     }
     this.addClassesForCards(this.activeFilters, this.cardsAll);
-    console.log(this.activeFilters);
   };
 
   public addClassesForCards(activeFilters: string[], cards: Card[]): void {
-    console.log(activeFilters);
     this.resetClasses(activeFilters, cards); // сбрасываем классы
     // eslint-disable-next-line arrow-body-style
     const bySize: Card[] = cards.filter(({ size }): boolean => {
@@ -222,16 +220,11 @@ export default class CardsField extends BaseComponent {
     // eslint-disable-next-line arrow-body-style
     const bySearch: Card[] = cards.filter(({ element }): boolean => {
       return activeFilters.some((filter: string): boolean => {
-        const textIntoElement = element.innerText.toUpperCase();
         const temp = this.getFilterType(filter, 0);
-        if (temp !== 'Search') {
-          return false;
-        }
-        console.log(textIntoElement.includes(this.getFilterType(filter, 1)), this.getFilterType(filter, 1));
-        return textIntoElement.includes(this.getFilterType(filter, 1));
+        if (temp !== 'Search') return false;
+        return element.innerText.toUpperCase().includes(this.getFilterType(filter, 1));
       });
     });
-    console.log(bySize, byCategory, bySearch, byPrice, byCount);
     if (!!byCategory.length || !!bySize.length || !!byPrice.length || !!byCount.length || !!bySearch.length) {
       this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount, bySearch);
     } else {
@@ -253,18 +246,20 @@ export default class CardsField extends BaseComponent {
         visibleCard.element.classList.remove('hidden');
       });
     }
-    this.changeFoundItem();
+
+    /* this.setCountFrom(this.visibleCards); */
+    this.changeFoundItemsCount();
   }
 
   public getFilterType = (value: string, index: number): string => value.split(',')[index];
 
-  public changeFoundItem(): void {
+  /* public setCountFrom(data: Card[]): void {} */
+
+  public changeFoundItemsCount(): void {
     if (this.postersFound) {
-      if (this.activeFilters.length === 0) {
-        this.postersFound.textContent = `Found: ${this.cardsAll.length}`;
-      } else if (this.visibleCards.length >= 0) {
-        this.postersFound.textContent = `Found: ${this.visibleCards.length}`;
-      }
+      this.postersFound.textContent = this.activeFilters.length
+        ? `Found: ${this.visibleCards.length}`
+        : `Found: ${this.cardsAll.length}`;
     }
   }
 

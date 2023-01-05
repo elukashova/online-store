@@ -25,8 +25,8 @@
   cursor: pointer;
 }
 
-.cards__content {
-}
+/* .cards__content {
+} */
 
 .cards__sort-wrapper {
   display: flex;
@@ -39,14 +39,14 @@
 .cards__sort-products {
   cursor: pointer;
 }
-.cards__sort-by-price {
+/* .cards__sort-by-price {
 }
 .cards__sort-by-price {
 }
 .cards__sort-by-rating {
 }
 .cards__found-count {
-}
+} */
 .cards__search-wrapper {
   display: flex;
   border-radius: 25px;
