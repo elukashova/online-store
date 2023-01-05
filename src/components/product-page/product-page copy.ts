@@ -42,7 +42,7 @@ export default class ProductPage extends BaseComponent {
 
   private chosenImg: HTMLElement | null = null;
 
-  private imgWithListener: HTMLElement[] = [];
+  private notChosenImg1: HTMLElement | null = null;
 
   private mainImage: HTMLElement | null = null;
 
@@ -96,12 +96,10 @@ export default class ProductPage extends BaseComponent {
     this.chosenImg = rendered('img', miniImagesWrapper, 'product-img__mini chosen', '', {
       src: this.images[0],
     });
-    for (let i: number = 1; i < this.images.length; i += 1) {
-      const img: HTMLElement = rendered('img', miniImagesWrapper, 'product-img__mini not-chosen', '', {
-        src: this.images[i],
-      });
-      img.addEventListener('click', this.changeCurrentImgCallback);
-    }
+    this.notChosenImg1 = rendered('img', miniImagesWrapper, 'product-img__mini not-chosen', '', {
+      src: this.images[1],
+    });
+    this.notChosenImg1.addEventListener('click', this.changeCurrentImgCallback);
 
     const mainImgContainer: HTMLElement = rendered('div', imagesContainer, 'product__main-img-container');
     this.mainImage = rendered('img', mainImgContainer, 'product-img__main-img', '', {
@@ -198,16 +196,16 @@ export default class ProductPage extends BaseComponent {
   // колбэк для клика на новую картинку
   private changeCurrentImgCallback = (e: Event): void => {
     e.preventDefault();
-    let { target } = e;
-    if (target instanceof HTMLImageElement && this.chosenImg) {
+    const { target } = e;
+    if (target instanceof HTMLImageElement && this.chosenImg && this.notChosenImg1) {
       target.classList.remove('not-chosen');
       target.classList.add('chosen');
       this.chosenImg.classList.remove('chosen');
       this.chosenImg.classList.add('not-chosen');
       const temp: HTMLElement = this.chosenImg;
       this.chosenImg = target;
-      target = temp;
-      target.addEventListener('click', this.changeCurrentImgCallback);
+      this.notChosenImg1 = temp;
+      this.notChosenImg1.addEventListener('click', this.changeCurrentImgCallback);
     }
     if (this.mainImage && this.mainImage instanceof HTMLImageElement) {
       if (this.chosenImg && this.chosenImg instanceof HTMLImageElement) {

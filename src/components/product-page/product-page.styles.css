@@ -65,6 +65,7 @@
 
 .not-chosen {
     cursor: pointer;
+    transition: opacity .2s;
 }
 
 .not-chosen:hover {
