@@ -252,22 +252,22 @@ export default class CardsField extends BaseComponent {
     if (this.priceFilter) {
       if (this.priceFilter.lowestInput) {
         this.priceFilter.lowestInput.setAttribute('value', `${priceMin}`);
-        if (this.priceFilter.minElement) this.priceFilter.minElement.textContent = `$${priceMin}`;
       }
       if (this.priceFilter.highestInput) {
         this.priceFilter.highestInput.setAttribute('value', `${priceMax}`);
-        if (this.priceFilter.maxElement) this.priceFilter.maxElement.textContent = `$${priceMax}`;
       }
+      if (this.priceFilter.minElement) this.priceFilter.minElement.textContent = `$${priceMin}`;
+      if (this.priceFilter.maxElement) this.priceFilter.maxElement.textContent = `$${priceMax}`;
     }
     if (this.stockFilter) {
       if (this.stockFilter.lowestInput) {
         this.stockFilter.lowestInput.setAttribute('value', `${stockMin}`);
-        if (this.stockFilter.minElement) this.stockFilter.minElement.textContent = `${stockMin}`;
       }
       if (this.stockFilter.highestInput) {
         this.stockFilter.highestInput.setAttribute('value', `${stockMax}`);
-        if (this.stockFilter.maxElement) this.stockFilter.maxElement.textContent = `${stockMax}`;
       }
+      if (this.stockFilter.minElement) this.stockFilter.minElement.textContent = `${stockMin}`;
+      if (this.stockFilter.maxElement) this.stockFilter.maxElement.textContent = `${stockMax}`;
     }
   }
 
