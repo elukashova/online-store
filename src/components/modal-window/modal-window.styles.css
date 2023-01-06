@@ -1,6 +1,6 @@
 .checkout-modal-container {
   display: flex;
-  background-color: rgba(255,255,255,0.7);;
+  background-color: rgba(255, 255, 255, 0.7);
   width: 100%;
   height: 100%;
   z-index: 20;
@@ -62,22 +62,24 @@
   height: 65%;
 }
 
-.pers-data__name-input,
-.pers-data__phone-input,
-.pers-data__address-input,
-.pers-data__email-input,
-.card-data__number-input,
-.card-data__expiration-input,
-.card-data__cvv-input {
-  border: 1px solid rgba(0, 0, 0, 0.5);
+.input {
+  border: 2px solid rgba(0, 0, 0, 0.5);
   width: 80%;
   font-size: 1.2rem;
   font-weight: 400;
-  color: #65635F;
+  color: #65635f;
   text-align: center;
   line-height: 2rem;
   padding: 0;
   margin: 0;
+}
+
+.invalid {
+  border: 2px solid #f70303;
+}
+
+.valid {
+  border: 2px solid #40e01f;
 }
 
 .card-data__expiration-input,
@@ -94,7 +96,7 @@
 .card-data__cvv-input::placeholder {
   font-size: 1.2rem;
   font-weight: 300;
-  color: #FF7D15;
+  color: #ff7d15;
   text-align: center;
   opacity: 70%;
 }
@@ -108,8 +110,8 @@
 
 .checkout__confirm-btn {
   cursor: pointer;
-  background-color: #FF7D15;
-  color: #FFF;
+  background-color: #ff7d15;
+  color: #fff;
   font-size: 1rem;
   text-transform: uppercase;
   height: 2rem;
