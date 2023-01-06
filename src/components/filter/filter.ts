@@ -19,6 +19,10 @@ export default class Filter {
 
   public allCountsFrom: HTMLElement[] | null = [];
 
+  public minElement: HTMLElement | null = null;
+
+  public maxElement: HTMLElement | null = null;
+
   constructor(
     private readonly container: HTMLElement,
     private readonly name: string,
@@ -80,10 +84,12 @@ export default class Filter {
     const [minCount, maxCount]: number[] = findMinAndMax(cardsData.products, str);
     const maxValue: string = str === 'price' ? `${maxPrice}` : `${maxCount}`;
     const minValue: string = str === 'price' ? `${minPrice}` : `${minCount}`;
-    rendered('span', valueWrapper, `${str}-value__from`, `${valuePrefix}${minValue}`, {
+    this.minElement = rendered('span', valueWrapper, `${str}-value__from`, `${valuePrefix}${minValue}`, {
       id: `from-${str}-value`,
     });
-    rendered('span', valueWrapper, `${str}-value__to`, `${valuePrefix}${maxValue}`, { id: `to-${str}-value` });
+    this.maxElement = rendered('span', valueWrapper, `${str}-value__to`, `${valuePrefix}${maxValue}`, {
+      id: `to-${str}-value`,
+    });
 
     this.lowestInput = rendered('input', sliderWrapper, `filters__${str}_lowest`, '', {
       id: `from-${str}`,
