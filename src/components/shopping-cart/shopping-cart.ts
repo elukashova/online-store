@@ -5,20 +5,16 @@ import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
 import CartCard from './card-cart';
 import Header from '../header/header';
-import {
-  checkProductDataInLocalStorage,
-  checkPromoDataInLocalStorage,
-  setDataToLocalStorage,
-} from '../../utils/localStorage';
+import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
 import { PosterStorageType } from '../../utils/localStorage.types';
 import { ObservedSubject } from '../card/card.types';
 import { Callback, PromoInputs, PromoValues } from './shopping-cart.types';
 import ModalWindow from '../modal-window/modal-window';
 
 export default class Cart extends BaseComponent {
-  private storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
+  private storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
 
-  private promoStorageInfo: string[] | null = checkPromoDataInLocalStorage('appliedPromo');
+  private promoStorageInfo: string[] | null = checkDataInLocalStorage('appliedPromo');
 
   private itemsOrder: number = 0;
 

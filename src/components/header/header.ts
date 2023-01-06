@@ -3,7 +3,7 @@ import BaseComponent from '../base-component/base-component';
 import rendered from '../../utils/render/render';
 import { ObservedSubject } from '../card/card.types';
 import Card from '../card/card';
-import { setDataToLocalStorage, checkHeaderDataInLocalStorage } from '../../utils/localStorage';
+import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { HeaderType } from './header.types';
 import { JsonObj } from '../../utils/localStorage.types';
 import CartCard from '../shopping-cart/card-cart';
@@ -14,7 +14,7 @@ export default class Header extends BaseComponent {
 
   public cartItemsElement: HTMLElement | null = null;
 
-  private readonly storageInfo: JsonObj | null = checkHeaderDataInLocalStorage('headerInfo');
+  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('headerInfo');
 
   public headerInfo: HeaderType = {
     cartItems: 0,
