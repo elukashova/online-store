@@ -157,4 +157,21 @@ export default class ModalWindow extends BaseComponent {
       console.log(this.validInputs);
     }
   }
+
+  public autoSlashForDate(e: Event): void {
+    if (e.target && e.target instanceof HTMLInputElement) {
+      const inputValue = e.target.value;
+      if (inputValue.length === 2) {
+        e.target.value = `${inputValue}/`;
+      }
+    }
+  }
+
+  public buttonHandler(e: Event): void {
+    if (this.validInputs.length < this.inputsAll.length) {
+      e.preventDefault();
+    } else {
+      console.log('Переход в мейн');
+    }
+  }
 }
