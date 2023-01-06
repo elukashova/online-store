@@ -10,6 +10,7 @@ import { PosterStorageType } from '../../utils/localStorage.types';
 import { ObservedSubject } from '../card/card.types';
 import { Callback, PromoInputs, PromoValues } from './shopping-cart.types';
 import ModalWindow from '../modal-window/modal-window';
+import { setQueryParams, getQueryParams } from '../../utils/queryParams';
 
 export default class Cart extends BaseComponent {
   private storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
@@ -44,11 +45,11 @@ export default class Cart extends BaseComponent {
 
   private buyNowButton: HTMLElement | null = null;
 
-  private itemsPerPage: number = Number(this.getQueryParams('limit')) ? Number(this.getQueryParams('limit')) : 2;
+  private itemsPerPage: number = Number(getQueryParams('limit')) ? Number(getQueryParams('limit')) : 2;
 
   private pagesNumber: number = 0;
 
-  private currentPage: number = Number(this.getQueryParams('page')) ? Number(this.getQueryParams('page')) : 1;
+  private currentPage: number = Number(getQueryParams('page')) ? Number(getQueryParams('page')) : 1;
 
   // индексы, которые мне нужны для создания карточек при перелистывании
   private startIdx: number = 0;
@@ -199,21 +200,6 @@ export default class Cart extends BaseComponent {
     }
   }
 
-  // метод для сохранения query параметров
-  private setQueryParams(key: string, value: string): void {
-    const searchParams: URLSearchParams = new URLSearchParams(window.location.search);
-    searchParams.set(key, value);
-    const newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
-    window.history.pushState(null, '', newRelativePathQuery);
-  }
-
-  // метод для чтения query параметров
-  private getQueryParams(key: string): string | null {
-    const params: URLSearchParams = new URLSearchParams(window.location.search);
-    const value: string | null = params.get(key);
-    return value;
-  }
-
   // функция создания карточек
   private createItemsCards(array: PosterStorageType[], callback: (event: Event) => void): void {
     cardsData.products.forEach((data) => {
@@ -251,7 +237,7 @@ export default class Cart extends BaseComponent {
     e.preventDefault();
     // меняем номер страницы
     this.currentPage += 1;
-    this.setQueryParams('page', `${this.currentPage}`);
+    setQueryParams('page', `${this.currentPage}`);
     this.updatePageNumber();
     // активируем левую кнопку и вешаем слушатель
     this.activateLeftButton();
@@ -289,7 +275,7 @@ export default class Cart extends BaseComponent {
     this.slideBack = true;
     // меняем номер страницы
     this.currentPage -= 1;
-    this.setQueryParams('page', `${this.currentPage}`);
+    setQueryParams('page', `${this.currentPage}`);
     this.updatePageNumber();
     // активируем правую кнопку, если речь о предпоследней странице
     if (this.rightArrowBtn && this.currentPage === this.pagesNumber - 1) {
@@ -323,9 +309,9 @@ export default class Cart extends BaseComponent {
       if (this.itemsPerPage === this.addedItems.length || Number(e.target.value) > this.addedItems.length) {
         this.currentPage = 1;
         this.deactivateBothButtons();
-        this.setQueryParams('page', `${this.currentPage}`);
+        setQueryParams('page', `${this.currentPage}`);
       }
-      this.setQueryParams('limit', `${this.itemsPerPage}`);
+      setQueryParams('limit', `${this.itemsPerPage}`);
     }
   };
 
@@ -542,7 +528,7 @@ export default class Cart extends BaseComponent {
       if (this.currentPage > this.pagesNumber) {
         this.currentPage = this.pagesNumber;
         this.currentPageElement.textContent = `${this.pagesNumber}`;
-        this.setQueryParams('page', `${this.currentPage}`);
+        setQueryParams('page', `${this.currentPage}`);
         if (this.rightArrowBtn) {
           this.deactivateRightButton();
         }
