@@ -18,6 +18,8 @@ export default class Card extends BaseComponent {
 
   public price: number;
 
+  public description: string;
+
   public rating: number;
 
   public discountPercentage: number;
@@ -46,6 +48,7 @@ export default class Card extends BaseComponent {
     this.size = data.size;
     this.stock = data.stock;
     this.price = data.price;
+    this.description = data.description;
     this.rating = data.rating;
     this.discountPercentage = data.discountPercentage;
     this.images = data.images.slice();
@@ -66,9 +69,10 @@ export default class Card extends BaseComponent {
     rendered('p', cardInfoWrapper, 'card__category', `${this.category}`);
     rendered('p', cardInfoWrapper, 'card__rating', `Size: ${this.size}`);
     rendered('p', cardInfoWrapper, 'card__stock', `Stock: ${this.stock}`);
-    rendered('p', cardInfoWrapper, 'card__price', `$ ${this.price}`);
     rendered('p', cardInfoWrapper, 'card__rating', `Rating: ${this.rating}`); // для тестов сортировки
+    rendered('p', cardInfoWrapper, 'card__price', `$ ${this.price}`);
     rendered('p', cardInfoWrapper, 'card__discount', `Discount: ${this.discountPercentage}%`);
+    rendered('p', cardInfoWrapper, 'card__description', `${this.description.split('.')[0]}.`);
     const buttonsWrapper: HTMLElement = rendered('div', cardInfo, 'card__btns');
     const productPageBtn: HTMLElement = rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
       src: 'assets/icons/button-open-card.svg',

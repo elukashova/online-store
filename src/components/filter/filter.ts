@@ -1,12 +1,27 @@
-/* eslint-disable max-lines-per-function */
 import './filter.styles.css';
 import rendered from '../../utils/render/render';
 import cardsData from '../../assets/json/data';
 import findMinAndMax from './utils/find.minmax';
 import RangeTypes from './enums.filter';
+import findCountOfProductsFromData from './utils/find.initial.count';
+import { CardDataType } from '../card/card.types';
 
 export default class Filter {
   public checkboxes: HTMLElement[] = [];
+
+  public countFrom: HTMLElement | null = null;
+
+  public countTo: HTMLElement | null = null;
+
+  public lowestInput: HTMLElement | null = null;
+
+  public highestInput: HTMLElement | null = null;
+
+  public allCountsFrom: HTMLElement[] | null = [];
+
+  public minElement: HTMLElement | null = null;
+
+  public maxElement: HTMLElement | null = null;
 
   constructor(
     private readonly container: HTMLElement,
@@ -35,10 +50,27 @@ export default class Filter {
       rendered('label', inputWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${str}-${ind + 1}`,
       });
-      rendered('span', inputWrapper, `${str}__out-of-${ind + 1}`, ' 1/5');
+      this.countFrom = rendered('span', inputWrapper, `${str}__out-from-${ind + 1}`, '1', {
+        id: `${item}`,
+      });
+      rendered('span', inputWrapper, `${str}__slash-${ind + 1}`, '/');
+      this.countTo = rendered('span', inputWrapper, `${str}__out-to-${ind + 1}`, '5');
+      this.setInitialCount(cardsData.products, str, item);
+      if (this.allCountsFrom) this.allCountsFrom.push(this.countFrom);
       this.checkboxes.push(inputElement);
     });
     return filterWrapper;
+  }
+
+  public setInitialCount(data: CardDataType[], field: string, name: string): void {
+    const dataObjects = findCountOfProductsFromData(data, field);
+    dataObjects.forEach((elem) => {
+      const { type, key, count } = elem;
+      if (field === type && name === key && this.countTo && this.countFrom) {
+        this.countTo.textContent = `${count}`;
+        this.countFrom.textContent = `${count}`;
+      }
+    });
   }
 
   public renderInputRange(str: string): HTMLElement {
@@ -52,12 +84,14 @@ export default class Filter {
     const [minCount, maxCount]: number[] = findMinAndMax(cardsData.products, str);
     const maxValue: string = str === 'price' ? `${maxPrice}` : `${maxCount}`;
     const minValue: string = str === 'price' ? `${minPrice}` : `${minCount}`;
-    rendered('span', valueWrapper, `${str}-value__from`, `${valuePrefix}${minValue}`, {
+    this.minElement = rendered('span', valueWrapper, `${str}-value__from`, `${valuePrefix}${minValue}`, {
       id: `from-${str}-value`,
     });
-    rendered('span', valueWrapper, `${str}-value__to`, `${valuePrefix}${maxValue}`, { id: `to-${str}-value` });
+    this.maxElement = rendered('span', valueWrapper, `${str}-value__to`, `${valuePrefix}${maxValue}`, {
+      id: `to-${str}-value`,
+    });
 
-    const lowestInput: HTMLElement = rendered('input', sliderWrapper, `filters__${str}_lowest`, '', {
+    this.lowestInput = rendered('input', sliderWrapper, `filters__${str}_lowest`, '', {
       id: `from-${str}`,
       type: 'range',
       min: minValue,
@@ -65,7 +99,7 @@ export default class Filter {
       value: minValue,
       step: '1',
     });
-    const highestInput: HTMLElement = rendered('input', sliderWrapper, `filters__${str}_highest`, '', {
+    this.highestInput = rendered('input', sliderWrapper, `filters__${str}_highest`, '', {
       id: `to-${str}`,
       type: 'range',
       min: minValue,
@@ -73,11 +107,10 @@ export default class Filter {
       value: maxValue,
       step: '1',
     });
-    this.addListenerToRange(lowestInput, highestInput); // вешаем функцию слушатель
+    this.addListenerToRange(this.lowestInput, this.highestInput); // вешаем функцию слушатель
     return filterWrapper;
   }
 
-  // eslint-disable-next-line max-len
   public addListenerToRange(lowestInput: HTMLElement, highestInput: HTMLElement): void {
     if (lowestInput instanceof HTMLInputElement && highestInput instanceof HTMLInputElement) {
       lowestInput.addEventListener('input', (e) => {
