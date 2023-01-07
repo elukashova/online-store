@@ -97,11 +97,11 @@
 .card-data__data-cvv-label-wrapper {
   width: 80%;
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: 1fr 1fr;
 }
 
 .card-data__data-cvv-label-wrapper {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .pers-data__name-input::placeholder,
@@ -153,7 +153,7 @@
   text-transform: uppercase;
   height: 2.7rem;
   width: 80%;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .checkout__confirm-btn.valid-btn {

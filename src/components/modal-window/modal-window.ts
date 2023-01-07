@@ -1,6 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import rendered from '../../utils/render/render';
 import BaseComponent from '../base-component/base-component';
+import { Callback } from '../shopping-cart/shopping-cart.types';
 import './modal-window.styles.css';
 
 export default class ModalWindow extends BaseComponent {
@@ -32,7 +33,7 @@ export default class ModalWindow extends BaseComponent {
 
   private cardNumberLogo: HTMLElement | null = null;
 
-  constructor(private root: HTMLElement) {
+  constructor(private root: HTMLElement, private callback: Callback) {
     super('div', 'checkout-modal-container');
     this.element.addEventListener('click', this.closeModalCallback);
     this.render();
@@ -314,9 +315,16 @@ export default class ModalWindow extends BaseComponent {
         if (e.target.getAttribute('data-valid') === 'invalid') {
           console.log('Давай по новой');
         } else {
+          this.exploreBtnCallback(e);
           console.log('Переход в мейн');
         }
       }
     }
   }
+
+  private exploreBtnCallback = (e: Event): void => {
+    e.preventDefault();
+    window.history.pushState({}, '', '/');
+    this.callback(e);
+  };
 }
