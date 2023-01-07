@@ -45,8 +45,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
-  /* justify-content: space-between; */
 }
 
 .input {
@@ -69,21 +69,40 @@
   border: 2px solid #40e01f;
 }
 
-.card-data__number-input-wrapper,
+.card-data__number-input-wrapper {
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.card-data__number-input {
+  margin: 0;
+}
+
+.card-data__expiration-input,
+.card-data__cvv-input {
+  margin: 1rem 0 0.5rem;
+  width: 97%;
+}
+
+.card-data__expiration-input {
+  justify-self: start;
+}
+
+.card-data__cvv-input {
+  justify-self: end;
+}
+
 .card-data__data-cvv-wrapper,
 .card-data__data-cvv-label-wrapper {
   width: 80%;
-  display: flex;
-  flex-wrap: nowrap;
+  display: grid;
+  grid-template-columns: auto auto;
 }
 
 .card-data__data-cvv-label-wrapper {
   margin-bottom: 1rem;
 }
-/* .card-data__expiration-input,
-.card-data__cvv-input {
-  width: 49%;
-} */
 
 .pers-data__name-input::placeholder,
 .pers-data__phone-input::placeholder,
@@ -110,24 +129,29 @@
   margin: 0;
 }
 
-.card-data__number-input-image {
+.card-data__number-logo-wrapper {
   width: 15%;
-  height: 100%;
 }
 
-/* .card-data__input-details-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.card-data__number-input-image {
+  background-size: contain;
   width: 80%;
-} */
+}
+
+.checkout__confirm-btn-wrapper {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
 
 .checkout__confirm-btn {
   background-color: #ff7e155d;
   color: #fff;
   font-size: 1rem;
   text-transform: uppercase;
-  height: 2rem;
+  height: 2.7rem;
   width: 80%;
   margin-bottom: 1rem;
 }

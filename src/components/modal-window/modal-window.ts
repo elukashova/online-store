@@ -108,7 +108,8 @@ export default class ModalWindow extends BaseComponent {
     );
     rendered('h2', this.personalInfoForm, 'card-data__title title', 'Credit card details');
     const cardNumberWrapper: HTMLElement = rendered('div', this.personalInfoForm, 'card-data__number-input-wrapper');
-    this.cardNumberLogo = rendered('img', cardNumberWrapper, 'card-data__number-input-image', '', {
+    const logoWrapper: HTMLElement = rendered('div', cardNumberWrapper, 'card-data__number-logo-wrapper');
+    this.cardNumberLogo = rendered('img', logoWrapper, 'card-data__number-input-image', '', {
       src: '../../../assets/icons/payment.png',
     });
     this.cardNumberInput = rendered('input', cardNumberWrapper, 'card-data__number-input input', '', {
@@ -125,7 +126,7 @@ export default class ModalWindow extends BaseComponent {
       'pers-data__number-label label hidden',
       'Card number must be exactly 16 digits long',
       {
-        for: 'number',
+        for: 'card',
       },
     );
     const dataAndCvvWrapper: HTMLElement = rendered('div', this.personalInfoForm, 'card-data__data-cvv-wrapper');
@@ -147,7 +148,7 @@ export default class ModalWindow extends BaseComponent {
       'label',
       dataAndCvvLabelWrapper,
       'pers-data__expiration-label label hidden',
-      'Only numbers are allowed - month no more than 12, year from 23. For example, 12/25.',
+      'Only 12 months, year from 23. For example, 12/25.',
       {
         for: 'expiration',
       },
@@ -182,7 +183,8 @@ export default class ModalWindow extends BaseComponent {
       this.cardExpirationInput,
       this.cardCVVInput,
     ];
-    this.confirmBtn = rendered('input', modalCheckout, 'checkout__confirm-btn', '', {
+    const confirmBtnWrapper: HTMLElement = rendered('div', modalCheckout, 'checkout__confirm-btn-wrapper');
+    this.confirmBtn = rendered('input', confirmBtnWrapper, 'checkout__confirm-btn', '', {
       type: 'button',
       value: 'confirm',
       id: 'button',
@@ -191,7 +193,7 @@ export default class ModalWindow extends BaseComponent {
     });
     this.confirmBtnText = rendered(
       'label',
-      modalCheckout,
+      confirmBtnWrapper,
       'checkout__confirm-btn-text hidden',
       'Please make sure all fields are filled in correctly',
       {
