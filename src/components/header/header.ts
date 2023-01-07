@@ -1,6 +1,6 @@
 import './header.styles.css';
 import BaseComponent from '../base-component/base-component';
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import { ObservedSubject } from '../card/card.types';
 import Card from '../card/card';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';

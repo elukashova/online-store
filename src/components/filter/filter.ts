@@ -1,5 +1,5 @@
 import './filter.styles.css';
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import cardsData from '../../assets/json/data';
 import findMinAndMax from './utils/find.minmax';
 import RangeTypes from './enums.filter';

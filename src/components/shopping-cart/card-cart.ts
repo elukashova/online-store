@@ -1,4 +1,4 @@
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import { CardDataType, Observer } from '../card/card.types';
 import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
@@ -161,7 +161,6 @@ export default class CartCard extends BaseComponent {
     if (isExist) {
       console.log('Subject: Observer has been attached already.');
     }
-    // console.log('Subject: Attached an observer.');
     this.observers.push(observer);
   }
 
@@ -176,7 +175,6 @@ export default class CartCard extends BaseComponent {
   }
 
   public notifyObserver(): void {
-    // console.log('Subject: Notifying observers...');
     for (let i: number = 0; i < this.observers.length; i += 1) {
       this.observers[i].update(this);
     }

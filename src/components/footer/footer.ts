@@ -1,6 +1,6 @@
 import './footer.styles.css';
 import BaseComponent from '../base-component/base-component';
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 
 export default class Footer extends BaseComponent {
   constructor() {

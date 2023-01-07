@@ -83,7 +83,7 @@ export default class App {
         this.header.deleteActiveClass();
         break;
       default:
-        this.routes.notfound = new Page404(this.route);
+        this.routes.notfound = new Page404();
         this.component = this.routes.notfound.element;
         this.header.deleteActiveClass();
     }
@@ -97,11 +97,4 @@ export default class App {
       }
     }
   };
-
-  private appendHeaderFooter(header: Element, footer: Element): void {
-    if (this.rootElement.firstChild !== header && this.rootElement.lastChild !== footer) {
-      this.rootElement.insertBefore(header, this.mainContainer.element);
-      this.rootElement.append(footer);
-    }
-  }
 }

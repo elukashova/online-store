@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 import './cards-field.styles.css';
 import BaseComponent from '../base-component/base-component';
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import cardsData from '../../assets/json/data';
 import Card from '../card/card';
 import Filter from '../filter/filter';
