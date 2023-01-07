@@ -212,7 +212,9 @@ export default class ModalWindow extends BaseComponent {
   // временно отключила
   private closeModalCallback = (e: Event): void => {
     e.preventDefault();
-    /* this.root.removeChild(this.element); */
+    if (e.currentTarget === e.target) {
+      this.root.removeChild(this.element);
+    }
   };
 
   public inputHandler = (e: Event): void => {
