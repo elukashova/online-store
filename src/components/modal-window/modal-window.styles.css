@@ -177,3 +177,20 @@
 .hidden {
   display: none;
 }
+
+.redirect-message-container {
+  width: 50vw;
+  text-align: center;
+}
+
+.redirect-message-container__thank-you-text {
+  color: #ff7d15;
+  font-weight: 500;
+  font-size: 2.2rem;
+}
+
+.redirect-message-container__timer-text {
+  font-weight: 400;
+  font-size: 1.2rem;
+  color: #65635F;
+}

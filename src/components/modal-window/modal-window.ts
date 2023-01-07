@@ -2,7 +2,6 @@
 import rendered from '../../utils/render/render';
 import BaseComponent from '../base-component/base-component';
 import { Observer } from '../card/card.types';
-import { Callback } from '../shopping-cart/shopping-cart.types';
 import './modal-window.styles.css';
 
 export default class ModalWindow extends BaseComponent {
@@ -36,7 +35,7 @@ export default class ModalWindow extends BaseComponent {
 
   private observers: Observer[] = [];
 
-  constructor(private root: HTMLElement, private callback: Callback) {
+  constructor(private root: HTMLElement) {
     super('div', 'checkout-modal-container');
     this.element.addEventListener('click', this.closeModalCallback);
     this.render();
@@ -212,7 +211,6 @@ export default class ModalWindow extends BaseComponent {
     });
   }
 
-  // временно отключила
   private closeModalCallback = (e: Event): void => {
     e.preventDefault();
     if (e.currentTarget === e.target) {
@@ -312,18 +310,17 @@ export default class ModalWindow extends BaseComponent {
         if (e.target.getAttribute('data-valid') === 'invalid') {
           console.log('Давай по новой');
         } else {
-          this.exploreBtnCallback(e);
+          this.confirmBtnCallback(e);
           console.log('Переход в мейн');
         }
       }
     }
   }
 
-  private exploreBtnCallback = (e: Event): void => {
+  private confirmBtnCallback = (e: Event): void => {
     e.preventDefault();
-    this.notifyObserver();
-    window.history.pushState({}, '', '/');
-    this.callback(e);
+    this.root.removeChild(this.element);
+    this.notifyObserver(e);
   };
 
   // три метода, нужные для обсервера
@@ -346,10 +343,10 @@ export default class ModalWindow extends BaseComponent {
     console.log('Subject: Detached an observer.');
   }
 
-  public notifyObserver(): void {
+  public notifyObserver(e?: Event): void {
     // console.log('Subject: Notifying observers...');
     for (let i: number = 0; i < this.observers.length; i += 1) {
-      this.observers[i].update(this);
+      this.observers[i].update(this, e);
     }
   }
 }
