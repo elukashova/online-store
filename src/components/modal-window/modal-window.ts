@@ -113,7 +113,8 @@ export default class ModalWindow extends BaseComponent {
     this.cardNumberLogo = rendered('img', logoWrapper, 'card-data__number-input-image', '', {
       src: '../../../assets/icons/payment.png',
     });
-    this.cardNumberInput = rendered('input', cardNumberWrapper, 'card-data__number-input input', '', {
+    const cardWrapper: HTMLElement = rendered('div', cardNumberWrapper, 'card-data__card-wrapper');
+    this.cardNumberInput = rendered('input', cardWrapper, 'card-data__number-input input', '', {
       type: 'text',
       placeholder: 'Card number',
       id: 'card',
@@ -123,7 +124,7 @@ export default class ModalWindow extends BaseComponent {
     });
     const numberLabel = rendered(
       'label',
-      this.personalInfoForm,
+      cardWrapper,
       'pers-data__number-label label hidden',
       'Card number must be exactly 16 digits long',
       {
@@ -131,30 +132,27 @@ export default class ModalWindow extends BaseComponent {
       },
     );
     const dataAndCvvWrapper: HTMLElement = rendered('div', this.personalInfoForm, 'card-data__data-cvv-wrapper');
-    const dataAndCvvLabelWrapper: HTMLElement = rendered(
-      'div',
-      this.personalInfoForm,
-      'card-data__data-cvv-label-wrapper',
-    );
-    this.cardExpirationInput = rendered('input', dataAndCvvWrapper, 'card-data__expiration-input input', '', {
+    const dataWrapper: HTMLElement = rendered('div', dataAndCvvWrapper, 'card-data__data-wrapper');
+    const cvvWrapper: HTMLElement = rendered('div', dataAndCvvWrapper, 'card-data__cvv-wrapper');
+    this.cardExpirationInput = rendered('input', dataWrapper, 'card-data__expiration-input input', '', {
       type: 'text',
       placeholder: 'MM / YY',
       id: 'expiration',
       name: 'expiration',
       'max-length': '5',
-      'data-regex': '((0[1-9])|(1[0-2]))\\/((2[3-9])|(3[0-9]))',
+      'data-regex': '((0[1-9])|(1[0-2]))\\/((2[3-9])|(3[0-9])|(4[0-9])|(5[0-9])|(6[0-9])|(7[0-9])|(8[0-9])|(9[0-9]))',
       required: 'required',
     });
     const expirationLabel = rendered(
       'label',
-      dataAndCvvLabelWrapper,
+      dataWrapper,
       'pers-data__expiration-label label hidden',
       'Only 12 months, year from 23. For example, 12/25.',
       {
         for: 'expiration',
       },
     );
-    this.cardCVVInput = rendered('input', dataAndCvvWrapper, 'card-data__cvv-input input', '', {
+    this.cardCVVInput = rendered('input', cvvWrapper, 'card-data__cvv-input input', '', {
       type: 'text',
       placeholder: 'CVV',
       id: 'cvv',
@@ -163,15 +161,9 @@ export default class ModalWindow extends BaseComponent {
       'data-regex': '^[0-9]{3}$',
       required: 'required',
     });
-    const cvvLabel = rendered(
-      'label',
-      dataAndCvvLabelWrapper,
-      'pers-data__cvv-label label hidden',
-      '3 digits must be entered',
-      {
-        for: 'cvv',
-      },
-    );
+    const cvvLabel = rendered('label', cvvWrapper, 'pers-data__cvv-label label hidden', '3 digits must be entered', {
+      for: 'cvv',
+    });
     // eslint-disable-next-line max-len
     this.labelsAll = [cvvLabel, expirationLabel, numberLabel, nameLabel, phoneLabel, addressLabel, emailLabel];
 
