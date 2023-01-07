@@ -9,6 +9,7 @@ import { JsonObj } from '../../utils/localStorage.types';
 import CartCard from '../shopping-cart/card-cart';
 import ProductPage from '../product-page/product-page';
 import ModalWindow from '../modal-window/modal-window';
+import { Callback } from '../shopping-cart/shopping-cart.types';
 
 export default class Header extends BaseComponent {
   public totalPriceElement: HTMLElement | null = null;
@@ -28,7 +29,7 @@ export default class Header extends BaseComponent {
 
   private shoppingCartLink: HTMLElement | null = null;
 
-  constructor(private callback: (event: Event) => void) {
+  constructor(private callback: Callback) {
     super('header', 'header', 'header');
     this.checkLocalStorage();
     this.render();

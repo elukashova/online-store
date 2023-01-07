@@ -3,6 +3,7 @@ import { CardDataType, Observer } from '../card/card.types';
 import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageType } from '../../utils/localStorage.types';
+import { Callback } from './shopping-cart.types';
 
 export default class CartCard extends BaseComponent {
   private storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
@@ -51,7 +52,7 @@ export default class CartCard extends BaseComponent {
   public plus: boolean = false;
 
   // eslint-disable-next-line max-len
-  constructor(private data: CardDataType, private itemOrder: number, private callback: (event: Event) => void) {
+  constructor(private data: CardDataType, private itemOrder: number, private callback: Callback) {
     super('div', 'cart-items__item cart-item');
     this.id = this.data.id;
     this.title = this.data.title;

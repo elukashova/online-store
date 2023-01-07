@@ -11,6 +11,7 @@ import { ObservedSubject } from '../card/card.types';
 import findCountOfCurrentProducts from './utils/find.current.count';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageType } from '../../utils/localStorage.types';
+import { Callback } from '../shopping-cart/shopping-cart.types';
 
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = []; // все карточки
@@ -41,7 +42,7 @@ export default class CardsField extends BaseComponent {
 
   private readonly storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
 
-  constructor(public readonly header: Header, private callback: (event: Event) => void) {
+  constructor(public readonly header: Header, private callback: Callback) {
     super('div', 'content__container');
     this.checkLocalStorage();
     this.render();
