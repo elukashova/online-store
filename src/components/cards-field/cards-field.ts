@@ -11,6 +11,8 @@ import { ObservedSubject } from '../card/card.types';
 import findCountOfCurrentProducts from './utils/find.current.count';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageType } from '../../utils/localStorage.types';
+import { getQueryParams, setQueryParams } from '../../utils/queryParams';
+import FilterTypes from './enums.cards-field';
 
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = []; // все карточки
@@ -104,16 +106,8 @@ export default class CardsField extends BaseComponent {
       placeholder: 'Search poster',
       id: 'search',
     });
-    // слушатель для текстового поиска
-    searchInput.addEventListener('input', () => {
-      if (searchInput instanceof HTMLInputElement) {
-        const val = `Search,${searchInput.value.trim().toUpperCase()}`;
-        this.updateActiveFilters(val);
-      }
-    });
     rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg' });
     const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
-
     const viewFourProducts = rendered('img', viewTypes, 'cards__view-four', '', { src: 'assets/icons/block4.png' });
     const viewTwoProducts = rendered('img', viewTypes, 'cards__view-two', '', { src: 'assets/icons/block2.png' });
     viewTwoProducts.addEventListener('click', () => {
@@ -129,7 +123,6 @@ export default class CardsField extends BaseComponent {
     this.notFoundText = rendered('p', this.cardsContainer, 'cards__not-found hidden', 'Product not found', {
       id: 'cards__not-found',
     });
-
     cardsData.products.forEach((data) => {
       const card: Card = new Card(data, this.callback);
       card.attachObserver(this.header);
@@ -137,6 +130,15 @@ export default class CardsField extends BaseComponent {
       this.cardsAll.push(card);
       if (this.cardsContainer) this.cardsContainer.append(card.element);
     });
+
+    // слушатель для текстового поиска
+    searchInput.addEventListener('input', () => {
+      if (searchInput instanceof HTMLInputElement) {
+        const val = `Search,${searchInput.value.trim().toLowerCase()}`;
+        this.updateActiveFilters(val);
+      }
+    });
+
     // слушатель для сортировки
     this.selectInput.addEventListener('change', () => {
       if (this.selectInput instanceof HTMLSelectElement) {
@@ -155,23 +157,28 @@ export default class CardsField extends BaseComponent {
   // в массиве. Если нет - пушим, есть - заменяем.
   public updateActiveFilters = (filter: string): void => {
     const pushToActive = (array: string[], value: string): number => array.push(value);
-    if (this.getFilterType(filter, 0) === 'Price') {
+    if (this.getFilterType(filter, 0) === FilterTypes.Price) {
       // убрать повторы на рефакторинге
       const prevPrice = this.activeFilters.find((elem) => elem.startsWith(this.getFilterType(filter, 0)));
+      const query = this.composeQueryString(filter);
       if (prevPrice !== undefined) {
         this.activeFilters.splice(this.activeFilters.indexOf(prevPrice), 1, filter);
       } else {
         pushToActive(this.activeFilters, filter);
       }
-    } else if (this.getFilterType(filter, 0) === 'Count') {
+      setQueryParams(FilterTypes.Price.toLowerCase(), query);
+    } else if (this.getFilterType(filter, 0) === FilterTypes.Count) {
       const prevCount = this.activeFilters.find((elem) => elem.startsWith(this.getFilterType(filter, 0)));
+      const query = this.composeQueryString(filter);
       if (prevCount !== undefined) {
         this.activeFilters.splice(this.activeFilters.indexOf(prevCount), 1, filter);
       } else {
         pushToActive(this.activeFilters, filter);
       }
-    } else if (this.getFilterType(filter, 0) === 'Search') {
+      setQueryParams(FilterTypes.Count.toLowerCase(), query);
+    } else if (this.getFilterType(filter, 0) === FilterTypes.Search) {
       const prevCount = this.activeFilters.find((elem) => elem.startsWith(this.getFilterType(filter, 0)));
+      const query = this.composeQueryString(filter);
       if (this.getFilterType(filter, 1) === ' ') {
         this.activeFilters.splice(this.activeFilters.indexOf(filter));
       } else if (prevCount !== undefined) {
@@ -179,14 +186,52 @@ export default class CardsField extends BaseComponent {
       } else {
         pushToActive(this.activeFilters, filter);
       }
+      setQueryParams(FilterTypes.Search.toLowerCase(), query);
     } else if (this.activeFilters.includes(filter)) {
       this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
+      const queryType = this.checkFilter(filter);
+      const prev = getQueryParams(queryType);
+
+      if (prev !== null) {
+        console.log(prev.slice(prev.indexOf(filter)));
+        /* if (prev.includes(filter)) {
+          console.log(prev.slice(prev.indexOf(filter)));
+          // setQueryParams(queryType, `${prev}↕${filter}`);
+        }
+        setQueryParams(queryType, `${prev}↕${filter}`); */
+      }
     } else if (!this.activeFilters.includes(filter)) {
       pushToActive(this.activeFilters, filter);
+      const queryType = this.checkFilter(filter);
+      const prev = getQueryParams(queryType);
+      if (prev !== null) {
+        setQueryParams(queryType, `${prev}↕${filter}`);
+      } else {
+        setQueryParams(queryType, filter);
+      }
     }
     this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
 
+  public composeQueryString(str: string): string {
+    if (this.getFilterType(str, 0) !== FilterTypes.Search) {
+      return `${this.getFilterType(str, 1)}↕${this.getFilterType(str, 2)}`;
+    }
+    return `${this.getFilterType(str, 1).toLowerCase()}`;
+  }
+
+  public checkFilter(str: string): string {
+    let res;
+    if (this.categoryFilter) {
+      res = this.categoryFilter.checkboxes.some((filter) => filter.id === str);
+    }
+    return res === true ? FilterTypes.Category.toLowerCase() : FilterTypes.Size.toLowerCase();
+  }
+
+  /*  */
+  /*  */
+  /*  */
+  /*  */
   public addClassesForCards(activeFilters: string[], cards: Card[]): void {
     this.resetClasses(activeFilters, cards); // сбрасываем классы
     // eslint-disable-next-line arrow-body-style
@@ -210,7 +255,7 @@ export default class CardsField extends BaseComponent {
       return activeFilters.some((filter: string): boolean => {
         const temp = this.getFilterType(filter, 0);
         if (temp !== 'Search') return false;
-        return element.innerText.toUpperCase().includes(this.getFilterType(filter, 1));
+        return element.innerText.toLowerCase().includes(this.getFilterType(filter, 1));
       });
     });
     if (!!byCategory.length || !!bySize.length || !!byPrice.length || !!byCount.length || !!bySearch.length) {

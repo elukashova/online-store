@@ -288,7 +288,6 @@ export default class ModalWindow extends BaseComponent {
         if (this.confirmBtnText) this.confirmBtnText.classList.add('hidden');
       } else {
         this.confirmBtn.classList.remove('valid-btn');
-        // eslint-disable-next-line no-lonely-if
         if (this.confirmBtnText) this.confirmBtnText.classList.remove('hidden');
         this.checkLabel(this.labelsAll);
       }
