@@ -8,6 +8,7 @@ import { HeaderType } from './header.types';
 import { JsonObj } from '../../utils/localStorage.types';
 import CartCard from '../shopping-cart/card-cart';
 import ProductPage from '../product-page/product-page';
+import ModalWindow from '../modal-window/modal-window';
 
 export default class Header extends BaseComponent {
   public totalPriceElement: HTMLElement | null = null;
@@ -180,7 +181,14 @@ export default class Header extends BaseComponent {
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
-    // обновляю информацию в хедере
+
+    // обсервер на закрытие модалки
+    if (subject instanceof ModalWindow) {
+      this.headerInfo.totalPrice = 0;
+      this.headerInfo.cartItems = 0;
+
+      setDataToLocalStorage(this.headerInfo, 'headerInfo');
+    }
     this.updateInfoInHeader();
   }
 

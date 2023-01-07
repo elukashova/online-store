@@ -1,6 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import rendered from '../../utils/render/render';
 import BaseComponent from '../base-component/base-component';
+import { Observer } from '../card/card.types';
 import { Callback } from '../shopping-cart/shopping-cart.types';
 import './modal-window.styles.css';
 
@@ -32,6 +33,8 @@ export default class ModalWindow extends BaseComponent {
   private personalInfoForm: HTMLElement | null = null;
 
   private cardNumberLogo: HTMLElement | null = null;
+
+  private observers: Observer[] = [];
 
   constructor(private root: HTMLElement, private callback: Callback) {
     super('div', 'checkout-modal-container');
@@ -318,7 +321,35 @@ export default class ModalWindow extends BaseComponent {
 
   private exploreBtnCallback = (e: Event): void => {
     e.preventDefault();
+    this.notifyObserver();
     window.history.pushState({}, '', '/');
     this.callback(e);
   };
+
+  // три метода, нужные для обсервера
+  public attachObserver(observer: Observer): void {
+    const isExist = this.observers.includes(observer);
+    if (isExist) {
+      console.log('Subject: Observer has been attached already.');
+    }
+    // console.log('Subject: Attached an observer.');
+    this.observers.push(observer);
+  }
+
+  public removeObserver(observer: Observer): void {
+    const observerIndex = this.observers.indexOf(observer);
+    if (observerIndex === -1) {
+      console.log('Subject: Nonexistent observer.');
+    }
+
+    this.observers.splice(observerIndex, 1);
+    console.log('Subject: Detached an observer.');
+  }
+
+  public notifyObserver(): void {
+    // console.log('Subject: Notifying observers...');
+    for (let i: number = 0; i < this.observers.length; i += 1) {
+      this.observers[i].update(this);
+    }
+  }
 }

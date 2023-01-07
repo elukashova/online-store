@@ -228,6 +228,8 @@ export default class Cart extends BaseComponent {
 
   private openModalCheckout(callback: Callback): void {
     const modal: ModalWindow = new ModalWindow(this.root, callback);
+    modal.attachObserver(this.header);
+    modal.attachObserver(this);
     this.root.insertBefore(modal.element, this.header.element);
   }
 
@@ -626,6 +628,9 @@ export default class Cart extends BaseComponent {
         setDataToLocalStorage(this.addedItems, 'addedPosters'); // обновляю инфу о добавленных в корзину
         this.checkIfZero(subject);
       }
+    }
+    if (subject instanceof ModalWindow) {
+      localStorage.removeItem('addedPosters');
     }
   }
 
