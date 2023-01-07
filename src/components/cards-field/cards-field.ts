@@ -11,8 +11,15 @@ import { ObservedSubject } from '../card/card.types';
 import findCountOfCurrentProducts from './utils/find.current.count';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageType } from '../../utils/localStorage.types';
-import { getQueryParams, setQueryParams } from '../../utils/queryParams';
-import FilterTypes from './enums.cards-field';
+// eslint-disable-next-line object-curly-newline
+import {
+  deleteOneQueryParam,
+  deleteQueryParams,
+  getQueryParams,
+  getUrl,
+  setQueryParams,
+} from '../../utils/queryParams';
+import { FilterTypes, SortTypes } from './enums.cards-field';
 
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = []; // все карточки
@@ -41,12 +48,16 @@ export default class CardsField extends BaseComponent {
 
   public stockFilter: Filter | null = null;
 
+  public viewFourProducts: HTMLElement | null = null;
+
+  public viewTwoProducts: HTMLElement | null = null;
+
   private readonly storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
 
   constructor(public readonly header: Header, private callback: (event: Event) => void) {
     super('div', 'content__container');
     this.checkLocalStorage();
-    this.render();
+    this.checkUrlInfo();
   }
 
   public render(): void {
@@ -55,22 +66,26 @@ export default class CardsField extends BaseComponent {
     const reset = rendered('button', buttonsContainer, 'filters__btn-reset', 'Reset filters');
     reset.addEventListener('click', this.resetFilters);
     rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
+
     // фильтр по категории
     this.categoryFilter = new Filter(filtersContainer, 'Category', this.updateActiveFilters);
     let uniqueCategories = cardsData.products.map((item) => item.category);
     uniqueCategories = Array.from(new Set(uniqueCategories));
     const categoryNames: HTMLElement = this.categoryFilter.renderCheckbox(uniqueCategories, 'category');
     filtersContainer.append(categoryNames);
+
     // фильтр по размеру
     this.sizeFilter = new Filter(filtersContainer, 'Size', this.updateActiveFilters);
     let uniqueSize = cardsData.products.map((item) => item.size);
     uniqueSize = Array.from(new Set(uniqueSize));
     const sizeNames: HTMLElement = this.sizeFilter.renderCheckbox(uniqueSize, 'size');
     filtersContainer.append(sizeNames);
+
     // фильтр по цене
     this.priceFilter = new Filter(filtersContainer, 'Price', this.updateActiveFilters);
     const pricesTitles: HTMLElement = this.priceFilter.renderInputRange('price');
     filtersContainer.append(pricesTitles);
+
     // фильтр по стоку
     this.stockFilter = new Filter(filtersContainer, 'Stock', this.updateActiveFilters);
     const stockTitles: HTMLElement = this.stockFilter.renderInputRange('stock');
@@ -85,20 +100,20 @@ export default class CardsField extends BaseComponent {
     rendered('option', this.selectInput, 'cards__sort-standart-value', 'Sort posters', {
       value: 'no-sort',
       disabled: '',
-      selected: '',
     });
-    rendered('option', this.selectInput, 'cards__sort-by-price-asc', 'Sort by price asc', {
+    const priceAsc = rendered('option', this.selectInput, 'cards__sort-by-price-asc', 'Sort by price asc', {
       value: 'price-asc',
     });
-    rendered('option', this.selectInput, 'cards__sort-by-price-desc', 'Sort by price desc', {
+    const priceDesc = rendered('option', this.selectInput, 'cards__sort-by-price-desc', 'Sort by price desc', {
       value: 'price-desc',
     });
-    rendered('option', this.selectInput, 'cards__sort-by-rating-asc', 'Sort by rating asc', {
+    const RatingAsc = rendered('option', this.selectInput, 'cards__sort-by-rating-asc', 'Sort by rating asc', {
       value: 'rating-asc',
     });
-    rendered('option', this.selectInput, 'cards__sort-by-rating-desc', 'Sort by rating desc', {
+    const RatingDesc = rendered('option', this.selectInput, 'cards__sort-by-rating-desc', 'Sort by rating desc', {
       value: 'rating-desc',
     });
+    const allOptions = [priceAsc, priceDesc, RatingAsc, RatingDesc];
     this.postersFound = rendered('div', sortWrapper, 'cards__found-count', `Found: ${cardsData.products.length}`);
     const searchInputWrapper = rendered('div', sortWrapper, 'cards__search-wrapper');
     const searchInput = rendered('input', searchInputWrapper, 'cards__search', '', {
@@ -108,18 +123,8 @@ export default class CardsField extends BaseComponent {
     });
     rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg' });
     const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
-    const viewFourProducts = rendered('img', viewTypes, 'cards__view-four', '', { src: 'assets/icons/block4.png' });
-    const viewTwoProducts = rendered('img', viewTypes, 'cards__view-two', '', { src: 'assets/icons/block2.png' });
-    viewTwoProducts.addEventListener('click', () => {
-      if (this.cardsContainer) this.cardsContainer.classList.add('change-type');
-      viewTwoProducts.classList.add('change-type');
-      viewFourProducts.classList.remove('change-type');
-    });
-    viewFourProducts.addEventListener('click', () => {
-      if (this.cardsContainer) this.cardsContainer.classList.remove('change-type');
-      viewFourProducts.classList.add('change-type');
-      viewTwoProducts.classList.remove('change-type');
-    });
+    this.viewFourProducts = rendered('img', viewTypes, 'cards__view-four', '', { src: 'assets/icons/block4.png' });
+    this.viewTwoProducts = rendered('img', viewTypes, 'cards__view-two', '', { src: 'assets/icons/block2.png' });
     this.notFoundText = rendered('p', this.cardsContainer, 'cards__not-found hidden', 'Product not found', {
       id: 'cards__not-found',
     });
@@ -143,6 +148,15 @@ export default class CardsField extends BaseComponent {
     this.selectInput.addEventListener('change', () => {
       if (this.selectInput instanceof HTMLSelectElement) {
         this.sortByField(this.cardsAll, this.selectInput.value);
+        setQueryParams('sorting', this.selectInput.value);
+        allOptions.forEach((option) => option.removeAttribute('selected'));
+        allOptions.forEach((option) => {
+          if (this.selectInput && this.selectInput instanceof HTMLSelectElement) {
+            if (option instanceof HTMLOptionElement && this.selectInput.value === option.value) {
+              option.setAttribute('selected', 'selected');
+            }
+          }
+        });
       }
       this.cardsAll.forEach((card) => {
         if (this.cardsContainer) {
@@ -150,15 +164,47 @@ export default class CardsField extends BaseComponent {
         }
       });
     });
+
+    // слушатель смены вида (по 4 или по 2 в ряду)
+    viewTypes.addEventListener('click', (e) => {
+      if (this.cardsContainer) {
+        this.changeViewOfProducts(e);
+      }
+    });
   }
 
-  // Функция апдейта активных фильтров. В фильтры цены и стока приходят значения
-  // в формате 'Price, 75, 125'. Проверяем есть ли значение, начинающееся на Price
-  // в массиве. Если нет - пушим, есть - заменяем.
+  //
+  public checkUrlInfo(): void {
+    const url = getUrl();
+    if (url) {
+      if (url.endsWith('/')) {
+        // желательно сменить проверку
+        this.render();
+      } else {
+        const params = url.slice(url.indexOf('?') + 1);
+        if (params.length > 0) {
+          const regex = /=|-/;
+          const splitedParams = params.split('&').map((elem) => elem.split(regex));
+          console.log(splitedParams);
+
+          /* splitedParams =>
+      ['category', 'Abstract', 'Urban']
+      ['size', '30x30']
+      ['price', '+64', '+125']
+      ['count', '+25', '+140']
+      ['view', 'four']
+      ['search', 'flower+dance'] если значение было введено на русском, декодировать через (decodeURI(value));
+      */
+        }
+      }
+    }
+  }
+
+  // Функция апдейта активных фильтров
   public updateActiveFilters = (filter: string): void => {
     const pushToActive = (array: string[], value: string): number => array.push(value);
+
     if (this.getFilterType(filter, 0) === FilterTypes.Price) {
-      // убрать повторы на рефакторинге
       const prevPrice = this.activeFilters.find((elem) => elem.startsWith(this.getFilterType(filter, 0)));
       const query = this.composeQueryString(filter);
       if (prevPrice !== undefined) {
@@ -179,33 +225,37 @@ export default class CardsField extends BaseComponent {
     } else if (this.getFilterType(filter, 0) === FilterTypes.Search) {
       const prevCount = this.activeFilters.find((elem) => elem.startsWith(this.getFilterType(filter, 0)));
       const query = this.composeQueryString(filter);
-      if (this.getFilterType(filter, 1) === ' ') {
+      if (this.getFilterType(filter, 1) === ' ' || this.getFilterType(filter, 1) === '') {
         this.activeFilters.splice(this.activeFilters.indexOf(filter));
+        deleteQueryParams(FilterTypes.Search.toLowerCase());
       } else if (prevCount !== undefined) {
         this.activeFilters.splice(this.activeFilters.indexOf(prevCount), 1, filter);
+        setQueryParams(FilterTypes.Search.toLowerCase(), query);
       } else {
         pushToActive(this.activeFilters, filter);
+        setQueryParams(FilterTypes.Search.toLowerCase(), query);
       }
-      setQueryParams(FilterTypes.Search.toLowerCase(), query);
     } else if (this.activeFilters.includes(filter)) {
       this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
       const queryType = this.checkFilter(filter);
       const prev = getQueryParams(queryType);
-
       if (prev !== null) {
-        console.log(prev.slice(prev.indexOf(filter)));
-        /* if (prev.includes(filter)) {
-          console.log(prev.slice(prev.indexOf(filter)));
-          // setQueryParams(queryType, `${prev}↕${filter}`);
+        if (prev.includes(filter)) {
+          if (prev.includes('-')) {
+            deleteOneQueryParam(queryType, filter);
+          } else {
+            deleteQueryParams(queryType);
+          }
+        } else {
+          setQueryParams(queryType, `${prev}-${filter}`);
         }
-        setQueryParams(queryType, `${prev}↕${filter}`); */
       }
     } else if (!this.activeFilters.includes(filter)) {
       pushToActive(this.activeFilters, filter);
       const queryType = this.checkFilter(filter);
       const prev = getQueryParams(queryType);
       if (prev !== null) {
-        setQueryParams(queryType, `${prev}↕${filter}`);
+        setQueryParams(queryType, `${prev}-${filter}`);
       } else {
         setQueryParams(queryType, filter);
       }
@@ -215,7 +265,7 @@ export default class CardsField extends BaseComponent {
 
   public composeQueryString(str: string): string {
     if (this.getFilterType(str, 0) !== FilterTypes.Search) {
-      return `${this.getFilterType(str, 1)}↕${this.getFilterType(str, 2)}`;
+      return `${this.getFilterType(str, 1)}-${this.getFilterType(str, 2)}`;
     }
     return `${this.getFilterType(str, 1).toLowerCase()}`;
   }
@@ -228,10 +278,6 @@ export default class CardsField extends BaseComponent {
     return res === true ? FilterTypes.Category.toLowerCase() : FilterTypes.Size.toLowerCase();
   }
 
-  /*  */
-  /*  */
-  /*  */
-  /*  */
   public addClassesForCards(activeFilters: string[], cards: Card[]): void {
     this.resetClasses(activeFilters, cards); // сбрасываем классы
     // eslint-disable-next-line arrow-body-style
@@ -287,11 +333,11 @@ export default class CardsField extends BaseComponent {
       });
     }
     this.setCountFrom(this.visibleCards);
-    this.setNewRange(this.visibleCards);
+    // this.setNewRange(this.visibleCards);
     this.changeFoundItemsCount();
   }
 
-  public setNewRange(data: Card[]): void {
+  /* public setNewRange(data: Card[]): void {
     if (data.length) {
       const [priceMin, priceMax] = this.getRange(data, 'price');
       const [stockMin, stockMax] = this.getRange(data, 'stock');
@@ -316,7 +362,7 @@ export default class CardsField extends BaseComponent {
         if (this.stockFilter.maxElement) this.stockFilter.maxElement.textContent = `${stockMax}`;
       }
     }
-  }
+  } */
 
   public getRange(data: Card[], type: string): number[] {
     const arrCopy = [...data];
@@ -333,9 +379,13 @@ export default class CardsField extends BaseComponent {
     if (filter && filter.allCountsFrom) {
       if (type === 'start') {
         filter.allCountsFrom.forEach((elem) => {
-          const temp = elem;
-          if (filter && filter.countTo) {
-            temp.textContent = `${filter.countTo.textContent}`;
+          if (filter.allCountsTo) {
+            filter.allCountsTo.forEach((initialEl) => {
+              const temp = elem;
+              if (initialEl.className === elem.className) {
+                temp.textContent = `${initialEl.textContent}`;
+              }
+            });
           }
         });
       } else if (type === 'remove') {
@@ -444,6 +494,24 @@ export default class CardsField extends BaseComponent {
     this.activeFilters = [];
     this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
+
+  public changeViewOfProducts(e: Event): void {
+    if (this.cardsContainer) {
+      if (this.viewFourProducts && this.viewTwoProducts) {
+        if (e.target && e.target instanceof HTMLElement && e.target.classList.contains('cards__view-four')) {
+          this.cardsContainer.classList.remove('change-type');
+          this.viewFourProducts.classList.add('change-type');
+          this.viewTwoProducts.classList.remove('change-type');
+          setQueryParams('view', SortTypes.ViewFour);
+        } else {
+          this.cardsContainer.classList.add('change-type');
+          this.viewTwoProducts.classList.add('change-type');
+          this.viewFourProducts.classList.remove('change-type');
+          setQueryParams('view', SortTypes.ViewTwo);
+        }
+      }
+    }
+  }
 
   /* функция обсервера, реагирующая на добавление карточек,
     чтобы сохранять добавленные товары в local storage */

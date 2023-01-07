@@ -19,6 +19,8 @@ export default class Filter {
 
   public allCountsFrom: HTMLElement[] | null = [];
 
+  public allCountsTo: HTMLElement[] | null = [];
+
   public minElement: HTMLElement | null = null;
 
   public maxElement: HTMLElement | null = null;
@@ -50,11 +52,11 @@ export default class Filter {
       rendered('label', inputWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${str}-${ind + 1}`,
       });
-      this.countFrom = rendered('span', inputWrapper, `${str}__out-from-${ind + 1}`, '1', {
+      this.countFrom = rendered('span', inputWrapper, `${str}__out-from-to-${ind + 1}`, '1', {
         id: `${item}`,
       });
       rendered('span', inputWrapper, `${str}__slash-${ind + 1}`, '/');
-      this.countTo = rendered('span', inputWrapper, `${str}__out-to-${ind + 1}`, '5');
+      this.countTo = rendered('span', inputWrapper, `${str}__out-from-to-${ind + 1}`, '5');
       this.setInitialCount(cardsData.products, str, item);
       if (this.allCountsFrom) this.allCountsFrom.push(this.countFrom);
       this.checkboxes.push(inputElement);
@@ -69,6 +71,7 @@ export default class Filter {
       if (field === type && name === key && this.countTo && this.countFrom) {
         this.countTo.textContent = `${count}`;
         this.countFrom.textContent = `${count}`;
+        if (this.allCountsTo) this.allCountsTo.push(this.countTo);
       }
     });
   }
