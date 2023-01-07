@@ -198,7 +198,7 @@ export default class Cart extends BaseComponent {
     this.buyNowButton.addEventListener('click', this.buyNowBtnCallback);
     // открываем модалку, если корзина открыта через product page
     if (this.isCheckout === true) {
-      this.openModalCheckout();
+      this.openModalCheckout(this.callback);
       this.isCheckout = false;
     }
   }
@@ -241,11 +241,11 @@ export default class Cart extends BaseComponent {
   // колбэк для кнопки покупки
   private buyNowBtnCallback = (e: Event): void => {
     e.preventDefault();
-    this.openModalCheckout();
+    this.openModalCheckout(this.callback);
   };
 
-  private openModalCheckout(): void {
-    const modal: ModalWindow = new ModalWindow(this.root);
+  private openModalCheckout(callback: Callback): void {
+    const modal: ModalWindow = new ModalWindow(this.root, callback);
     this.root.insertBefore(modal.element, this.header.element);
   }
 
