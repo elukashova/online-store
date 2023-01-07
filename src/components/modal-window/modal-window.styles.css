@@ -71,18 +71,19 @@
 
 .card-data__number-input-wrapper {
   width: 80%;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 13% 1fr;
 }
 
 .card-data__number-input {
+  width: 100%;
   margin: 0;
 }
 
 .card-data__expiration-input,
 .card-data__cvv-input {
   margin: 1rem 0 0.5rem;
-  width: 97%;
+  width: 100%;
 }
 
 .card-data__expiration-input {
@@ -93,11 +94,19 @@
   justify-self: end;
 }
 
-.card-data__data-cvv-wrapper,
-.card-data__data-cvv-label-wrapper {
+.card-data__data-cvv-wrapper {
   width: 80%;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 2%;
+}
+
+.card-data__data-wrapper,
+.card-data__cvv-wrapper,
+.card-data__card-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-data__data-cvv-label-wrapper {
@@ -130,7 +139,7 @@
 }
 
 .card-data__number-logo-wrapper {
-  width: 15%;
+  width: 100%;
 }
 
 .card-data__number-input-image {
