@@ -13,16 +13,13 @@
 .checkout-modal {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.5);
-  width: 30%;
-  height: 60%;
+  width: 40%;
+  height: 90%;
   opacity: 1;
   box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
 }
 
 .checkout__pers-data_wrapper,
@@ -34,12 +31,8 @@
   width: 100%;
 }
 
-.checkout__pers-data_wrapper {
-  height: 45%;
-}
-
-.checkout__card-data_wrapper {
-  height: 25%;
+.title {
+  margin: 1.3rem 0;
 }
 
 .pers-data__title,
@@ -48,18 +41,12 @@
   font-size: 1.3rem;
 }
 
-.pers-data__input-wrapper,
-.card-data__input-wrapper {
+.pers-data__input-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 80%;
   width: 100%;
-  justify-content: space-between;
-}
-
-.card-data__input-wrapper {
-  height: 65%;
+  /* justify-content: space-between; */
 }
 
 .input {
@@ -71,7 +58,7 @@
   text-align: center;
   line-height: 2rem;
   padding: 0;
-  margin: 0;
+  margin: 0.5rem;
 }
 
 .invalid {
@@ -82,10 +69,21 @@
   border: 2px solid #40e01f;
 }
 
-.card-data__expiration-input,
+.card-data__number-input-wrapper,
+.card-data__data-cvv-wrapper,
+.card-data__data-cvv-label-wrapper {
+  width: 80%;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.card-data__data-cvv-label-wrapper {
+  margin-bottom: 1rem;
+}
+/* .card-data__expiration-input,
 .card-data__cvv-input {
   width: 49%;
-}
+} */
 
 .pers-data__name-input::placeholder,
 .pers-data__phone-input::placeholder,
@@ -101,20 +99,48 @@
   opacity: 70%;
 }
 
-.card-data__input-details-wrapper {
+.label,
+.checkout__confirm-btn-text {
+  width: 95%;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #65635f93;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+}
+
+.card-data__number-input-image {
+  width: 15%;
+  height: 100%;
+}
+
+/* .card-data__input-details-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 80%;
-}
+} */
 
 .checkout__confirm-btn {
-  cursor: pointer;
-  background-color: #ff7d15;
+  background-color: #ff7e155d;
   color: #fff;
   font-size: 1rem;
   text-transform: uppercase;
   height: 2rem;
   width: 80%;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+}
+
+.checkout__confirm-btn.valid-btn {
+  background-color: #ff7d15;
+  cursor: pointer;
+}
+
+.checkout__confirm-btn-text {
+  display: inline-block;
+}
+
+.hidden {
+  display: none;
 }
