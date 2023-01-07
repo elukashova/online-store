@@ -1,18 +1,16 @@
-const enum FilterTypes {
+export enum FilterTypes {
   Category = 'Category',
   Size = 'Size',
   Price = 'Price',
   Count = 'Count',
-  Search = 'CateSearchgory',
+  Search = 'Search',
 }
 
-/* const enum CategoryTypes {
-  Abstract = 'Abstract',
-  Nature = 'Nature',
-  Characters = 'Characters',
-  Space = 'Space',
-  Urban = 'Urban',
-  Romantic = 'Romantic',
-} */
-
-export default FilterTypes;
+export enum SortTypes {
+  PriceAsc = 'price-asc',
+  PriceDesc = 'price-desc',
+  RatingAsc = 'rating-asc',
+  RatingDesc = 'rating-desc',
+  ViewFour = 'four',
+  ViewTwo = 'two',
+}
