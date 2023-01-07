@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import rendered from '../../utils/render/render';
 import BaseComponent from '../base-component/base-component';
-import { Callback } from '../shopping-cart/shopping-cart.types';
+import { Observer } from '../card/card.types';
 import './modal-window.styles.css';
 
 export default class ModalWindow extends BaseComponent {
@@ -33,7 +33,9 @@ export default class ModalWindow extends BaseComponent {
 
   private cardNumberLogo: HTMLElement | null = null;
 
-  constructor(private root: HTMLElement, private callback: Callback) {
+  private observers: Observer[] = [];
+
+  constructor(private root: HTMLElement) {
     super('div', 'checkout-modal-container');
     this.element.addEventListener('click', this.closeModalCallback);
     this.render();
@@ -113,7 +115,8 @@ export default class ModalWindow extends BaseComponent {
     this.cardNumberLogo = rendered('img', logoWrapper, 'card-data__number-input-image', '', {
       src: '../../../assets/icons/payment.png',
     });
-    this.cardNumberInput = rendered('input', cardNumberWrapper, 'card-data__number-input input', '', {
+    const cardWrapper: HTMLElement = rendered('div', cardNumberWrapper, 'card-data__card-wrapper');
+    this.cardNumberInput = rendered('input', cardWrapper, 'card-data__number-input input', '', {
       type: 'text',
       placeholder: 'Card number',
       id: 'card',
@@ -123,7 +126,7 @@ export default class ModalWindow extends BaseComponent {
     });
     const numberLabel = rendered(
       'label',
-      this.personalInfoForm,
+      cardWrapper,
       'pers-data__number-label label hidden',
       'Card number must be exactly 16 digits long',
       {
@@ -131,30 +134,27 @@ export default class ModalWindow extends BaseComponent {
       },
     );
     const dataAndCvvWrapper: HTMLElement = rendered('div', this.personalInfoForm, 'card-data__data-cvv-wrapper');
-    const dataAndCvvLabelWrapper: HTMLElement = rendered(
-      'div',
-      this.personalInfoForm,
-      'card-data__data-cvv-label-wrapper',
-    );
-    this.cardExpirationInput = rendered('input', dataAndCvvWrapper, 'card-data__expiration-input input', '', {
+    const dataWrapper: HTMLElement = rendered('div', dataAndCvvWrapper, 'card-data__data-wrapper');
+    const cvvWrapper: HTMLElement = rendered('div', dataAndCvvWrapper, 'card-data__cvv-wrapper');
+    this.cardExpirationInput = rendered('input', dataWrapper, 'card-data__expiration-input input', '', {
       type: 'text',
       placeholder: 'MM / YY',
       id: 'expiration',
       name: 'expiration',
       'max-length': '5',
-      'data-regex': '((0[1-9])|(1[0-2]))\\/((2[3-9])|(3[0-9]))',
+      'data-regex': '((0[1-9])|(1[0-2]))\\/((2[3-9])|(3[0-9])|(4[0-9])|(5[0-9])|(6[0-9])|(7[0-9])|(8[0-9])|(9[0-9]))',
       required: 'required',
     });
     const expirationLabel = rendered(
       'label',
-      dataAndCvvLabelWrapper,
+      dataWrapper,
       'pers-data__expiration-label label hidden',
       'Only 12 months, year from 23. For example, 12/25.',
       {
         for: 'expiration',
       },
     );
-    this.cardCVVInput = rendered('input', dataAndCvvWrapper, 'card-data__cvv-input input', '', {
+    this.cardCVVInput = rendered('input', cvvWrapper, 'card-data__cvv-input input', '', {
       type: 'text',
       placeholder: 'CVV',
       id: 'cvv',
@@ -163,15 +163,9 @@ export default class ModalWindow extends BaseComponent {
       'data-regex': '^[0-9]{3}$',
       required: 'required',
     });
-    const cvvLabel = rendered(
-      'label',
-      dataAndCvvLabelWrapper,
-      'pers-data__cvv-label label hidden',
-      '3 digits must be entered',
-      {
-        for: 'cvv',
-      },
-    );
+    const cvvLabel = rendered('label', cvvWrapper, 'pers-data__cvv-label label hidden', '3 digits must be entered', {
+      for: 'cvv',
+    });
     // eslint-disable-next-line max-len
     this.labelsAll = [cvvLabel, expirationLabel, numberLabel, nameLabel, phoneLabel, addressLabel, emailLabel];
 
@@ -217,10 +211,11 @@ export default class ModalWindow extends BaseComponent {
     });
   }
 
-  // временно отключила
   private closeModalCallback = (e: Event): void => {
     e.preventDefault();
-    /* this.root.removeChild(this.element); */
+    if (e.currentTarget === e.target) {
+      this.root.removeChild(this.element);
+    }
   };
 
   public inputHandler = (e: Event): void => {
@@ -315,16 +310,43 @@ export default class ModalWindow extends BaseComponent {
         if (e.target.getAttribute('data-valid') === 'invalid') {
           console.log('Давай по новой');
         } else {
-          this.exploreBtnCallback(e);
+          this.confirmBtnCallback(e);
           console.log('Переход в мейн');
         }
       }
     }
   }
 
-  private exploreBtnCallback = (e: Event): void => {
+  private confirmBtnCallback = (e: Event): void => {
     e.preventDefault();
-    window.history.pushState({}, '', '/');
-    this.callback(e);
+    this.root.removeChild(this.element);
+    this.notifyObserver(e);
   };
+
+  // три метода, нужные для обсервера
+  public attachObserver(observer: Observer): void {
+    const isExist = this.observers.includes(observer);
+    if (isExist) {
+      console.log('Subject: Observer has been attached already.');
+    }
+    // console.log('Subject: Attached an observer.');
+    this.observers.push(observer);
+  }
+
+  public removeObserver(observer: Observer): void {
+    const observerIndex = this.observers.indexOf(observer);
+    if (observerIndex === -1) {
+      console.log('Subject: Nonexistent observer.');
+    }
+
+    this.observers.splice(observerIndex, 1);
+    console.log('Subject: Detached an observer.');
+  }
+
+  public notifyObserver(e?: Event): void {
+    // console.log('Subject: Notifying observers...');
+    for (let i: number = 0; i < this.observers.length; i += 1) {
+      this.observers[i].update(this, e);
+    }
+  }
 }
