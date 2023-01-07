@@ -2,7 +2,7 @@ import './card.styles.css';
 import rendered from '../../utils/render/render';
 import { CardDataType, Observer } from './card.types';
 import BaseComponent from '../base-component/base-component';
-import { checkProductDataInLocalStorage } from '../../utils/localStorage';
+import { checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageType } from '../../utils/localStorage.types';
 
 export default class Card extends BaseComponent {
@@ -38,7 +38,7 @@ export default class Card extends BaseComponent {
 
   private wasAdded: boolean = false;
 
-  private readonly storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
 
   constructor(data: CardDataType, private callback: (event: Event) => void) {
     super('div', 'cards__item card');

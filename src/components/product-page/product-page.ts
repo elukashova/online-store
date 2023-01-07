@@ -2,7 +2,7 @@ import rendered from '../../utils/render/render';
 import BaseComponent from '../base-component/base-component';
 import cardsData from '../../assets/json/data';
 import './product-page.styles.css';
-import { checkProductDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
+import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
 import { PosterStorageType } from '../../utils/localStorage.types';
 import { Observer } from '../card/card.types';
 import { Callback } from '../shopping-cart/shopping-cart.types';
@@ -10,7 +10,7 @@ import { Callback } from '../shopping-cart/shopping-cart.types';
 export default class ProductPage extends BaseComponent {
   private observers: Observer[] = [];
 
-  private readonly storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
 
   private addedItems: PosterStorageType[] = [];
 

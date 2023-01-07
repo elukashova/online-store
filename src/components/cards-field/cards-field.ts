@@ -9,7 +9,7 @@ import Filter from '../filter/filter';
 import Header from '../header/header';
 import { ObservedSubject } from '../card/card.types';
 import findCountOfCurrentProducts from './utils/find.current.count';
-import { setDataToLocalStorage, checkProductDataInLocalStorage } from '../../utils/localStorage';
+import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageType } from '../../utils/localStorage.types';
 
 export default class CardsField extends BaseComponent {
@@ -39,7 +39,7 @@ export default class CardsField extends BaseComponent {
 
   public stockFilter: Filter | null = null;
 
-  private readonly storageInfo: PosterStorageType[] | null = checkProductDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
 
   constructor(public readonly header: Header, private callback: (event: Event) => void) {
     super('div', 'content__container');
