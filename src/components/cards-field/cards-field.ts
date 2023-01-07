@@ -115,7 +115,9 @@ export default class CardsField extends BaseComponent {
     rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg' });
     const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
 
-    const viewFourProducts = rendered('img', viewTypes, 'cards__view-four', '', { src: 'assets/icons/block4.png' });
+    const viewFourProducts = rendered('img', viewTypes, 'cards__view-four change-type', '', {
+      src: 'assets/icons/block4.png',
+    });
     const viewTwoProducts = rendered('img', viewTypes, 'cards__view-two', '', { src: 'assets/icons/block2.png' });
     viewTwoProducts.addEventListener('click', () => {
       if (this.cardsContainer) this.cardsContainer.classList.add('change-type');

@@ -68,13 +68,14 @@ export default class Card extends BaseComponent {
     const cardInfoWrapper: HTMLElement = rendered('div', cardInfo, 'card__info_wrapper');
     rendered('p', cardInfoWrapper, 'card__name', `${this.title}`);
     rendered('p', cardInfoWrapper, 'card__category', `${this.category}`);
-    rendered('p', cardInfoWrapper, 'card__rating', `Size: ${this.size}`);
+    rendered('p', cardInfoWrapper, 'card__size', `Size: ${this.size}`);
     rendered('p', cardInfoWrapper, 'card__stock', `Stock: ${this.stock}`);
     rendered('p', cardInfoWrapper, 'card__rating', `Rating: ${this.rating}`); // для тестов сортировки
     rendered('p', cardInfoWrapper, 'card__price', `$ ${this.price}`);
-    rendered('p', cardInfoWrapper, 'card__discount', `Discount: ${this.discountPercentage}%`);
     rendered('p', cardInfoWrapper, 'card__description', `${this.description.split('.')[0]}.`);
-    const buttonsWrapper: HTMLElement = rendered('div', cardInfo, 'card__btns');
+    const discountAndBtnsWrapper: HTMLElement = rendered('div', cardInfo, 'card__discount-btns-wrapper');
+    rendered('p', discountAndBtnsWrapper, 'card__discount', `Sale: ${this.discountPercentage}%`);
+    const buttonsWrapper: HTMLElement = rendered('div', discountAndBtnsWrapper, 'card__btns');
     const productPageBtn: HTMLElement = rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
       src: 'assets/icons/button-open-card.svg',
       id: `${this.id}`,

@@ -34,9 +34,10 @@ export default class Filter {
     rendered('legend', filterWrapper, `${str}__legend-1`, this.name);
     data.forEach((item, ind) => {
       const inputWrapper: HTMLElement = rendered('div', filterWrapper, `${str}__input-wrapper`);
+      const checkboxWrapper: HTMLElement = rendered('div', inputWrapper, `${str}__checkbox-wrapper`);
       const inputElement: HTMLElement = rendered(
         'input',
-        inputWrapper,
+        checkboxWrapper,
         `${str}__input-${ind + 1} ${item} ${str}-item`,
         '',
         {
@@ -47,14 +48,15 @@ export default class Filter {
       );
       inputElement.addEventListener('change', () => this.updateActiveFilters(item));
       // устанавливаем слушатель на инпут при создании и передаем в cardfields измененные чекбоксы
-      rendered('label', inputWrapper, `${str}__label-${ind + 1}`, `${item}`, {
+      rendered('label', checkboxWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${str}-${ind + 1}`,
       });
-      this.countFrom = rendered('span', inputWrapper, `${str}__out-from-${ind + 1}`, '1', {
+      const countWrapper: HTMLElement = rendered('div', inputWrapper, `${str}__count-wrapper`);
+      this.countFrom = rendered('span', countWrapper, `${str}__out-from-${ind + 1}`, '1', {
         id: `${item}`,
       });
-      rendered('span', inputWrapper, `${str}__slash-${ind + 1}`, '/');
-      this.countTo = rendered('span', inputWrapper, `${str}__out-to-${ind + 1}`, '5');
+      rendered('span', countWrapper, `${str}__slash-${ind + 1}`, '/');
+      this.countTo = rendered('span', countWrapper, `${str}__out-to-${ind + 1}`, '5');
       this.setInitialCount(cardsData.products, str, item);
       if (this.allCountsFrom) this.allCountsFrom.push(this.countFrom);
       this.checkboxes.push(inputElement);
