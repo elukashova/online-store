@@ -1,9 +1,9 @@
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import BaseComponent from '../base-component/base-component';
 import './404.styles.css';
 
 export default class Page404 extends BaseComponent {
-  constructor(private callback: (event: Event) => void) {
+  constructor() {
     super('div', 'page-not-found__container page-not-found');
     this.render();
   }

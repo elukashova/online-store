@@ -1,16 +1,18 @@
 .content__container {
   width: 90%;
   display: grid;
-  grid-template-columns: 20% 65%;
+  grid-template-columns: 16.5rem 78%;
   justify-content: center;
-  column-gap: 6em;
-  margin: 7.5em 3.5em 2.5em 3.5em;
+  column-gap: 2%;
+  margin: 1rem 5rem;
 }
 
 .filters__container {
   display: flex;
   flex-direction: column;
-  row-gap: 1.25rem;
+  row-gap: 2rem;
+  background-color: #e3e2e2;
+  padding: 1rem;
 }
 
 .filters__btns-wrapper {
@@ -35,20 +37,29 @@
 
 .cards__sort-products {
   cursor: pointer;
+  height: 1.5rem;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: #FF7D15;
+  width: 8.5rem;
 }
-/* .cards__sort-by-price {
-}
-.cards__sort-by-price {
-}
-.cards__sort-by-rating {
-}
+
 .cards__found-count {
-} */
+  font-weight: 300;
+  color: #65635F;
+  text-transform: uppercase;
+  width: 5rem;
+  text-align: center;
+}
+
 .cards__search-wrapper {
+  height: 2.5rem;
   display: flex;
   border-radius: 25px;
   padding: 10px;
   border: 1px solid #65635f80;
+  align-items: center;
+  width: 12rem;
 }
 
 .cards__search {
@@ -58,51 +69,57 @@
   word-wrap: break-word;
 }
 
+.cards__search::placeholder {
+  color: #FF7D15;
+  font-weight: 300;
+  text-transform: uppercase;
+}
+
 .cards__search-icon {
-  width: 25px;
+  height: 24px;
 }
 
 .cards__view-types {
   display: flex;
-  gap: 17%;
+  width: 4.5rem;
+  justify-content: space-between;
 }
 
 .cards__view-four {
   max-height: 30px;
   min-width: 30px;
   cursor: pointer;
+  opacity: 60%;
 }
 
 .cards__view-two {
   max-height: 29px;
   min-width: 29px;
   cursor: pointer;
+  opacity: 60%;
 }
 
 .cards__view-four.change-type,
 .cards__view-two.change-type {
   filter: brightness(0);
+  opacity: 100%;
 }
 
 .cards__container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 30px;
+  gap: 20px;
 }
 
 .cards__container.change-type {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 30px;
-}
-
-.cards__container.change-type .card__info {
-  width: 100%;
+  gap: 20px;
 }
 
 .cards__container.change-type .cards__item {
   display: grid;
-  grid-template-columns: 40% 50%;
+  grid-template-columns: 35% 62%;
   gap: 3%;
 }
 
@@ -115,10 +132,6 @@
   display: inline-block;
 }
 
-.cards__container.change-type .card__btn_open-card,
-.cards__container.change-type .card__btn_buy {
-  width: 40%;
-}
 
 .cards__not-found {
   grid-column: span 4;

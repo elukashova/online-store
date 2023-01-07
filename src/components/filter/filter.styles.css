@@ -1,15 +1,57 @@
-.filters__category {
+.filters__category,
+.filters__size {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+}
+
+.category__checkbox-wrapper,
+.size__checkbox-wrapper {
+  display: flex;
+  width: 50%;
+  gap: 0.5rem;
+}
+
+.category__count-wrapper,
+.size__count-wrapper {
+  display: flex;
+  gap: 0.3rem;
+  font-weight: 300;
+  color: #65635F;
+}
+
+.category__legend-1,
+.size__legend-1,
+.filters__price_legend,
+.filters__stock_legend {
+  font-size: 0.9em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: #FF7D15;
+  margin-bottom: 0.3rem;
 }
 
 .category__input-wrapper,
-.rating__input-wrapper {
+.size__input-wrapper {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.filters__price_wrapper,
+.filters__stock_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.price-value__from,
+.price-value__to,
+.stock-value__from,
+.stock-value__to {
+  font-weight: 300;
+  color: #65635F;
 }
 
 .filters__price_value-wrapper,

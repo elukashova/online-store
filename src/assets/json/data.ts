@@ -71,7 +71,7 @@ const posters = {
     },
     {
       id: 6,
-      title: 'Reflective Gandalf',
+      title: 'Reflective G.',
       description:
         'Solitary Gandalf basking in the breathtaking landscape. This piece of art was created for the real connoisseurs, able to appreciate its majesty and power.',
       price: 95,
@@ -231,7 +231,7 @@ const posters = {
     },
     {
       id: 18,
-      title: 'MarshmaLove Man',
+      title: 'MarshmaLove',
       description:
         'The Marshmallow Man as you have ever seen him. This funny artwork of will fill your day with pure enjoyment and relaxation, bringing a smile to your face.',
       price: 73,
@@ -349,7 +349,7 @@ const posters = {
       price: 86,
       discountPercentage: 19,
       rating: 4.91,
-      size: '40x40',
+      size: '50x50',
       stock: 2,
       category: 'Characters',
       images: [
@@ -416,7 +416,7 @@ const posters = {
     },
     {
       id: 31,
-      title: 'Promenade on Canvas',
+      title: 'Promenade',
       description:
         'Simple pleasures of life and small-town charm. This cozy artwork invites us to seek out the beauty and romance of the world around us.',
       price: 60,

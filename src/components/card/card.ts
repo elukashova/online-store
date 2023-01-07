@@ -1,9 +1,10 @@
 import './card.styles.css';
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import { CardDataType, Observer } from './card.types';
 import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageType } from '../../utils/localStorage.types';
+import { Callback } from '../shopping-cart/shopping-cart.types';
 
 export default class Card extends BaseComponent {
   public id: number;
@@ -40,7 +41,7 @@ export default class Card extends BaseComponent {
 
   private readonly storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
 
-  constructor(data: CardDataType, private callback: (event: Event) => void) {
+  constructor(data: CardDataType, private callback: Callback) {
     super('div', 'cards__item card');
     this.id = data.id;
     this.title = data.title;
@@ -67,13 +68,14 @@ export default class Card extends BaseComponent {
     const cardInfoWrapper: HTMLElement = rendered('div', cardInfo, 'card__info_wrapper');
     rendered('p', cardInfoWrapper, 'card__name', `${this.title}`);
     rendered('p', cardInfoWrapper, 'card__category', `${this.category}`);
-    rendered('p', cardInfoWrapper, 'card__rating', `Size: ${this.size}`);
+    rendered('p', cardInfoWrapper, 'card__size', `Size: ${this.size}`);
     rendered('p', cardInfoWrapper, 'card__stock', `Stock: ${this.stock}`);
     rendered('p', cardInfoWrapper, 'card__rating', `Rating: ${this.rating}`); // для тестов сортировки
     rendered('p', cardInfoWrapper, 'card__price', `$ ${this.price}`);
-    rendered('p', cardInfoWrapper, 'card__discount', `Discount: ${this.discountPercentage}%`);
     rendered('p', cardInfoWrapper, 'card__description', `${this.description.split('.')[0]}.`);
-    const buttonsWrapper: HTMLElement = rendered('div', cardInfo, 'card__btns');
+    const discountAndBtnsWrapper: HTMLElement = rendered('div', cardInfo, 'card__discount-btns-wrapper');
+    rendered('p', discountAndBtnsWrapper, 'card__discount', `Sale: ${this.discountPercentage}%`);
+    const buttonsWrapper: HTMLElement = rendered('div', discountAndBtnsWrapper, 'card__btns');
     const productPageBtn: HTMLElement = rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
       src: 'assets/icons/button-open-card.svg',
       id: `${this.id}`,
@@ -135,7 +137,6 @@ export default class Card extends BaseComponent {
     if (isExist) {
       console.log('Subject: Observer has been attached already.');
     }
-    // console.log('Subject: Attached an observer.');
     this.observers.push(observer);
   }
 
@@ -146,11 +147,9 @@ export default class Card extends BaseComponent {
     }
 
     this.observers.splice(observerIndex, 1);
-    console.log('Subject: Detached an observer.');
   }
 
   public notifyObserver(): void {
-    // console.log('Subject: Notifying observers...');
     for (let i: number = 0; i < this.observers.length; i += 1) {
       this.observers[i].update(this);
     }

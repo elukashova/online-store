@@ -1,4 +1,4 @@
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import BaseComponent from '../base-component/base-component';
 import cardsData from '../../assets/json/data';
 import './product-page.styles.css';
@@ -54,7 +54,6 @@ export default class ProductPage extends BaseComponent {
 
   public isCheckout: boolean = false;
 
-  // TODO: сюда надо будет передать данные из локал сторадж о том, добавлен ли товар в корзину
   constructor(id: number, private callback: Callback) {
     super('div', 'product__container product');
     cardsData.products.forEach((item) => {
@@ -179,7 +178,6 @@ export default class ProductPage extends BaseComponent {
         this.notifyObserver();
       }
       // переход в корзину
-      // TODO: еще нет модального окна оформления покупки
       window.history.pushState({}, '', '/cart');
       this.callback(e, this.isCheckout);
     }
@@ -253,7 +251,6 @@ export default class ProductPage extends BaseComponent {
     if (isExist) {
       console.log('Subject: Observer has been attached already.');
     }
-    // console.log('Subject: Attached an observer.');
     this.observers.push(observer);
   }
 
@@ -268,7 +265,6 @@ export default class ProductPage extends BaseComponent {
   }
 
   public notifyObserver(): void {
-    // console.log('Subject: Notifying observers...');
     for (let i: number = 0; i < this.observers.length; i += 1) {
       this.observers[i].update(this);
     }

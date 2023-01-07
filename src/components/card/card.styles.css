@@ -2,10 +2,12 @@
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  gap: 0.1rem;
 }
 
 .card__img {
-  max-width: 100%;
+  width: 100%;
   cursor: pointer;
 }
 
@@ -13,14 +15,61 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: aliceblue;
-  gap: 5%;
+  gap: 0.3rem;
+  padding: 0.3rem;
 }
 
 .card__info_wrapper {
   display: flex;
   flex-direction: column;
-  width: 72%;
+  width: 100%;
+  gap: 0.1rem;
+}
+
+.card__name {
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.card__category {
+  font-weight: 400;
+  color: #65635F;
+}
+
+.card__size {
+  margin-top: 2px;
+}
+
+.card__size,
+.card__stock,
+.card__rating {
+  font-size: 0.85rem;
+  color: #65635F;
+  font-weight: 300;
+}
+
+.card__rating {
+  margin-bottom: 2px;
+}
+
+.card__price {
+  font-weight: 500;
+}
+
+.card__discount-btns-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem;
+}
+
+.card__discount {
+  background-color: #FF7D15;
+  color: #FFF;
+  width: 6rem;
+  text-align: center;
+  line-height: 1.4rem;
+  border-radius: 8px;
 }
 
 .card__btns {
@@ -28,13 +77,13 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  width: 28%;
+  width: 4rem;
 }
 
 .card__btn_buy,
 .card__btn_open-card {
   cursor: pointer;
-  width: 45%;
+  width: 1.8rem;
 }
 
 .card__description {

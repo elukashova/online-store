@@ -1,8 +1,9 @@
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import { CardDataType, Observer } from '../card/card.types';
 import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageType } from '../../utils/localStorage.types';
+import { Callback } from './shopping-cart.types';
 
 export default class CartCard extends BaseComponent {
   private storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
@@ -51,7 +52,7 @@ export default class CartCard extends BaseComponent {
   public plus: boolean = false;
 
   // eslint-disable-next-line max-len
-  constructor(private data: CardDataType, private itemOrder: number, private callback: (event: Event) => void) {
+  constructor(private data: CardDataType, private itemOrder: number, private callback: Callback) {
     super('div', 'cart-items__item cart-item');
     this.id = this.data.id;
     this.title = this.data.title;
@@ -161,7 +162,6 @@ export default class CartCard extends BaseComponent {
     if (isExist) {
       console.log('Subject: Observer has been attached already.');
     }
-    // console.log('Subject: Attached an observer.');
     this.observers.push(observer);
   }
 
@@ -176,7 +176,6 @@ export default class CartCard extends BaseComponent {
   }
 
   public notifyObserver(): void {
-    // console.log('Subject: Notifying observers...');
     for (let i: number = 0; i < this.observers.length; i += 1) {
       this.observers[i].update(this);
     }

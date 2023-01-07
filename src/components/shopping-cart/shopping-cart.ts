@@ -2,7 +2,7 @@
 import './shopping-cart.styles.css';
 import cardsData from '../../assets/json/data';
 import BaseComponent from '../base-component/base-component';
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import CartCard from './card-cart';
 import Header from '../header/header';
 import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';

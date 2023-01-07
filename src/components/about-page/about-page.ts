@@ -1,5 +1,5 @@
 import './about-page.styles.css';
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import BaseComponent from '../base-component/base-component';
 import { Callback } from '../shopping-cart/shopping-cart.types';
 

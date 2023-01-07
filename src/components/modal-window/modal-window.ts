@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import BaseComponent from '../base-component/base-component';
 import { Observer } from '../card/card.types';
 import './modal-window.styles.css';
@@ -329,7 +329,6 @@ export default class ModalWindow extends BaseComponent {
     if (isExist) {
       console.log('Subject: Observer has been attached already.');
     }
-    // console.log('Subject: Attached an observer.');
     this.observers.push(observer);
   }
 
@@ -344,7 +343,6 @@ export default class ModalWindow extends BaseComponent {
   }
 
   public notifyObserver(e?: Event): void {
-    // console.log('Subject: Notifying observers...');
     for (let i: number = 0; i < this.observers.length; i += 1) {
       this.observers[i].update(this, e);
     }
