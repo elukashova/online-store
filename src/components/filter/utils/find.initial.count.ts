@@ -1,6 +1,5 @@
 import { CardDataType } from '../../card/card.types';
 
-// переписать
 function findCountOfProductsFromData(
   data: CardDataType[],
   field: string,

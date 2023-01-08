@@ -121,11 +121,11 @@ export default class Filter {
         if (e.target && e.target instanceof HTMLElement) {
           if (e.target.id === RangeTypes.PriceFrom) {
             this.changeLowInput(lowestInput, highestInput, RangeTypes.PriceFrom);
-            this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`price, ${lowestInput.value}, ${highestInput.value}`);
           }
           if (e.target.id === RangeTypes.StockFrom) {
             this.changeLowInput(lowestInput, highestInput, RangeTypes.StockFrom);
-            this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`count, ${lowestInput.value}, ${highestInput.value}`);
           }
         }
       });
@@ -133,11 +133,11 @@ export default class Filter {
         if (e.target && e.target instanceof HTMLElement) {
           if (e.target.id === RangeTypes.PriceTo) {
             this.changeHighInput(lowestInput, highestInput, RangeTypes.PriceTo);
-            this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`price, ${lowestInput.value}, ${highestInput.value}`);
           }
           if (e.target.id === RangeTypes.StockTo) {
             this.changeHighInput(lowestInput, highestInput, RangeTypes.StockTo);
-            this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`count, ${lowestInput.value}, ${highestInput.value}`);
           }
         }
       });
