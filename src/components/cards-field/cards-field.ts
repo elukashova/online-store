@@ -191,27 +191,10 @@ export default class CardsField extends BaseComponent {
       const splitedParams = decodedParams.split('&').map((elem) => elem.split(regex));
       this.splitParametersIntoTypes(splitedParams);
     } else {
-      if (this.categoryFilter) {
-        this.removeAllChecked(this.categoryFilter);
-      }
-      if (this.sizeFilter) {
-        this.removeAllChecked(this.sizeFilter);
-      }
-      this.changeViewOfProducts('remove');
-      if (this.allOptions) {
-        this.allOptions.forEach((option) => option.removeAttribute('selected'));
-        this.allOptions[0].setAttribute('selected', 'selected');
-      }
-      if (this.searchInput && this.searchInput instanceof HTMLInputElement) {
-        this.searchInput.value = '';
-      }
+      this.cardsAll = [];
+      this.element.replaceChildren();
+      this.render();
     }
-  }
-
-  public removeAllChecked(filterType: Filter): void {
-    filterType.checkboxes.forEach((filter) => {
-      filter.removeAttribute('checked');
-    });
   }
 
   // разбиваем параметры
@@ -480,7 +463,7 @@ export default class CardsField extends BaseComponent {
       }
     }
     this.setCountFrom(this.visibleCards);
-    // this.setNewRange(this.visibleCards);
+    this.setNewRange(this.visibleCards);
     this.changeFoundItemsCount();
   }
 
@@ -509,7 +492,7 @@ export default class CardsField extends BaseComponent {
     }
   }
 
-  /* public setNewRange(data: Card[]): void {
+  public setNewRange(data: Card[]): void {
     if (data.length) {
       const [priceMin, priceMax] = this.getRange(data, 'price');
       const [stockMin, stockMax] = this.getRange(data, 'stock');
@@ -534,7 +517,7 @@ export default class CardsField extends BaseComponent {
         if (this.stockFilter.maxElement) this.stockFilter.maxElement.textContent = `${stockMax}`;
       }
     }
-  } */
+  }
 
   public getRange(data: Card[], type: string): number[] {
     const arrCopy = [...data];
@@ -647,6 +630,7 @@ export default class CardsField extends BaseComponent {
     e.preventDefault();
     deleteAllQueryParams();
     this.activeFilters.length = 0;
+
     this.addClassesForCards(this.activeFilters, this.cardsAll);
     this.checkUrlInfo();
   };
