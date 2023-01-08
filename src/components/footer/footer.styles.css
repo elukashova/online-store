@@ -1,8 +1,6 @@
 .footer {
-  flex: 0 0 auto;
-  height: 15em;
+  height: 15rem;
   width: 100%;
-  margin-top: 1.5rem;
   background-color: rgb(255, 255, 255);
   display: flex;
   align-items: center;
@@ -10,16 +8,15 @@
   font-style: normal;
   font-weight: 400;
   color: #000000;
+  position: relative;
 }
 
 .footer__container {
   height: 100%;
-  width: 90%;
+  width: 100%;
   display: grid;
-  grid-template-columns: 70% 24.9rem;
-  grid-template-rows: 100%;
+  grid-template-columns: auto 24.9rem;
   align-items: center;
-  box-sizing: border-box;
   margin: 1rem 5rem;
 }
 
@@ -32,7 +29,6 @@
 
 .footer__image {
   width: 100%;
-  text-align: center;
 }
 
 .contacts-container__title {
@@ -50,6 +46,7 @@
   grid-template-columns: 15% 50% 30%;
   grid-template-rows: 20% 20% 20% 35%;
   align-content: flex-end;
+  row-gap: 2%;
 }
 
 .contacts-container__info-office,
@@ -73,13 +70,158 @@
   gap: 6%;
   align-items: flex-end;
   justify-content: flex-start;
+  align-items: center;
 }
 
-.contacts-container__github-logo,
+.contacts-container__github-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contacts-container__github-logo {
+  max-height: 35px;
+}
+
+.contacts-container__github-heart {
+  max-height: 12px;
+  z-index: 2;
+  transform: translateY(0.2rem);
+  animation:pulse .7s infinite;
+}
+
+@keyframes pulse {
+	10% {transform: scale(1.1)}
+}
+
+.contacts-container__github-icons-wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.contacts-container__github-first,
+.contacts-container__github-second {
+  transition: transform .3s;
+}
+
+.contacts-container__github-first {
+  transform: translateX(0.25rem);
+}
+
+.contacts-container__github-second {
+  transform: translateX(-0.25rem);
+}
+
+.contacts-container__github-first:hover {
+  transform: rotate(-15deg);
+}
+
+.contacts-container__github-second:hover {
+  transform: rotate(15deg);
+}
+
 .contacts-container__rsschool {
   max-height: 30px;
+  padding-top: 0.5%;
+  transition: transform .3s;
+}
+
+.contacts-container__rsschool:hover {
+  transform: scale(1.05) rotate(3deg);
 }
 
 .contacts-container__year {
-  font-size: 0.8em;
+  padding-top: 1%;
+  font-size: calc(.1em + 0.7vw);
+}
+
+@media screen and (max-width: 1000px) {
+  .footer__container {
+    grid-template-columns: auto 20rem;
+  }
+
+  .footer__container {
+    height: 90%;
+  }
+
+  .contacts-container__title {
+    font-size: calc(.8em + 1vw);
+  }
+
+  .contacts-container__info-office,
+  .contacts-container__info-phone,
+  .contacts-container__info-email {
+    font-size: calc(.3em + 1vw);
+  }
+
+  .contacts-container__info-address,
+  .contacts-container__info-phone-number,
+  .contacts-container__info-email-address {
+    font-size: calc(.25em + 1vw);
+  }
+  
+}
+
+@media screen and (max-width: 1200px) {
+
+  .footer__container {
+    grid-template-columns: auto 30%;
+  }
+}
+  
+
+@media screen and (max-width: 1000px) {
+  .footer {
+    height: 13rem;
+  }
+
+  .footer__container {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .footer__container {
+    height: 100%;
+  }
+
+  .contacts-container__title {
+    font-size: calc(.7em + 1vw);
+  }
+
+  .contacts-container__github-logo {
+    max-height: 30px;
+  }
+  
+}
+
+@media screen and (max-width: 780px) {
+  .footer {
+    height: 13rem;
+  }
+
+  .footer__contacts-container {
+    width: 100%;
+  }
+
+  .contacts-container__title {
+    font-size: calc(.5em + 1vw);
+  }
+
+  .contacts-container__github-logo {
+    max-height: 25px;
+  }
+
+  .contacts-container__rsschool {
+    max-height: 25px;
+    padding-top: 1.5%;
+  }
+  
+  .contacts-container__year {
+    font-size: calc(.3em + 0.7vw);
+    padding-top: 4%;
+  }
+
+  .footer__contacts-container {
+    height: 70%;
+  }
 }

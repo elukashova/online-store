@@ -68,7 +68,8 @@ export default class CardsField extends BaseComponent {
     const buttonsContainer: HTMLElement = rendered('div', filtersContainer, 'filters__btns-wrapper');
     const reset = rendered('button', buttonsContainer, 'filters__btn-reset', 'Reset filters');
     reset.addEventListener('click', this.resetFilters);
-    rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
+    const copyLink: HTMLElement = rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
+    copyLink.addEventListener('click', this.copyLink);
 
     // фильтр по категории
     this.categoryFilter = new Filter(filtersContainer, 'Category', this.updateActiveFilters);
@@ -126,7 +127,7 @@ export default class CardsField extends BaseComponent {
     });
     rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg' });
     const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
-    this.viewFourProducts = rendered('img', viewTypes, 'cards__view-four', '', {
+    this.viewFourProducts = rendered('img', viewTypes, 'cards__view-four change-type', '', {
       src: 'assets/icons/block4.png',
       id: 'four',
     });
@@ -199,7 +200,6 @@ export default class CardsField extends BaseComponent {
     };
     params.forEach((elem) => {
       elem.forEach((item) => item.split(','));
-      console.log(elem);
       const type = splitParameters(elem, 0);
       if (type === QueryParameters.View) {
         this.changeViewOfProducts(splitParameters(elem, 1));
@@ -594,6 +594,23 @@ export default class CardsField extends BaseComponent {
     this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
 
+  // копирование текущей ссылки
+  private copyLink = (e: Event): void => {
+    e.preventDefault();
+    if (e.target && e.target instanceof HTMLButtonElement) {
+      e.target.textContent = 'Link copied!';
+      e.target.style.color = '#FF7D15';
+      const url: string = window.location.href;
+      navigator.clipboard.writeText(url);
+      setTimeout(() => {
+        if (e.target && e.target instanceof HTMLButtonElement) {
+          e.target.textContent = 'Copy link';
+          e.target.style.color = '#65635f';
+        }
+      }, 1000);
+    }
+  };
+
   /* функция обсервера, реагирующая на добавление карточек,
     чтобы сохранять добавленные товары в local storage */
   public update(subject: ObservedSubject): void {
@@ -606,6 +623,7 @@ export default class CardsField extends BaseComponent {
       info.quantity += 1;
       this.addedItems.push(info);
       setDataToLocalStorage(this.addedItems, 'addedPosters');
+      console.log(this.addedItems);
     }
 
     if (subject instanceof Card && !subject.element.classList.contains('added')) {

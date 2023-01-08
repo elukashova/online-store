@@ -59,7 +59,8 @@ export default class Card extends BaseComponent {
   // eslint-disable-next-line max-lines-per-function
   public render(): void {
     this.element.classList.add(`${this.category}`);
-    const cardImg: HTMLElement = rendered('img', this.element, 'card__img', '', {
+    const cardImg: HTMLElement = rendered('figure', this.element, 'card__img-holder');
+    rendered('img', cardImg, 'card__img', '', {
       src: this.images[0],
       id: `img${this.id}`,
     });

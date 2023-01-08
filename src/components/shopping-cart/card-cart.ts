@@ -138,10 +138,13 @@ export default class CartCard extends BaseComponent {
         this.itemAmountElement.textContent = `${this.itemAmount}`;
       }
       this.notifyObserver();
+      if (this.plusBtn && this.plusBtn.classList.contains('disabled')) {
+        this.plusBtn.classList.remove('disabled');
+      }
     }
   };
 
-  private plusBtnCallback = (): void => {
+  private plusBtnCallback = (e: Event): void => {
     this.plus = true;
     this.minus = false;
     // невозможность добавить больше, чем есть на стоке
@@ -153,6 +156,9 @@ export default class CartCard extends BaseComponent {
         this.itemAmountElement.textContent = `${this.itemAmount}`;
       }
       this.notifyObserver();
+      if (this.itemAmount === this.stock && e.target instanceof HTMLElement) {
+        e.target.classList.add('disabled');
+      }
     }
   };
 

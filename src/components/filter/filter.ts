@@ -53,11 +53,12 @@ export default class Filter {
       rendered('label', checkboxWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${str}-${ind + 1}`,
       });
-      this.countFrom = rendered('span', inputWrapper, `${str}__out-from-to-${ind + 1}`, '1', {
+      const countWrapper: HTMLElement = rendered('div', inputWrapper, `${str}__count-wrapper`);
+      this.countFrom = rendered('span', countWrapper, `${str}__out-from-to-${ind + 1}`, '1', {
         id: `${item}`,
       });
-      rendered('span', inputWrapper, `${str}__slash-${ind + 1}`, '/');
-      this.countTo = rendered('span', inputWrapper, `${str}__out-from-to-${ind + 1}`, '5');
+      rendered('span', countWrapper, `${str}__slash-${ind + 1}`, '/');
+      this.countTo = rendered('span', countWrapper, `${str}__out-from-to-${ind + 1}`, '5');
       this.setInitialCount(cardsData.products, str, item);
       if (this.allCountsFrom) this.allCountsFrom.push(this.countFrom);
       this.checkboxes.push(inputElement);

@@ -125,7 +125,6 @@ export default class ModalWindow extends BaseComponent {
       required: 'required',
       maxlength: '16',
     });
-    console.log(this.cardNumberInput);
     const numberLabel = rendered(
       'label',
       cardWrapper,
@@ -147,6 +146,7 @@ export default class ModalWindow extends BaseComponent {
       required: 'required',
       maxlength: '5',
     });
+    this.cardExpirationInput.addEventListener('keydown', this.autoSlashForDate);
     this.cardExpirationInput.addEventListener('keyup', this.autoSlashForDate);
     const expirationLabel = rendered(
       'label',
@@ -252,10 +252,11 @@ export default class ModalWindow extends BaseComponent {
     this.checkAllIsValid(this.validInputs, this.inputsAll);
   }
 
-  public autoSlashForDate(e: Event): void {
+  public autoSlashForDate(e: KeyboardEvent): void {
     if (e.target && e.target instanceof HTMLInputElement) {
       const inputValue = e.target.value;
-      if (inputValue.length === 2) {
+      const { key } = e;
+      if (inputValue.length === 2 && key !== 'Backspace') {
         e.target.value = `${inputValue}/`;
       }
     }
