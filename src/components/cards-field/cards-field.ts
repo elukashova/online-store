@@ -68,7 +68,8 @@ export default class CardsField extends BaseComponent {
     const buttonsContainer: HTMLElement = rendered('div', filtersContainer, 'filters__btns-wrapper');
     const reset = rendered('button', buttonsContainer, 'filters__btn-reset', 'Reset filters');
     reset.addEventListener('click', this.resetFilters);
-    rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
+    const copyLink: HTMLElement = rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
+    copyLink.addEventListener('click', this.copyLink);
 
     // фильтр по категории
     this.categoryFilter = new Filter(filtersContainer, 'Category', this.updateActiveFilters);
@@ -199,7 +200,6 @@ export default class CardsField extends BaseComponent {
     };
     params.forEach((elem) => {
       elem.forEach((item) => item.split(','));
-      console.log(elem);
       const type = splitParameters(elem, 0);
       if (type === QueryParameters.View) {
         this.changeViewOfProducts(splitParameters(elem, 1));
@@ -592,6 +592,23 @@ export default class CardsField extends BaseComponent {
   public resetFilters = (): void => {
     this.activeFilters = [];
     this.addClassesForCards(this.activeFilters, this.cardsAll);
+  };
+
+  // копирование текущей ссылки
+  private copyLink = (e: Event): void => {
+    e.preventDefault();
+    if (e.target && e.target instanceof HTMLButtonElement) {
+      e.target.textContent = 'Link copied!';
+      e.target.style.color = '#FF7D15';
+      const url: string = window.location.href;
+      navigator.clipboard.writeText(url);
+      setTimeout(() => {
+        if (e.target && e.target instanceof HTMLButtonElement) {
+          e.target.textContent = 'Copy link';
+          e.target.style.color = '#65635f';
+        }
+      }, 1000);
+    }
   };
 
   /* функция обсервера, реагирующая на добавление карточек,
