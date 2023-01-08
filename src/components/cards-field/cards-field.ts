@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
 import './cards-field.styles.css';
@@ -19,7 +20,7 @@ import {
   getUrl,
   setQueryParams,
 } from '../../utils/queryParams';
-import { FilterTypes, SortTypes } from './enums.cards-field';
+import { FilterTypes, QueryParameters, SortTypes } from './enums.cards-field';
 
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = []; // все карточки
@@ -29,6 +30,8 @@ export default class CardsField extends BaseComponent {
   public visibleCards: Card[] = []; // текущие видимые карточки (для сортировки)
 
   public addedItems: PosterStorageType[] = []; // для сохранения id добавленных товаров в local storage
+
+  public allOptions: HTMLElement[] | null = null;
 
   public cardsContainer: HTMLElement | null = null;
 
@@ -113,7 +116,7 @@ export default class CardsField extends BaseComponent {
     const RatingDesc = rendered('option', this.selectInput, 'cards__sort-by-rating-desc', 'Sort by rating desc', {
       value: 'rating-desc',
     });
-    const allOptions = [priceAsc, priceDesc, RatingAsc, RatingDesc];
+    this.allOptions = [priceAsc, priceDesc, RatingAsc, RatingDesc];
     this.postersFound = rendered('div', sortWrapper, 'cards__found-count', `Found: ${cardsData.products.length}`);
     const searchInputWrapper = rendered('div', sortWrapper, 'cards__search-wrapper');
     const searchInput = rendered('input', searchInputWrapper, 'cards__search', '', {
@@ -123,8 +126,14 @@ export default class CardsField extends BaseComponent {
     });
     rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg' });
     const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
-    this.viewFourProducts = rendered('img', viewTypes, 'cards__view-four', '', { src: 'assets/icons/block4.png' });
-    this.viewTwoProducts = rendered('img', viewTypes, 'cards__view-two', '', { src: 'assets/icons/block2.png' });
+    this.viewFourProducts = rendered('img', viewTypes, 'cards__view-four', '', {
+      src: 'assets/icons/block4.png',
+      id: 'four',
+    });
+    this.viewTwoProducts = rendered('img', viewTypes, 'cards__view-two', '', {
+      src: 'assets/icons/block2.png',
+      id: 'two',
+    });
     this.notFoundText = rendered('p', this.cardsContainer, 'cards__not-found hidden', 'Product not found', {
       id: 'cards__not-found',
     });
@@ -146,47 +155,33 @@ export default class CardsField extends BaseComponent {
 
     // слушатель для сортировки
     this.selectInput.addEventListener('change', () => {
-      if (this.selectInput instanceof HTMLSelectElement) {
-        this.sortByField(this.cardsAll, this.selectInput.value);
-        setQueryParams('sorting', this.selectInput.value);
-        allOptions.forEach((option) => option.removeAttribute('selected'));
-        allOptions.forEach((option) => {
-          if (this.selectInput && this.selectInput instanceof HTMLSelectElement) {
-            if (option instanceof HTMLOptionElement && this.selectInput.value === option.value) {
-              option.setAttribute('selected', 'selected');
-            }
-          }
-        });
+      if (this.cardsContainer && this.selectInput) {
+        this.startSorting(this.selectInput);
       }
-      this.cardsAll.forEach((card) => {
-        if (this.cardsContainer) {
-          this.cardsContainer.append(card.element);
-        }
-      });
     });
 
-    // слушатель смены вида (по 4 или по 2 в ряду)
+    // слушатель смены вида
     viewTypes.addEventListener('click', (e) => {
       if (this.cardsContainer) {
-        this.changeViewOfProducts(e);
+        this.checkView(e);
       }
     });
   }
 
-  //
+  // Проверяем есть ли данные в query параметрах
   public checkUrlInfo(): void {
     const url = getUrl();
     if (url) {
       if (url.endsWith('/')) {
-        // желательно сменить проверку
+        // желательно сменить проверку, эта ненадежная
         this.render();
       } else {
+        this.render();
         const params = url.slice(url.indexOf('?') + 1);
         if (params.length > 0) {
-          const regex = /=|-/;
+          const regex = /=|%/;
           const splitedParams = params.split('&').map((elem) => elem.split(regex));
-          console.log(splitedParams);
-
+          this.splitParametersIntoTypes(splitedParams);
           /* splitedParams =>
       ['category', 'Abstract', 'Urban']
       ['size', '30x30']
@@ -195,9 +190,105 @@ export default class CardsField extends BaseComponent {
       ['view', 'four']
       ['search', 'flower+dance'] если значение было введено на русском, декодировать через (decodeURI(value));
       */
+          /* ['Abstract', 'Nature', 'Characters', '50x50', '40x40', '30x30', 'Urban', 'Space', 'Romantic'] */
         }
       }
     }
+  }
+
+  // разбиваем параметры и вызываем нужные фильтры и сортировки
+  public splitParametersIntoTypes = (params: string[][]): void => {
+    const splitParameters = (value: string[], index: number): string => value[index];
+    const updateFilters = (parameters: string[]): void => {
+      const values = parameters.splice(1);
+      if (values.length) {
+        values.forEach((value) => this.activeFilters.push(value));
+      }
+    };
+    params.forEach((elem) => {
+      elem.forEach((item) => item.split(','));
+      console.log(elem);
+      const type = splitParameters(elem, 0);
+      if (type === QueryParameters.View) {
+        this.changeViewOfProducts(splitParameters(elem, 1));
+      } else if (type === QueryParameters.Sorting) {
+        this.sortCards(splitParameters(elem, 1));
+      } else {
+        // если фильтры то обновляем  this.activeFilters
+        if (type === QueryParameters.Category) {
+          updateFilters(elem);
+        }
+        if (type === QueryParameters.Size) {
+          updateFilters(elem);
+        }
+        /* if (type === QueryParameters.Price) {
+          updateFilters(elem);
+        }
+        if (type === QueryParameters.Count) {
+          updateFilters(elem);
+        }
+        if (type === QueryParameters.Search) {
+          updateFilters(elem);
+        } */
+        // console.log(this.activeFilters);
+      }
+    });
+  };
+
+  public checkView(e: Event): void {
+    if (e.target && e.target instanceof HTMLElement) {
+      if (e.target.classList.contains('cards__view-four')) {
+        this.changeViewOfProducts('four');
+      } else {
+        this.changeViewOfProducts('two');
+      }
+    }
+  }
+
+  public changeViewOfProducts(str: string): void {
+    if (this.cardsContainer && this.cardsContainer instanceof HTMLElement) {
+      if (this.viewFourProducts && this.viewTwoProducts) {
+        if (str === this.viewFourProducts.id) {
+          this.cardsContainer.classList.remove('change-type');
+          this.viewFourProducts.classList.add('change-type');
+          this.viewTwoProducts.classList.remove('change-type');
+          setQueryParams('view', SortTypes.ViewFour);
+        } else {
+          this.cardsContainer.classList.add('change-type');
+          this.viewTwoProducts.classList.add('change-type');
+          this.viewFourProducts.classList.remove('change-type');
+          setQueryParams('view', SortTypes.ViewTwo);
+        }
+      }
+    }
+  }
+
+  public startSorting(select: HTMLElement): void {
+    if (select instanceof HTMLSelectElement) {
+      this.sortCards(select.value);
+    }
+  }
+
+  public sortCards(str: string): void {
+    if (this.selectInput instanceof HTMLSelectElement) {
+      this.sortByField(this.cardsAll, str);
+      setQueryParams('sorting', str);
+      if (this.allOptions) {
+        this.allOptions.forEach((option) => option.removeAttribute('selected'));
+        this.allOptions.forEach((option) => {
+          if (this.selectInput && this.selectInput instanceof HTMLSelectElement) {
+            if (option instanceof HTMLOptionElement && str === option.value) {
+              option.setAttribute('selected', 'selected');
+            }
+          }
+        });
+      }
+    }
+    this.cardsAll.forEach((card) => {
+      if (this.cardsContainer) {
+        this.cardsContainer.append(card.element);
+      }
+    });
   }
 
   // Функция апдейта активных фильтров
@@ -241,13 +332,13 @@ export default class CardsField extends BaseComponent {
       const prev = getQueryParams(queryType);
       if (prev !== null) {
         if (prev.includes(filter)) {
-          if (prev.includes('-')) {
+          if (prev.includes('%')) {
             deleteOneQueryParam(queryType, filter);
           } else {
             deleteQueryParams(queryType);
           }
         } else {
-          setQueryParams(queryType, `${prev}-${filter}`);
+          setQueryParams(queryType, `${prev}%${filter}`);
         }
       }
     } else if (!this.activeFilters.includes(filter)) {
@@ -255,7 +346,7 @@ export default class CardsField extends BaseComponent {
       const queryType = this.checkFilter(filter);
       const prev = getQueryParams(queryType);
       if (prev !== null) {
-        setQueryParams(queryType, `${prev}-${filter}`);
+        setQueryParams(queryType, `${prev}%${filter}`);
       } else {
         setQueryParams(queryType, filter);
       }
@@ -265,7 +356,7 @@ export default class CardsField extends BaseComponent {
 
   public composeQueryString(str: string): string {
     if (this.getFilterType(str, 0) !== FilterTypes.Search) {
-      return `${this.getFilterType(str, 1)}-${this.getFilterType(str, 2)}`;
+      return `${this.getFilterType(str, 1)}%${this.getFilterType(str, 2)}`;
     }
     return `${this.getFilterType(str, 1).toLowerCase()}`;
   }
@@ -309,7 +400,6 @@ export default class CardsField extends BaseComponent {
     } else {
       this.visibleCards.length = 0;
     }
-
     if (this.visibleCards.length === 0 && this.activeFilters.length !== 0) {
       if (this.notFoundText) {
         this.notFoundText.classList.remove('hidden');
@@ -494,24 +584,6 @@ export default class CardsField extends BaseComponent {
     this.activeFilters = [];
     this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
-
-  public changeViewOfProducts(e: Event): void {
-    if (this.cardsContainer) {
-      if (this.viewFourProducts && this.viewTwoProducts) {
-        if (e.target && e.target instanceof HTMLElement && e.target.classList.contains('cards__view-four')) {
-          this.cardsContainer.classList.remove('change-type');
-          this.viewFourProducts.classList.add('change-type');
-          this.viewTwoProducts.classList.remove('change-type');
-          setQueryParams('view', SortTypes.ViewFour);
-        } else {
-          this.cardsContainer.classList.add('change-type');
-          this.viewTwoProducts.classList.add('change-type');
-          this.viewFourProducts.classList.remove('change-type');
-          setQueryParams('view', SortTypes.ViewTwo);
-        }
-      }
-    }
-  }
 
   /* функция обсервера, реагирующая на добавление карточек,
     чтобы сохранять добавленные товары в local storage */

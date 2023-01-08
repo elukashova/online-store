@@ -15,7 +15,6 @@ export const getQueryParams = (key: string): string | null => {
 
 export const getUrl = (): string | null => {
   const currentUrl = window.location.href;
-  console.log(currentUrl);
   return currentUrl;
 };
 
@@ -30,9 +29,9 @@ export const deleteQueryParams = (key: string): void => {
 // функция удаления одного параметра
 export const deleteOneQueryParam = (key: string, value: string): void => {
   const searchParams = new URLSearchParams(window.location.search);
-  const success = searchParams.getAll(key).toString().split('-');
+  const success = searchParams.getAll(key).toString().split('%');
   success.splice(success.indexOf(value), 1);
-  const res = success.join('-').toString();
+  const res = success.join('%').toString();
   searchParams.set(key, res);
   const newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
   window.history.pushState(null, '', newRelativePathQuery);
