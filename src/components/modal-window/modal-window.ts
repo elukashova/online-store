@@ -125,7 +125,6 @@ export default class ModalWindow extends BaseComponent {
       required: 'required',
       maxlength: '16',
     });
-    console.log(this.cardNumberInput);
     const numberLabel = rendered(
       'label',
       cardWrapper,
