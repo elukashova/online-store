@@ -1,6 +1,6 @@
 import './footer.styles.css';
 import BaseComponent from '../base-component/base-component';
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 
 export default class Footer extends BaseComponent {
   constructor() {
@@ -11,7 +11,7 @@ export default class Footer extends BaseComponent {
   public render(): void {
     const container: HTMLElement = rendered('div', this.element, 'footer__container');
     const contactsContainer: HTMLElement = rendered('div', container, 'footer__contacts-container contacts-container');
-    rendered('img', container, 'footer__image', '', { src: 'assets/images/footer_bg.png' });
+    rendered('img', container, 'footer__image', '', { src: 'assets/images/footer_bg.jpg' });
     rendered('p', contactsContainer, 'contacts-container__title', 'Have some questions?\nContact us');
     const contactsInfo: HTMLElement = rendered('div', contactsContainer, 'contacts-container__info');
     rendered('p', contactsInfo, 'contacts-container__info-office', 'Office ');

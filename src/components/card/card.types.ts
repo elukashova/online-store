@@ -18,5 +18,5 @@ export interface ObservedSubject {
 }
 
 export interface Observer {
-  update(subject: ObservedSubject): void;
+  update(subject: ObservedSubject, e?: Event): void;
 }

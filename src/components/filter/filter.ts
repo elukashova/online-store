@@ -1,5 +1,5 @@
 import './filter.styles.css';
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import cardsData from '../../assets/json/data';
 import findMinAndMax from './utils/find.minmax';
 import RangeTypes from './enums.filter';
@@ -36,9 +36,10 @@ export default class Filter {
     rendered('legend', filterWrapper, `${str}__legend-1`, this.name);
     data.forEach((item, ind) => {
       const inputWrapper: HTMLElement = rendered('div', filterWrapper, `${str}__input-wrapper`);
+      const checkboxWrapper: HTMLElement = rendered('div', inputWrapper, `${str}__checkbox-wrapper`);
       const inputElement: HTMLElement = rendered(
         'input',
-        inputWrapper,
+        checkboxWrapper,
         `${str}__input-${ind + 1} ${item} ${str}-item`,
         '',
         {
@@ -49,7 +50,7 @@ export default class Filter {
       );
       inputElement.addEventListener('change', () => this.updateActiveFilters(item));
       // устанавливаем слушатель на инпут при создании и передаем в cardfields измененные чекбоксы
-      rendered('label', inputWrapper, `${str}__label-${ind + 1}`, `${item}`, {
+      rendered('label', checkboxWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${str}-${ind + 1}`,
       });
       this.countFrom = rendered('span', inputWrapper, `${str}__out-from-to-${ind + 1}`, '1', {

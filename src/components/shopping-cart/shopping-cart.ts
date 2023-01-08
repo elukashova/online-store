@@ -2,7 +2,7 @@
 import './shopping-cart.styles.css';
 import cardsData from '../../assets/json/data';
 import BaseComponent from '../base-component/base-component';
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import CartCard from './card-cart';
 import Header from '../header/header';
 import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
@@ -195,7 +195,7 @@ export default class Cart extends BaseComponent {
     this.buyNowButton.addEventListener('click', this.buyNowBtnCallback);
     // открываем модалку, если корзина открыта через product page
     if (this.isCheckout === true) {
-      this.openModalCheckout(this.callback);
+      this.openModalCheckout();
       this.isCheckout = false;
     }
   }
@@ -223,11 +223,13 @@ export default class Cart extends BaseComponent {
   // колбэк для кнопки покупки
   private buyNowBtnCallback = (e: Event): void => {
     e.preventDefault();
-    this.openModalCheckout(this.callback);
+    this.openModalCheckout();
   };
 
-  private openModalCheckout(callback: Callback): void {
-    const modal: ModalWindow = new ModalWindow(this.root, callback);
+  private openModalCheckout(): void {
+    const modal: ModalWindow = new ModalWindow(this.root);
+    modal.attachObserver(this.header);
+    modal.attachObserver(this);
     this.root.insertBefore(modal.element, this.header.element);
   }
 
@@ -600,7 +602,7 @@ export default class Cart extends BaseComponent {
   }
 
   // функция обсервера
-  public update(subject: ObservedSubject): void {
+  public update(subject: ObservedSubject, e?: Event): void {
     if (subject instanceof CartCard) {
       if (subject.plus === true && subject.itemAmount <= subject.stock) {
         this.totalPrice += subject.price;
@@ -627,6 +629,14 @@ export default class Cart extends BaseComponent {
         this.checkIfZero(subject);
       }
     }
+    if (subject instanceof ModalWindow) {
+      if (e) {
+        this.showThankYouMessage(e);
+      }
+      this.cartContainer?.remove();
+      this.summaryContainer?.remove();
+      localStorage.removeItem('addedPosters');
+    }
   }
 
   private updateSummaryContent(): void {
@@ -641,6 +651,28 @@ export default class Cart extends BaseComponent {
       this.afterPromoPrice = this.calculateNewPrice();
       this.newPriceElement.textContent = `$ ${this.afterPromoPrice.toLocaleString('en-US')}`;
     }
+  }
+
+  private showThankYouMessage(e: Event): void {
+    let count: number = 3;
+    const background: HTMLElement = rendered('div', this.element, 'redirect-message-container');
+    rendered('h2', background, 'redirect-message-container__thank-you-text', 'Thank you for your order!');
+    const timerText: HTMLElement = rendered(
+      'span',
+      background,
+      'redirect-message-container__timer-text',
+      `Redirect to the store in ${count} seconds`,
+    );
+    const interval: NodeJS.Timer = setInterval(() => {
+      count -= 1;
+      timerText.textContent = `Redirect to the store in ${count} seconds`;
+
+      if (count === 0) {
+        clearInterval(interval);
+        window.history.pushState({}, '', '/');
+        this.callback(e);
+      }
+    }, 1000);
   }
 
   /* проверить, является ли количество одного продукта нулевым

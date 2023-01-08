@@ -3,7 +3,7 @@
 /* eslint-disable max-len */
 import './cards-field.styles.css';
 import BaseComponent from '../base-component/base-component';
-import rendered from '../../utils/render/render';
+import rendered from '../../utils/render';
 import cardsData from '../../assets/json/data';
 import Card from '../card/card';
 import Filter from '../filter/filter';
@@ -12,7 +12,6 @@ import { ObservedSubject } from '../card/card.types';
 import findCountOfCurrentProducts from './utils/find.current.count';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageType } from '../../utils/localStorage.types';
-// eslint-disable-next-line object-curly-newline
 import {
   deleteOneQueryParam,
   deleteQueryParams,
@@ -21,6 +20,7 @@ import {
   setQueryParams,
 } from '../../utils/queryParams';
 import { FilterTypes, QueryParameters, SortTypes } from './enums.cards-field';
+import { Callback } from '../shopping-cart/shopping-cart.types';
 
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = []; // все карточки
@@ -57,7 +57,7 @@ export default class CardsField extends BaseComponent {
 
   private readonly storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
 
-  constructor(public readonly header: Header, private callback: (event: Event) => void) {
+  constructor(public readonly header: Header, private callback: Callback) {
     super('div', 'content__container');
     this.checkLocalStorage();
     this.checkUrlInfo();
