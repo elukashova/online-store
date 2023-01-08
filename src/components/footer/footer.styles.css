@@ -46,6 +46,7 @@
   grid-template-columns: 15% 50% 30%;
   grid-template-rows: 20% 20% 20% 35%;
   align-content: flex-end;
+  row-gap: 2%;
 }
 
 .contacts-container__info-office,
@@ -161,13 +162,20 @@
   
 }
 
+@media screen and (max-width: 1200px) {
+
+  .footer__container {
+    grid-template-columns: auto 30%;
+  }
+}
+  
+
 @media screen and (max-width: 1000px) {
   .footer {
     height: 13rem;
   }
 
   .footer__container {
-    grid-template-columns: auto 15rem;
     margin-top: 0;
     margin-bottom: 0;
   }
@@ -189,10 +197,6 @@
 @media screen and (max-width: 780px) {
   .footer {
     height: 13rem;
-  }
-
-  .footer__container {
-    grid-template-columns: auto 10rem;
   }
 
   .footer__contacts-container {

@@ -17,7 +17,7 @@ export default class Footer extends BaseComponent {
     rendered('p', contactsInfo, 'contacts-container__info-office', 'Office ');
     rendered('p', contactsInfo, 'contacts-container__info-address', 'Lisboa, Avenida da Liberdade, 3');
     rendered('p', contactsInfo, 'contacts-container__info-phone', 'Tel. ');
-    rendered('p', contactsInfo, 'contacts-container__info-phone-number', '+351-01-341-3961');
+    rendered('p', contactsInfo, 'contacts-container__info-phone-number', '+351-00-000-0000');
     rendered('p', contactsInfo, 'contacts-container__info-email', 'Email ');
     rendered('p', contactsInfo, 'contacts-container__info-email-address', 'art.ificial@gmail.com');
     const contactsSocialMedia: HTMLElement = rendered('div', contactsInfo, 'contacts-container__social-media');

@@ -127,7 +127,7 @@ export default class CardsField extends BaseComponent {
     });
     rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg' });
     const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
-    this.viewFourProducts = rendered('img', viewTypes, 'cards__view-four', '', {
+    this.viewFourProducts = rendered('img', viewTypes, 'cards__view-four change-type', '', {
       src: 'assets/icons/block4.png',
       id: 'four',
     });
@@ -623,6 +623,7 @@ export default class CardsField extends BaseComponent {
       info.quantity += 1;
       this.addedItems.push(info);
       setDataToLocalStorage(this.addedItems, 'addedPosters');
+      console.log(this.addedItems);
     }
 
     if (subject instanceof Card && !subject.element.classList.contains('added')) {
