@@ -177,20 +177,12 @@ export default class CardsField extends BaseComponent {
         this.render();
       } else {
         this.render();
-        const params = url.slice(url.indexOf('?') + 1);
+
+        const params = decodeURI(url.slice(url.indexOf('?') + 1));
         if (params.length > 0) {
-          const regex = /=|%/;
+          const regex = /=|~/;
           const splitedParams = params.split('&').map((elem) => elem.split(regex));
           this.splitParametersIntoTypes(splitedParams);
-          /* splitedParams =>
-      ['category', 'Abstract', 'Urban']
-      ['size', '30x30']
-      ['price', '+64', '+125']
-      ['count', '+25', '+140']
-      ['view', 'four']
-      ['search', 'flower+dance'] если значение было введено на русском, декодировать через (decodeURI(value));
-      */
-          /* ['Abstract', 'Nature', 'Characters', '50x50', '40x40', '30x30', 'Urban', 'Space', 'Romantic'] */
         }
       }
     }
@@ -214,16 +206,21 @@ export default class CardsField extends BaseComponent {
       } else if (type === QueryParameters.Sorting) {
         this.sortCards(splitParameters(elem, 1));
       } else {
-        // если фильтры то обновляем  this.activeFilters
-        if (type === QueryParameters.Category) {
+        // если фильтры то обновляем this.activeFilters
+        // и передаем какие чекбоксы сделать checked
+        if (type === QueryParameters.Category || type === QueryParameters.Size) {
           updateFilters(elem);
+          if (this.categoryFilter) {
+            this.addCheckedForCheckboxes(this.categoryFilter, this.activeFilters);
+          }
+          if (this.sizeFilter) {
+            this.addCheckedForCheckboxes(this.sizeFilter, this.activeFilters);
+          }
         }
-        if (type === QueryParameters.Size) {
+
+        if (type === QueryParameters.Price) {
           updateFilters(elem);
-        }
-        /* if (type === QueryParameters.Price) {
-          updateFilters(elem);
-        }
+        } /*
         if (type === QueryParameters.Count) {
           updateFilters(elem);
         }
@@ -234,6 +231,18 @@ export default class CardsField extends BaseComponent {
       }
     });
   };
+
+  public addCheckedForCheckboxes(filter: Filter, activeFilters: string[]): void {
+    if (filter) {
+      filter.checkboxes.forEach((checkbox) => {
+        activeFilters.forEach((active) => {
+          if (checkbox.id === active) {
+            checkbox.setAttribute('checked', 'checked');
+          }
+        });
+      });
+    }
+  }
 
   public checkView(e: Event): void {
     if (e.target && e.target instanceof HTMLElement) {
@@ -332,13 +341,13 @@ export default class CardsField extends BaseComponent {
       const prev = getQueryParams(queryType);
       if (prev !== null) {
         if (prev.includes(filter)) {
-          if (prev.includes('%')) {
+          if (prev.includes('~')) {
             deleteOneQueryParam(queryType, filter);
           } else {
             deleteQueryParams(queryType);
           }
         } else {
-          setQueryParams(queryType, `${prev}%${filter}`);
+          setQueryParams(queryType, `${prev}~${filter}`);
         }
       }
     } else if (!this.activeFilters.includes(filter)) {
@@ -346,7 +355,7 @@ export default class CardsField extends BaseComponent {
       const queryType = this.checkFilter(filter);
       const prev = getQueryParams(queryType);
       if (prev !== null) {
-        setQueryParams(queryType, `${prev}%${filter}`);
+        setQueryParams(queryType, `${prev}~${filter}`);
       } else {
         setQueryParams(queryType, filter);
       }
@@ -356,7 +365,7 @@ export default class CardsField extends BaseComponent {
 
   public composeQueryString(str: string): string {
     if (this.getFilterType(str, 0) !== FilterTypes.Search) {
-      return `${this.getFilterType(str, 1)}%${this.getFilterType(str, 2)}`;
+      return `${this.getFilterType(str, 1)}~${this.getFilterType(str, 2)}`;
     }
     return `${this.getFilterType(str, 1).toLowerCase()}`;
   }
