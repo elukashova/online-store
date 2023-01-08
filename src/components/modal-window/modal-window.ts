@@ -123,7 +123,9 @@ export default class ModalWindow extends BaseComponent {
       name: 'card',
       'data-regex': '^[0-9]{16}$',
       required: 'required',
+      maxlength: '16',
     });
+    console.log(this.cardNumberInput);
     const numberLabel = rendered(
       'label',
       cardWrapper,
@@ -141,10 +143,11 @@ export default class ModalWindow extends BaseComponent {
       placeholder: 'MM / YY',
       id: 'expiration',
       name: 'expiration',
-      'max-length': '5',
       'data-regex': '((0[1-9])|(1[0-2]))\\/((2[3-9])|(3[0-9])|(4[0-9])|(5[0-9])|(6[0-9])|(7[0-9])|(8[0-9])|(9[0-9]))',
       required: 'required',
+      maxlength: '5',
     });
+    this.cardExpirationInput.addEventListener('keyup', this.autoSlashForDate);
     const expirationLabel = rendered(
       'label',
       dataWrapper,
@@ -162,6 +165,7 @@ export default class ModalWindow extends BaseComponent {
       'max-length': '3',
       'data-regex': '^[0-9]{3}$',
       required: 'required',
+      maxlength: '3',
     });
     const cvvLabel = rendered('label', cvvWrapper, 'pers-data__cvv-label label hidden', '3 digits must be entered', {
       for: 'cvv',
@@ -203,7 +207,6 @@ export default class ModalWindow extends BaseComponent {
         this.changeLogoOfPaymentSystem(e);
       }
     });
-    this.cardExpirationInput.addEventListener('keypress', this.autoSlashForDate);
     this.confirmBtn.addEventListener('click', (e) => {
       if (this.confirmBtnText) {
         this.buttonHandler(e);
@@ -306,11 +309,8 @@ export default class ModalWindow extends BaseComponent {
   public buttonHandler(e: Event): void {
     if (e.target && e.target instanceof HTMLInputElement) {
       if (e.target.hasAttribute('data-valid')) {
-        if (e.target.getAttribute('data-valid') === 'invalid') {
-          console.log('Давай по новой');
-        } else {
+        if (e.target.getAttribute('data-valid') !== 'invalid') {
           this.confirmBtnCallback(e);
-          console.log('Переход в мейн');
         }
       }
     }
