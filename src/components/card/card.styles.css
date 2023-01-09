@@ -6,9 +6,18 @@
   gap: 0.1rem;
 }
 
+.card__img-holder {
+  overflow: hidden;
+}
+
 .card__img {
   width: 100%;
   cursor: pointer;
+  transition: transform .5s;
+}
+
+.card__img:hover {
+  transform: scale(1.1);
 }
 
 .card__info {
@@ -29,65 +38,77 @@
 .card__name {
   text-transform: uppercase;
   font-weight: 500;
+  font-size: calc(.25em + 0.8vw);
 }
 
 .card__category {
   font-weight: 400;
   color: #65635F;
+  font-size: calc(.25em + 0.8vw);
 }
 
 .card__size {
-  margin-top: 2px;
+  margin-top: 5px;
 }
 
 .card__size,
 .card__stock,
 .card__rating {
-  font-size: 0.85rem;
   color: #65635F;
   font-weight: 300;
+  font-size: calc(.2em + 0.7vw);
 }
 
 .card__rating {
-  margin-bottom: 2px;
+  margin-bottom: 5px;
 }
 
 .card__price {
   font-weight: 500;
+  font-size: calc(.3em + 0.8vw);
 }
 
 .card__discount-btns-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.3rem;
 }
 
 .card__discount {
   background-color: #FF7D15;
   color: #FFF;
-  width: 6rem;
+  width: 6em;
   text-align: center;
-  line-height: 1.4rem;
+  line-height: 1.4em;
   border-radius: 8px;
+  font-size: calc(.3em + 0.8vw);
 }
 
 .card__btns {
-  align-self: end;
+  align-self: flex-end;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  width: 4rem;
+  width: 4.5em;
+  height: calc(1em + 1vw);
 }
 
 .card__btn_buy,
 .card__btn_open-card {
   cursor: pointer;
-  width: 1.8rem;
+  height: 95%;
+  transition: border-radius .4s, box-shadow .4s;
+  border-radius: 0.15em;
+}
+
+.card__btn_buy:hover,
+.card__btn_open-card:hover {
+  border-radius: 50%;
 }
 
 .card__description {
   display: none;
+  font-size: calc(.25em + 0.8vw);
 }
 
 .hidden {
@@ -99,4 +120,26 @@
   flex-direction: column;
   flex-wrap: nowrap;
   height: max-content;
+}
+
+@media screen and (max-width: 1100px) {
+  .card__btns {
+    width: 3.8em;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .card__discount-btns-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    align-items: flex-start;
+    gap: 5%;
+  }
+}
+
+@media screen and (max-width: 780px) {
+  .card__btns {
+    width: 3.5em;
+  }
 }

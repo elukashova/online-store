@@ -1,18 +1,19 @@
 .content__container {
-  width: 90%;
+  min-width: 100%;
   display: grid;
-  grid-template-columns: 16.5rem 78%;
-  justify-content: center;
-  column-gap: 2%;
-  margin: 1rem 5rem;
+  grid-template-columns: 17% 81%;
+  grid-template-rows: 1fr;
+  gap: 2%;
+  margin-bottom: 1rem;
 }
 
 .filters__container {
   display: flex;
   flex-direction: column;
-  row-gap: 2rem;
+  row-gap: 2em;
   background-color: #e3e2e2;
-  padding: 1rem;
+  padding: 5%;
+  height: 100%;
 }
 
 .filters__btns-wrapper {
@@ -25,6 +26,22 @@
   background: none;
   color: #65635f;
   cursor: pointer;
+  transition: color .3s;
+  font-size: calc(.2em + 0.6vw);
+}
+
+.filters__btn-reset:hover,
+.filters__btn-copy:hover {
+  color: #FF7D15;
+}
+
+.filters__btn-reset:active,
+.filters__btn-copy:active {
+  color: #65635F;
+}
+
+.cards__content {
+  height: 100%;
 }
 
 .cards__sort-wrapper {
@@ -32,19 +49,26 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.8em;
-  margin: 0 0 3% 0;
+  margin: 0 0 1.5em 0;
 }
 
 .cards__sort-products {
   cursor: pointer;
-  height: 1.5rem;
+  height: 2.5em;
   text-transform: uppercase;
+  font-size: calc(.2em + 0.6vw);
   font-weight: 500;
   color: #FF7D15;
-  width: 8.5rem;
+  width: 11em;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+}
+
+.cards__sort-products:focus {
+  outline: none;
 }
 
 .cards__found-count {
+  font-size: calc(.2em + 0.6vw);
   font-weight: 300;
   color: #65635F;
   text-transform: uppercase;
@@ -53,17 +77,17 @@
 }
 
 .cards__search-wrapper {
-  height: 2.5rem;
+  height: 2.5em;
   display: flex;
   border-radius: 25px;
   padding: 10px;
-  border: 1px solid #65635f80;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
   align-items: center;
   width: 12rem;
 }
 
 .cards__search {
-  padding: 0.2rem;
+  padding: 0.2em;
   outline: none;
   text-align: center;
   word-wrap: break-word;
@@ -73,6 +97,18 @@
   color: #FF7D15;
   font-weight: 300;
   text-transform: uppercase;
+  font-size: calc(.2em + 0.6vw);
+}
+
+.cards__search::-webkit-search-cancel-button {
+  background: linear-gradient(45deg, rgba(0,0,0,0) 0%,rgba(0,0,0,0) 43%,#000 45%,#000 55%,rgba(0,0,0,0) 57%,rgba(0,0,0,0) 100%),
+  linear-gradient(135deg, transparent 0%,transparent 43%,#000 45%,#000 55%,transparent 57%,transparent 100%);
+  opacity: .3;
+  -webkit-appearance: none;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 50em;
+  position: relative;
 }
 
 .cards__search-icon {
@@ -103,12 +139,24 @@
 .cards__view-two.change-type {
   filter: brightness(0);
   opacity: 100%;
+  cursor: default;
+  pointer-events: none;
+}
+
+.cards__view-four, 
+.cards__view-two {
+  transition: transform .3s;
+}
+
+.cards__view-four:hover, 
+.cards__view-two:hover {
+  transform: scale(1.2);
 }
 
 .cards__container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 30px;
 }
 
 .cards__container.change-type {
@@ -119,8 +167,8 @@
 
 .cards__container.change-type .cards__item {
   display: grid;
-  grid-template-columns: 35% 62%;
-  gap: 3%;
+  grid-template-columns: 52% 46%;
+  gap: 2%;
 }
 
 .cards__container.change-type .card__info_wrapper {
@@ -143,4 +191,79 @@
 .cards__container.change-type .cards__item.hidden,
 .hidden {
   display: none;
+}
+
+@media screen and (max-width: 1000px) {
+  .cards__search-wrapper {
+    width: 9rem;
+    height: 2em;
+  }
+
+  .cards__search {
+    width: 100%;
+  }
+
+  .cards__search-icon {
+    height: 20px;
+  }
+
+  .cards__view-types {
+    width: 4rem;
+  }
+
+  .cards__view-four {
+    max-height: 27px;
+    min-width: 27px;
+  }
+  
+  .cards__view-two {
+    max-height: 26px;
+    min-width: 26px;
+  }
+
+  .cards__container {
+    gap: 13px;
+  }
+
+  .content__container:has(.cards__container.change-type) {
+    grid-template-columns: 25% 73%;
+  }
+
+  .cards__container.change-type .cards__item {
+    display: flex;
+    gap: 1%;
+  }
+}
+
+@media screen and (max-width: 780px) {
+  .content__container {
+    margin-bottom: 0.2rem;
+    grid-template-columns: 20% 78%;
+  }
+
+  .cards__container,
+  .cards__container.change-type {
+    gap: 10px;
+  }
+
+  .cards__view-types {
+    width: 3rem;
+  }
+
+  .cards__view-four {
+    max-height: 21px;
+    min-width: 21px;
+  }
+  
+  .cards__view-two {
+    max-height: 20px;
+    min-width: 20px;
+  }
+}
+
+@media screen and (max-width: 530px) {
+  .cards__container {
+    gap: 5px;
+  }
+
 }

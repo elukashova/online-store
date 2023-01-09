@@ -202,9 +202,11 @@ export default class Cart extends BaseComponent {
 
   // функция создания карточек
   private createItemsCards(array: PosterStorageType[], callback: (event: Event) => void): void {
-    cardsData.products.forEach((data) => {
-      for (let i: number = 0; i < array.length; i += 1) {
-        if (data.id === array[i].id) {
+    console.log(this.addedItems);
+    for (let i: number = 0; i < array.length; i += 1) {
+      cardsData.products.forEach((data) => {
+        if (array[i].id === data.id) {
+          console.log(array[i].id);
           if (this.slideBack === true || this.itemsNumChange === true) {
             this.itemsOrder = this.addedItems.indexOf(array[0]);
           }
@@ -216,8 +218,8 @@ export default class Cart extends BaseComponent {
           card.attachObserver(this);
           this.cartContainer?.append(card.element);
         }
-      }
-    });
+      });
+    }
   }
 
   // колбэк для кнопки покупки

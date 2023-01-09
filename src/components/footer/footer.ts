@@ -17,25 +17,30 @@ export default class Footer extends BaseComponent {
     rendered('p', contactsInfo, 'contacts-container__info-office', 'Office ');
     rendered('p', contactsInfo, 'contacts-container__info-address', 'Lisboa, Avenida da Liberdade, 3');
     rendered('p', contactsInfo, 'contacts-container__info-phone', 'Tel. ');
-    rendered('p', contactsInfo, 'contacts-container__info-phone-number', '+351-01-341-3961');
+    rendered('p', contactsInfo, 'contacts-container__info-phone-number', '+351-00-000-0000');
     rendered('p', contactsInfo, 'contacts-container__info-email', 'Email ');
-    rendered('p', contactsInfo, 'contacts-container__info-email-address', 'bestposterever@gmail.com');
+    rendered('p', contactsInfo, 'contacts-container__info-email-address', 'art.ificial@gmail.com');
     const contactsSocialMedia: HTMLElement = rendered('div', contactsInfo, 'contacts-container__social-media');
     rendered('span', contactsSocialMedia, 'contacts-container__year', '2022');
-    const socialGithubL: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__github-first', '', {
+    const githubWrapper = rendered('div', contactsSocialMedia, 'contacts-container__github-wrapper');
+    rendered('img', githubWrapper, 'contacts-container__github-heart', '', {
+      src: 'assets/icons/heart.png',
+    });
+    const githubIconsWrapper = rendered('div', githubWrapper, 'contacts-container__github-icons-wrapper');
+    const socialGithubL: HTMLElement = rendered('a', githubIconsWrapper, 'contacts-container__github-first', '', {
       href: 'https://github.com/elukashova',
     });
-    const socialGithubN: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__github-second', '', {
+    const socialGithubN: HTMLElement = rendered('a', githubIconsWrapper, 'contacts-container__github-second', '', {
       href: 'https://github.com/TrickyPie',
+    });
+    rendered('img', socialGithubL, 'contacts-container__github-logo', '', {
+      src: 'assets/icons/github-left.png',
+    });
+    rendered('img', socialGithubN, 'contacts-container__github-logo', '', {
+      src: 'assets/icons/github-right.png',
     });
     const socialRsschool: HTMLElement = rendered('a', contactsSocialMedia, 'contacts-container__rsschool', '', {
       href: 'https://rs.school/js/',
-    });
-    rendered('img', socialGithubL, 'contacts-container__github-logo', '', {
-      src: 'assets/icons/github.png',
-    });
-    rendered('img', socialGithubN, 'contacts-container__github-logo', '', {
-      src: 'assets/icons/github.png',
     });
     rendered('img', socialRsschool, 'contacts-container__rsschool', 'RS School', {
       src: 'assets/icons/rsschool.png',
