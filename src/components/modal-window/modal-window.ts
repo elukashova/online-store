@@ -147,7 +147,7 @@ export default class ModalWindow extends BaseComponent {
       required: 'required',
       maxlength: '5',
     });
-    this.cardExpirationInput.addEventListener('keyup', this.autoSlashForDate);
+    this.cardExpirationInput.addEventListener('keypress', this.autoSlashForDate);
     const expirationLabel = rendered(
       'label',
       dataWrapper,

@@ -150,9 +150,9 @@ export default class CardsField extends BaseComponent {
     reset.addEventListener('click', this.resetFilters);
 
     // слушатель для текстового поиска
-    this.searchInput.addEventListener('input', () => {
-      if (this.searchInput instanceof HTMLInputElement) {
-        const val = `search,${this.searchInput.value.trim().toLowerCase()}`;
+    this.searchInput.addEventListener('input', (e) => {
+      if (e.currentTarget && e.currentTarget instanceof HTMLInputElement) {
+        const val = `search,${e.currentTarget.value.trim().toLowerCase()}`;
         this.updateActiveFilters(val);
       }
     });
@@ -351,7 +351,6 @@ export default class CardsField extends BaseComponent {
         if (this.sizeFilter) this.addCheckboxes(this.sizeFilter, filter);
       }
     }
-
     this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
 
@@ -374,11 +373,12 @@ export default class CardsField extends BaseComponent {
   // добавление или замена фильтра в активные фильтры
   public addOrReplaceFilter(filterType: string, filter: string): void {
     const prev = this.activeFilters.find((elem) => elem.startsWith(this.getPartOfString(filter, 0)));
+    console.log(prev);
     const query = this.composeQueryString(filter);
-    if (prev !== undefined) {
-      this.activeFilters.splice(this.activeFilters.indexOf(prev), 1, filter);
-    } else {
+    if (prev === undefined) {
       this.pushToActive(this.activeFilters, filter);
+    } else {
+      this.activeFilters.splice(this.activeFilters.indexOf(prev), 1, filter);
     }
     setQueryParams(filterType, query);
   }
@@ -430,7 +430,6 @@ export default class CardsField extends BaseComponent {
         return element.innerText.toLowerCase().includes(this.getPartOfString(filter, 1));
       });
     });
-
     // если при применении фильтров есть значения - фильтруем их все вместе
     if (!!byCategory.length || !!bySize.length || !!byPrice.length || !!byCount.length || !!bySearch.length) {
       this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount, bySearch);
@@ -462,9 +461,96 @@ export default class CardsField extends BaseComponent {
         if (this.sizeFilter) this.changeValueForEmpty(this.sizeFilter);
       }
     }
+    /* if (!bySearch.length) {
+      if (getQueryParams(QueryParameters.Search)) {
+        console.log('Поиск не дал результатов');
+        this.visibleCards = [];
+        this.doNotFoundVisible();
+      }
+    } else if (!!byCategory.length || !!bySize.length || !!byPrice.length || !!byCount.length || !!bySearch.length) {
+      this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount, bySearch);
+      // меняем количество товаров около чекбоксов на актуальное
+      if (this.categoryFilter) this.changeStartValueForNotEmpty(this.categoryFilter);
+      if (this.sizeFilter) this.changeStartValueForNotEmpty(this.sizeFilter);
+      // скрываем надпись not found и делаем карточки видимыми
+      this.visibleCards.forEach((visibleCard) => {
+        if (this.notFoundText) {
+          this.notFoundText.classList.add('hidden');
+        }
+        visibleCard.element.classList.remove('hidden');
+      });
+    } else {
+      this.visibleCards.length = 0;
+      // если при применении фильтров значений нет, но активные фильтры не пустые
+      // значит у нас нет пересечения между фильтрами. Выводим not found
+      if (this.activeFilters.length !== 0) {
+        this.doNotFoundVisible();
+      } else if (this.visibleCards.length === 0 && this.activeFilters.length === 0) {
+        if (this.categoryFilter) this.changeValueForEmpty(this.categoryFilter);
+        if (this.sizeFilter) this.changeValueForEmpty(this.sizeFilter);
+      }
+    } */
     this.setCountFrom(this.visibleCards);
     this.setNewRange(this.visibleCards);
     this.changeFoundItemsCount();
+  }
+
+  public doNotFoundVisible(): void {
+    if (this.notFoundText) {
+      this.notFoundText.classList.remove('hidden');
+      this.cardsAll.forEach((card) => {
+        card.element.classList.add('hidden');
+      });
+    }
+    if (this.categoryFilter) this.changeStartValueForNotEmpty(this.categoryFilter);
+    if (this.sizeFilter) this.changeStartValueForNotEmpty(this.sizeFilter);
+  }
+
+  public setNewRange(data: Card[]): void {
+    if (data.length) {
+      const [priceMin, priceMax] = this.getRange(data, 'price');
+      const [stockMin, stockMax] = this.getRange(data, 'stock');
+      const changeValue = (typeFilter: Filter): void => {
+        // eslint-disable-next-line object-curly-newline
+        const { lowestInput, highestInput, minElement, maxElement } = typeFilter;
+        if (
+          lowestInput &&
+          highestInput &&
+          lowestInput instanceof HTMLInputElement &&
+          highestInput instanceof HTMLInputElement
+        ) {
+          if (typeFilter === this.priceFilter) {
+            lowestInput.setAttribute('value', `${priceMin}`);
+            highestInput.setAttribute('value', `${priceMax}`);
+          } else if (typeFilter === this.stockFilter) {
+            lowestInput.setAttribute('value', `${stockMin}`);
+            highestInput.setAttribute('value', `${stockMax}`);
+          }
+          if (minElement) {
+            minElement.textContent = `$${lowestInput.value}`;
+          }
+          if (maxElement) {
+            maxElement.textContent = `$${highestInput.value}`;
+          }
+        }
+      };
+      if (this.priceFilter && this.stockFilter) {
+        changeValue(this.priceFilter);
+        changeValue(this.stockFilter);
+      }
+    }
+  }
+
+  // получаю минимальное и максимальное число среди видимых карт
+  public getRange(data: Card[], type: string): number[] {
+    const arrCopy = [...data];
+    const result = arrCopy.sort((a, b) => (type === 'price' ? a.price - b.price : a.stock - b.stock));
+    // eslint-disable-next-line operator-linebreak
+    const [resMin, resMax] =
+      type === 'price'
+        ? [result[0].price, result[result.length - 1].price]
+        : [result[0].stock, result[result.length - 1].stock];
+    return [resMin, resMax];
   }
 
   // получаем изначальные значения количества товаров и указываем их
@@ -490,44 +576,6 @@ export default class CardsField extends BaseComponent {
         temp.textContent = '0';
       });
     }
-  }
-
-  public setNewRange(data: Card[]): void {
-    if (data.length) {
-      const [priceMin, priceMax] = this.getRange(data, 'price');
-      const [stockMin, stockMax] = this.getRange(data, 'stock');
-      if (this.priceFilter) {
-        if (this.priceFilter.lowestInput) {
-          this.priceFilter.lowestInput.setAttribute('value', `${priceMin}`);
-        }
-        if (this.priceFilter.highestInput) {
-          this.priceFilter.highestInput.setAttribute('value', `${priceMax}`);
-        }
-        if (this.priceFilter.minElement) this.priceFilter.minElement.textContent = `$${priceMin}`;
-        if (this.priceFilter.maxElement) this.priceFilter.maxElement.textContent = `$${priceMax}`;
-      }
-      if (this.stockFilter) {
-        if (this.stockFilter.lowestInput) {
-          this.stockFilter.lowestInput.setAttribute('value', `${stockMin}`);
-        }
-        if (this.stockFilter.highestInput) {
-          this.stockFilter.highestInput.setAttribute('value', `${stockMax}`);
-        }
-        if (this.stockFilter.minElement) this.stockFilter.minElement.textContent = `${stockMin}`;
-        if (this.stockFilter.maxElement) this.stockFilter.maxElement.textContent = `${stockMax}`;
-      }
-    }
-  }
-
-  public getRange(data: Card[], type: string): number[] {
-    const arrCopy = [...data];
-    const result = arrCopy.sort((a, b) => (type === 'price' ? a.price - b.price : a.stock - b.stock));
-    // eslint-disable-next-line operator-linebreak
-    const [resMin, resMax] =
-      type === 'price'
-        ? [result[0].price, result[result.length - 1].price]
-        : [result[0].stock, result[result.length - 1].stock];
-    return [resMin, resMax];
   }
 
   // получить часть строки
