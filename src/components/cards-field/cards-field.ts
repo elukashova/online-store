@@ -342,8 +342,8 @@ export default class CardsField extends BaseComponent {
             }
           }
         }
-        if (this.categoryFilter) this.removeCheckboxes(this.categoryFilter, filter);
-        if (this.sizeFilter) this.removeCheckboxes(this.sizeFilter, filter);
+        if (this.categoryFilter) this.addOrRemoveCheckboxes(this.categoryFilter, filter, false);
+        if (this.sizeFilter) this.addOrRemoveCheckboxes(this.sizeFilter, filter, false);
         // если значения нет в активных - пушим либо через ~, либо просто, если других значений нет
       } else if (!this.activeFilters.includes(filter)) {
         this.pushToActive(this.activeFilters, filter);
@@ -352,25 +352,21 @@ export default class CardsField extends BaseComponent {
         } else {
           setQueryParams(queryType, filter);
         }
-        if (this.categoryFilter) this.addCheckboxes(this.categoryFilter, filter);
-        if (this.sizeFilter) this.addCheckboxes(this.sizeFilter, filter);
+        if (this.categoryFilter) this.addOrRemoveCheckboxes(this.categoryFilter, filter, true);
+        if (this.sizeFilter) this.addOrRemoveCheckboxes(this.sizeFilter, filter, true);
       }
     }
     this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
 
-  public addCheckboxes(filterType: Filter, filter: string): void {
+  public addOrRemoveCheckboxes(filterType: Filter, filter: string, val: boolean): void {
     filterType.checkboxes.forEach((category) => {
       if (category.id === filter) {
-        category.setAttribute('checked', 'checked');
-      }
-    });
-  }
-
-  public removeCheckboxes(filterType: Filter, filter: string): void {
-    filterType.checkboxes.forEach((category) => {
-      if (category.id === filter) {
-        category.removeAttribute('checked');
+        if (val) {
+          category.setAttribute('checked', 'checked');
+        } else {
+          category.removeAttribute('checked');
+        }
       }
     });
   }
