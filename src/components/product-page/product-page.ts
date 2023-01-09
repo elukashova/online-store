@@ -82,7 +82,6 @@ export default class ProductPage extends BaseComponent {
     this.storeAnchorElement = rendered('a', breadCrumbsContainer, 'breadcrump__store', 'Store', {
       href: '/',
     });
-    this.storeAnchorElement.addEventListener('click', this.backToStoreCallback);
     rendered('span', breadCrumbsContainer, 'breadcrump__breadcrumps', '>>');
     rendered('span', breadCrumbsContainer, 'breadcrump__category', `${this.category}`);
     rendered('span', breadCrumbsContainer, 'breadcrump__breadcrumps', '>>');
@@ -109,14 +108,6 @@ export default class ProductPage extends BaseComponent {
 
     // правая часть
     const productInfoContainer: HTMLElement = rendered('div', this.element, 'product__info-container product-info');
-    const backBtnAnchor: HTMLElement = rendered('a', productInfoContainer, 'product-info__back-btn-link', '', {
-      href: '/',
-    });
-    rendered('img', backBtnAnchor, 'product-info__back-btn', '', {
-      src: '../assets/icons/btn-back.svg',
-    });
-    rendered('span', backBtnAnchor, 'product-info__back-btn_text', 'back');
-    backBtnAnchor.addEventListener('click', this.backToStoreCallback);
     const productDescr: HTMLElement = rendered('div', productInfoContainer, 'product-info__description-block');
     rendered('span', productDescr, 'product-info__title', this.title);
     rendered('span', productDescr, 'product-info__category', this.category);
@@ -182,15 +173,6 @@ export default class ProductPage extends BaseComponent {
       this.callback(e, this.isCheckout);
     }
     this.isCheckout = false;
-  };
-
-  // возврат на главную страницу
-  private backToStoreCallback = (e: Event): void => {
-    e.preventDefault();
-    const { target } = e;
-    if (target && target instanceof HTMLAnchorElement) {
-      this.callback(e);
-    }
   };
 
   // колбэк для клика на новую картинку
