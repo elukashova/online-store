@@ -702,12 +702,11 @@ export default class Cart extends BaseComponent {
     // меняю стили контейнера с грида на флекс
     this.element.style.display = 'flex';
     this.element.style.flexDirection = 'column';
-
+    rendered('span', this.element, 'cart__empty_title', 'Your cart is empty!');
     rendered('img', this.element, 'cart__empty_img', '', {
       src: 'assets/images/empty-cart.png',
       alt: 'Empty cart on orange phone.',
     });
-    rendered('span', this.element, 'cart__empty_title', 'Your cart is empty!');
     rendered('span', this.element, 'cart__empty_text', 'Looks like you have not added anything to your cart yet.');
   }
 }
