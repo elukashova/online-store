@@ -12,7 +12,8 @@ export default class AboutPage extends BaseComponent {
   }
 
   private render(): void {
-    rendered('img', this.element, 'about__image', '', {
+    const imgWrapper: HTMLElement = rendered('div', this.element, 'about__img-wrapper');
+    rendered('img', imgWrapper, 'about__image', '', {
       src: 'assets/images/about-us-img.jpg',
     });
     const contentWrapper: HTMLElement = rendered('div', this.element, 'about__content-wrapper');
