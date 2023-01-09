@@ -14,7 +14,11 @@ const devServer = (isDev) =>
           hot: true,
           port: 8080,
           static: path.resolve(__dirname, './dist'),
-          historyApiFallback: true,
+          historyApiFallback: {
+            rewrites: [
+              { from: /./, to: '/index.html' },
+            ],
+          },
         },
       };
 

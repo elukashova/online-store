@@ -93,18 +93,18 @@ export default class ProductPage extends BaseComponent {
     const imagesContainer: HTMLElement = rendered('div', imagesCrumbsContainer, 'product__imgs-container');
     const miniImagesWrapper: HTMLElement = rendered('div', imagesContainer, 'product__mini-imgs-wrapper product-img');
     this.chosenImg = rendered('img', miniImagesWrapper, 'product-img__mini chosen', '', {
-      src: this.images[0],
+      src: `../${this.images[0]}`,
     });
     for (let i: number = 1; i < this.images.length; i += 1) {
       const img: HTMLElement = rendered('img', miniImagesWrapper, 'product-img__mini not-chosen', '', {
-        src: this.images[i],
+        src: `../${this.images[i]}`,
       });
       img.addEventListener('click', this.changeCurrentImgCallback);
     }
 
     const mainImgContainer: HTMLElement = rendered('div', imagesContainer, 'product__main-img-container');
     this.mainImage = rendered('img', mainImgContainer, 'product-img__main-img', '', {
-      src: this.images[0],
+      src: `../${this.images[0]}`,
     });
 
     // правая часть
@@ -113,7 +113,7 @@ export default class ProductPage extends BaseComponent {
       href: '/',
     });
     rendered('img', backBtnAnchor, 'product-info__back-btn', '', {
-      src: 'assets/icons/btn-back.svg',
+      src: '../assets/icons/btn-back.svg',
     });
     rendered('span', backBtnAnchor, 'product-info__back-btn_text', 'back');
     backBtnAnchor.addEventListener('click', this.backToStoreCallback);
