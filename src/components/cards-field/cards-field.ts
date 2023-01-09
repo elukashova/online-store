@@ -128,15 +128,17 @@ export default class CardsField extends BaseComponent {
       placeholder: 'Search poster',
       id: 'search',
     });
-    rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg' });
+    rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg', alt: '' });
     const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
     this.viewFourProducts = rendered('img', viewTypes, 'cards__view-four change-type', '', {
       src: 'assets/icons/block4.png',
       id: 'four',
+      alt: 'switch to view of four products',
     });
     this.viewTwoProducts = rendered('img', viewTypes, 'cards__view-two', '', {
       src: 'assets/icons/block2.png',
       id: 'two',
+      alt: 'switch to view of two products',
     });
     this.notFoundText = rendered('p', this.cardsContainer, 'cards__not-found hidden', 'Product not found', {
       id: 'cards__not-found',
@@ -374,7 +376,6 @@ export default class CardsField extends BaseComponent {
   // добавление или замена фильтра в активные фильтры
   public addOrReplaceFilter(filterType: string, filter: string): void {
     const prev = this.activeFilters.find((elem) => elem.startsWith(this.getPartOfString(filter, 0)));
-    console.log(prev);
     const query = this.composeQueryString(filter);
     if (prev === undefined) {
       this.pushToActive(this.activeFilters, filter);
@@ -603,6 +604,26 @@ export default class CardsField extends BaseComponent {
       if (this.postersFound.textContent === 'Found: 0') {
         this.doNotFoundVisible();
       }
+      if (this.postersFound.textContent === 'Found: 32') {
+        if (!getQueryParams(QueryParameters.Price) && !getQueryParams(QueryParameters.Count)) {
+          if (this.priceFilter) this.resetRange(this.priceFilter);
+          if (this.stockFilter) this.resetRange(this.stockFilter);
+        }
+      }
+    }
+  }
+
+  public resetRange(filterType: Filter): void {
+    // eslint-disable-next-line object-curly-newline
+    const { highestInput, lowestInput, maxElement, minElement } = filterType;
+
+    if (lowestInput && lowestInput instanceof HTMLInputElement && minElement) {
+      lowestInput.value = lowestInput.min;
+      minElement.textContent = filterType === this.priceFilter ? `$ ${lowestInput.value}` : `${lowestInput.value}`;
+    }
+    if (highestInput && highestInput instanceof HTMLInputElement && maxElement) {
+      highestInput.value = highestInput.max;
+      maxElement.textContent = filterType === this.priceFilter ? `$ ${highestInput.value}` : `${highestInput.value}`;
     }
   }
 
@@ -700,7 +721,6 @@ export default class CardsField extends BaseComponent {
       info.quantity += 1;
       this.addedItems.push(info);
       setDataToLocalStorage(this.addedItems, 'addedPosters');
-      console.log(this.addedItems);
     }
 
     if (subject instanceof Card && !subject.element.classList.contains('added')) {

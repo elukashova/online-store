@@ -114,6 +114,7 @@ export default class ModalWindow extends BaseComponent {
     const logoWrapper: HTMLElement = rendered('div', cardNumberWrapper, 'card-data__number-logo-wrapper');
     this.cardNumberLogo = rendered('img', logoWrapper, 'card-data__number-input-image', '', {
       src: '../../../assets/icons/payment.png',
+      alt: 'type of payment system',
     });
     const cardWrapper: HTMLElement = rendered('div', cardNumberWrapper, 'card-data__card-wrapper');
     this.cardNumberInput = rendered('input', cardWrapper, 'card-data__number-input input', '', {

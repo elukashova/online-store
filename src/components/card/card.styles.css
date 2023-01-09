@@ -109,6 +109,7 @@
 .card__description {
   display: none;
   font-size: calc(0.25em + 0.8vw);
+  margin-right: 5%;
 }
 
 .hidden {

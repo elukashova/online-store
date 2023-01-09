@@ -63,6 +63,7 @@ export default class Card extends BaseComponent {
     rendered('img', cardImg, 'card__img', '', {
       src: this.images[0],
       id: `img${this.id}`,
+      alt: 'photo of poster',
     });
     cardImg.addEventListener('click', this.productPageBtnCallback);
     const cardInfo: HTMLElement = rendered('div', this.element, 'card__info');
@@ -71,15 +72,16 @@ export default class Card extends BaseComponent {
     rendered('p', cardInfoWrapper, 'card__category', `${this.category}`);
     rendered('p', cardInfoWrapper, 'card__size', `Size: ${this.size}`);
     rendered('p', cardInfoWrapper, 'card__stock', `Stock: ${this.stock}`);
-    rendered('p', cardInfoWrapper, 'card__rating', `Rating: ${this.rating}`); // для тестов сортировки
+    rendered('p', cardInfoWrapper, 'card__rating', `Rating: ${this.rating}`);
     rendered('p', cardInfoWrapper, 'card__price', `$ ${this.price}`);
-    rendered('p', cardInfoWrapper, 'card__description', `${this.description}`);
+    rendered('p', cardInfoWrapper, 'card__description', `${this.description.split('.')[0]}`);
     const discountAndBtnsWrapper: HTMLElement = rendered('div', cardInfo, 'card__discount-btns-wrapper');
     rendered('p', discountAndBtnsWrapper, 'card__discount', `Sale: ${this.discountPercentage}%`);
     const buttonsWrapper: HTMLElement = rendered('div', discountAndBtnsWrapper, 'card__btns');
     const productPageBtn: HTMLElement = rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
       src: 'assets/icons/button-open-card.svg',
       id: `${this.id}`,
+      alt: 'open product info',
     });
     productPageBtn.addEventListener('click', this.productPageBtnCallback);
     // проверяем local storage, добавлена ли этот товар в корзину
@@ -103,6 +105,7 @@ export default class Card extends BaseComponent {
     }
     this.buyButton = rendered('img', buttonsWrapper, 'card__btn_buy', '', {
       src: `${imgSource}`,
+      alt: 'add to cart',
     });
     // вешаем слушатель на кнопку
     this.buyButton.addEventListener('click', this.buyBtnCallback);
