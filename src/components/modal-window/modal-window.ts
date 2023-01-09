@@ -58,7 +58,7 @@ export default class ModalWindow extends BaseComponent {
       'label',
       this.personalInfoForm,
       'pers-data__name-label label hidden',
-      'First and last name must contain at least two words, each at least 3 chars long',
+      'First and last name must contain at least two words, each at least 3 letters long',
       { for: 'name' },
     );
     this.phoneInput = rendered('input', this.personalInfoForm, 'pers-data__phone-input input', '', {
@@ -81,7 +81,7 @@ export default class ModalWindow extends BaseComponent {
       placeholder: 'Delivery address',
       id: 'address',
       name: 'address',
-      'data-regex': '([A-Za-zА-Яа-яЁё]{5,}[,]?\\s[0-9-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s[0-9-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s?)',
+      'data-regex': '([A-Za-zА-Яа-яЁё]{5,}[,]?\\s[-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s[-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s?)',
       required: 'required',
     });
     const addressLabel = rendered(
@@ -114,6 +114,7 @@ export default class ModalWindow extends BaseComponent {
     const logoWrapper: HTMLElement = rendered('div', cardNumberWrapper, 'card-data__number-logo-wrapper');
     this.cardNumberLogo = rendered('img', logoWrapper, 'card-data__number-input-image', '', {
       src: '../../../assets/icons/payment.png',
+      alt: 'type of payment system',
     });
     const cardWrapper: HTMLElement = rendered('div', cardNumberWrapper, 'card-data__card-wrapper');
     this.cardNumberInput = rendered('input', cardWrapper, 'card-data__number-input input', '', {
@@ -288,8 +289,8 @@ export default class ModalWindow extends BaseComponent {
       } else {
         this.confirmBtn.classList.remove('valid-btn');
         if (this.confirmBtnText) this.confirmBtnText.classList.remove('hidden');
-        this.checkLabel(this.labelsAll);
       }
+      this.checkLabel(this.labelsAll);
     }
   }
 

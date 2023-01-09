@@ -15,6 +15,7 @@ export default class AboutPage extends BaseComponent {
     const imgWrapper: HTMLElement = rendered('div', this.element, 'about__img-wrapper');
     rendered('img', imgWrapper, 'about__image', '', {
       src: 'assets/images/about-us-img.jpg',
+      alt: 'A young mermaid girl with blue hair is in the water with lotuses in her hair. Image created with AI Midjourney.',
     });
     const contentWrapper: HTMLElement = rendered('div', this.element, 'about__content-wrapper');
     rendered('h2', contentWrapper, 'about__title', 'About us');

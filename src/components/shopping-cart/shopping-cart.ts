@@ -140,10 +140,12 @@ export default class Cart extends BaseComponent {
     const buttonsWrapper: HTMLElement = rendered('div', totalPagesWrapper, 'info-pages__btns');
     this.leftArrowBtn = rendered('img', buttonsWrapper, 'info-pages__btn-left disabled', '', {
       src: 'assets/icons/cart-btn__left.svg',
+      alt: 'left arrow',
     });
     this.currentPageElement = rendered('span', buttonsWrapper, 'info-pages__pages-total', `${this.currentPage}`);
     this.rightArrowBtn = rendered('img', buttonsWrapper, 'info-pages__btn-right disabled', '', {
       src: 'assets/icons/cart-btn__right.svg',
+      alt: 'right arrow',
     });
 
     // items
@@ -703,6 +705,7 @@ export default class Cart extends BaseComponent {
     rendered('span', this.element, 'cart__empty_title', 'Your cart is empty!');
     rendered('img', this.element, 'cart__empty_img', '', {
       src: 'assets/images/empty-cart.png',
+      alt: 'Empty cart on orange phone.',
     });
     rendered('span', this.element, 'cart__empty_text', 'Looks like you have not added anything to your cart yet.');
   }

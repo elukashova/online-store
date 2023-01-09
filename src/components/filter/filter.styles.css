@@ -10,7 +10,7 @@
   display: flex;
   gap: 0.5em;
   align-items: center;
-  font-size: calc(.2rem + 0.8vw);
+  font-size: calc(0.2rem + 0.8vw);
 }
 
 .category__count-wrapper,
@@ -18,18 +18,18 @@
   display: flex;
   gap: 0.3em;
   font-weight: 300;
-  color: #65635F;
-  font-size: calc(.2rem + 0.8vw);
+  color: #65635f;
+  font-size: calc(0.2rem + 0.8vw);
 }
 
 .category__legend-1,
 .size__legend-1,
 .filters__price_legend,
 .filters__stock_legend {
-  font-size: calc(.2em + 0.7vw);
+  font-size: calc(0.2em + 0.7vw);
   text-transform: uppercase;
   font-weight: 500;
-  color: #FF7D15;
+  color: #ff7d15;
   margin-bottom: 0.3em;
 }
 
@@ -53,17 +53,17 @@
   border-radius: 0.15em;
   margin: 0;
   padding: 0;
-  border: 1px solid #65635F;
+  border: 1px solid #65635f;
 }
 
 .category-item::before,
 .size-item::before {
-  content: "";
+  content: '';
   width: 0.8em;
   height: 0.8em;
   transform: scale(0);
   transition: 120ms transform ease-in-out;
-  box-shadow: inset 1em 1em #FF7D15;
+  box-shadow: inset 1em 1em #ff7d15;
 }
 
 .category-item:checked:before,
@@ -82,9 +82,9 @@
 .price-value__to,
 .stock-value__from,
 .stock-value__to {
-  font-size: calc(.2em + 0.8vw);
+  font-size: calc(0.2em + 0.8vw);
   font-weight: 300;
-  color: #65635F;
+  color: #65635f;
 }
 
 .filters__price_value-wrapper,
@@ -132,21 +132,21 @@
   border-radius: 50%;
   box-shadow: 0 0 0 1px #9a9191;
   cursor: pointer;
-  transition: background .3s;
+  transition: background 0.3s;
 }
 
 .filters__price_lowest::-webkit-slider-thumb:hover,
 .filters__price_highest::-webkit-slider-thumb:hover,
 .filters__stock_lowest::-webkit-slider-thumb:hover,
 .filters__stock_highest::-webkit-slider-thumb:hover {
-  background: #FF7D15;
+  background: #ff7d15;
 }
 
 .filters__price_lowest::-webkit-slider-thumb:active,
 .filters__price_highest::-webkit-slider-thumb:active,
 .filters__stock_lowest::-webkit-slider-thumb:active,
 .filters__stock_highest::-webkit-slider-thumb:active {
-  background: #65635F;
+  background: #65635f;
 }
 
 @media screen and (max-width: 1000px) {
@@ -155,14 +155,14 @@
     width: 0.9em;
     height: 0.9em;
   }
-  
+
   .category-item::before,
   .size-item::before {
-    content: "";
+    content: '';
     width: 0.6em;
     height: 0.6em;
     transform: scale(0);
     transition: 120ms transform ease-in-out;
-    box-shadow: inset 1em 1em #FF7D15;
+    box-shadow: inset 1em 1em #ff7d15;
   }
 }
