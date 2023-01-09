@@ -116,6 +116,10 @@ export default class Card extends BaseComponent {
     e.preventDefault();
     window.history.pushState({}, '', `product/${this.id}`);
     this.callback(e);
+    window.scrollTo({
+      top: 0,
+      behavior: 'auto',
+    });
   };
 
   private buyBtnCallback = (): void => {
