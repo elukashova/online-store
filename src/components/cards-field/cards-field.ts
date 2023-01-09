@@ -599,6 +599,10 @@ export default class CardsField extends BaseComponent {
       this.postersFound.textContent = this.activeFilters.length
         ? `Found: ${this.visibleCards.length}`
         : `Found: ${this.cardsAll.length}`;
+
+      if (this.postersFound.textContent === 'Found: 0') {
+        this.doNotFoundVisible();
+      }
     }
   }
 

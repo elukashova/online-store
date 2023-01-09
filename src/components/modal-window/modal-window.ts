@@ -81,7 +81,7 @@ export default class ModalWindow extends BaseComponent {
       placeholder: 'Delivery address',
       id: 'address',
       name: 'address',
-      'data-regex': '([A-Za-zА-Яа-яЁё]{5,}[,]?\\s[0-9-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s[0-9-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s?)',
+      'data-regex': '([A-Za-zА-Яа-яЁё]{5,}[,]?\\s[-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s[-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s?)',
       required: 'required',
     });
     const addressLabel = rendered(
