@@ -246,7 +246,7 @@ export default class ModalWindow extends BaseComponent {
         input.classList.add('invalid');
         input.classList.remove('valid');
         if (this.validInputs.includes(input)) {
-          this.validInputs.splice(this.validInputs.indexOf(input));
+          this.validInputs.splice(this.validInputs.indexOf(input), 1);
         }
       }
     }
