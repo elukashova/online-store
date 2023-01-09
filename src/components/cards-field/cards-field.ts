@@ -512,10 +512,10 @@ export default class CardsField extends BaseComponent {
             highestInput.setAttribute('value', `${stockMax}`);
           }
           if (minElement) {
-            minElement.textContent = `$${lowestInput.value}`;
+            minElement.textContent = `${typeFilter === this.priceFilter ? '$' : ''} ${lowestInput.value}`;
           }
           if (maxElement) {
-            maxElement.textContent = `$${highestInput.value}`;
+            maxElement.textContent = `${typeFilter === this.priceFilter ? '$' : ''} ${highestInput.value}`;
           }
         }
       };
@@ -618,11 +618,11 @@ export default class CardsField extends BaseComponent {
     const { highestInput, lowestInput, maxElement, minElement } = filterType;
 
     if (lowestInput && lowestInput instanceof HTMLInputElement && minElement) {
-      lowestInput.value = lowestInput.min;
+      lowestInput.setAttribute('value', lowestInput.min);
       minElement.textContent = filterType === this.priceFilter ? `$ ${lowestInput.value}` : `${lowestInput.value}`;
     }
     if (highestInput && highestInput instanceof HTMLInputElement && maxElement) {
-      highestInput.value = highestInput.max;
+      highestInput.setAttribute('value', highestInput.max);
       maxElement.textContent = filterType === this.priceFilter ? `$ ${highestInput.value}` : `${highestInput.value}`;
     }
   }
