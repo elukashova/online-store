@@ -152,7 +152,14 @@ export default class CardsField extends BaseComponent {
     // слушатель для текстового поиска
     this.searchInput.addEventListener('input', (e) => {
       if (e.currentTarget && e.currentTarget instanceof HTMLInputElement) {
-        const val = `search,${e.currentTarget.value.trim().toLowerCase()}`;
+        const inputText = e.currentTarget.value.trim().toLowerCase();
+        const val = `search,${inputText}`;
+        if (inputText === '') {
+          if (this.notFoundText) {
+            this.notFoundText.classList.add('hidden');
+          }
+        }
+        this.setNewRange(this.cardsAll);
         this.updateActiveFilters(val);
       }
     });
@@ -428,6 +435,38 @@ export default class CardsField extends BaseComponent {
         return element.innerText.toLowerCase().includes(this.getPartOfString(filter, 1));
       });
     });
+    /* // если при применении фильтров есть значения - фильтруем их все вместе
+    if (!!byCategory.length || !!bySize.length || !!byPrice.length || !!byCount.length || !!bySearch.length) {
+      this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount, bySearch);
+      // меняем количество товаров около чекбоксов на актуальное
+      if (this.categoryFilter) this.changeStartValueForNotEmpty(this.categoryFilter);
+      if (this.sizeFilter) this.changeStartValueForNotEmpty(this.sizeFilter);
+      // скрываем надпись not found и делаем карточки видимыми
+      this.visibleCards.forEach((visibleCard) => {
+        if (this.notFoundText) {
+          this.notFoundText.classList.add('hidden');
+        }
+        visibleCard.element.classList.remove('hidden');
+      });
+    } else {
+      this.visibleCards.length = 0;
+      // если при применении фильтров значений нет, но активные фильтры не пустые
+      // значит у нас нет пересечения между фильтрами. Выводим not found
+      if (this.activeFilters.length !== 0) {
+        if (this.notFoundText) {
+          this.notFoundText.classList.remove('hidden');
+          this.cardsAll.forEach((card) => {
+            card.element.classList.add('hidden');
+          });
+        }
+        if (this.categoryFilter) this.changeStartValueForNotEmpty(this.categoryFilter);
+        if (this.sizeFilter) this.changeStartValueForNotEmpty(this.sizeFilter);
+      } else if (this.visibleCards.length === 0 && this.activeFilters.length === 0) {
+        if (this.categoryFilter) this.changeValueForEmpty(this.categoryFilter);
+        if (this.sizeFilter) this.changeValueForEmpty(this.sizeFilter);
+      }
+    } */
+
     // если при применении фильтров есть значения - фильтруем их все вместе
     if (!!byCategory.length || !!bySize.length || !!byPrice.length || !!byCount.length || !!bySearch.length) {
       this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount, bySearch);
@@ -459,6 +498,7 @@ export default class CardsField extends BaseComponent {
         if (this.sizeFilter) this.changeValueForEmpty(this.sizeFilter);
       }
     }
+
     /* if (!bySearch.length) {
       if (getQueryParams(QueryParameters.Search)) {
         console.log('Поиск не дал результатов');
