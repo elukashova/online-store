@@ -512,10 +512,10 @@ export default class CardsField extends BaseComponent {
             highestInput.setAttribute('value', `${stockMax}`);
           }
           if (minElement) {
-            minElement.textContent = `$${lowestInput.value}`;
+            minElement.textContent = `${typeFilter === this.priceFilter ? '$' : ''} ${lowestInput.value}`;
           }
           if (maxElement) {
-            maxElement.textContent = `$${highestInput.value}`;
+            maxElement.textContent = `${typeFilter === this.priceFilter ? '$' : ''} ${highestInput.value}`;
           }
         }
       };
