@@ -58,7 +58,7 @@ export default class ModalWindow extends BaseComponent {
       'label',
       this.personalInfoForm,
       'pers-data__name-label label hidden',
-      'First and last name must contain at least two words, each at least 3 chars long',
+      'First and last name must contain at least two words, each at least 3 letters long',
       { for: 'name' },
     );
     this.phoneInput = rendered('input', this.personalInfoForm, 'pers-data__phone-input input', '', {
@@ -288,8 +288,8 @@ export default class ModalWindow extends BaseComponent {
       } else {
         this.confirmBtn.classList.remove('valid-btn');
         if (this.confirmBtnText) this.confirmBtnText.classList.remove('hidden');
-        this.checkLabel(this.labelsAll);
       }
+      this.checkLabel(this.labelsAll);
     }
   }
 

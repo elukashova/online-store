@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  box-shadow: rgba(60, 64, 67, 0.15) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
   gap: 0.1rem;
 }
 
@@ -13,7 +13,7 @@
 .card__img {
   width: 100%;
   cursor: pointer;
-  transition: transform .5s;
+  transition: transform 0.5s;
 }
 
 .card__img:hover {
@@ -38,13 +38,13 @@
 .card__name {
   text-transform: uppercase;
   font-weight: 500;
-  font-size: calc(.25em + 0.8vw);
+  font-size: calc(0.25em + 0.8vw);
 }
 
 .card__category {
   font-weight: 400;
-  color: #65635F;
-  font-size: calc(.25em + 0.8vw);
+  color: #65635f;
+  font-size: calc(0.25em + 0.8vw);
 }
 
 .card__size {
@@ -54,9 +54,9 @@
 .card__size,
 .card__stock,
 .card__rating {
-  color: #65635F;
+  color: #65635f;
   font-weight: 300;
-  font-size: calc(.2em + 0.7vw);
+  font-size: calc(0.2em + 0.7vw);
 }
 
 .card__rating {
@@ -65,7 +65,7 @@
 
 .card__price {
   font-weight: 500;
-  font-size: calc(.3em + 0.8vw);
+  font-size: calc(0.3em + 0.8vw);
 }
 
 .card__discount-btns-wrapper {
@@ -75,13 +75,13 @@
 }
 
 .card__discount {
-  background-color: #FF7D15;
-  color: #FFF;
+  background-color: #ff7d15;
+  color: #fff;
   width: 6em;
   text-align: center;
   line-height: 1.4em;
   border-radius: 8px;
-  font-size: calc(.3em + 0.8vw);
+  font-size: calc(0.3em + 0.8vw);
 }
 
 .card__btns {
@@ -97,7 +97,7 @@
 .card__btn_open-card {
   cursor: pointer;
   height: 95%;
-  transition: border-radius .4s, box-shadow .4s;
+  transition: border-radius 0.4s, box-shadow 0.4s;
   border-radius: 0.15em;
 }
 
@@ -108,7 +108,7 @@
 
 .card__description {
   display: none;
-  font-size: calc(.25em + 0.8vw);
+  font-size: calc(0.25em + 0.8vw);
 }
 
 .hidden {

@@ -84,7 +84,7 @@
   border-radius: 25px;
   padding: 1px 10px;
   box-shadow: rgba(0, 0, 0, 0.07) 0px 6px 24px 0px, rgba(0, 0, 0, 0.09) 0px 0px 0px 1px;
-  align-items: center;
+  align-content: center;
   min-width: 10rem;
 }
 

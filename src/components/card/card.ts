@@ -73,7 +73,7 @@ export default class Card extends BaseComponent {
     rendered('p', cardInfoWrapper, 'card__stock', `Stock: ${this.stock}`);
     rendered('p', cardInfoWrapper, 'card__rating', `Rating: ${this.rating}`); // для тестов сортировки
     rendered('p', cardInfoWrapper, 'card__price', `$ ${this.price}`);
-    rendered('p', cardInfoWrapper, 'card__description', `${this.description.split('.')[0]}.`);
+    rendered('p', cardInfoWrapper, 'card__description', `${this.description}`);
     const discountAndBtnsWrapper: HTMLElement = rendered('div', cardInfo, 'card__discount-btns-wrapper');
     rendered('p', discountAndBtnsWrapper, 'card__discount', `Sale: ${this.discountPercentage}%`);
     const buttonsWrapper: HTMLElement = rendered('div', discountAndBtnsWrapper, 'card__btns');
