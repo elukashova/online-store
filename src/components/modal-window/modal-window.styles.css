@@ -62,11 +62,11 @@
 }
 
 .invalid {
-  border: 2px solid #f70303;
+  border: 2px solid #f703036b;
 }
 
 .valid {
-  border: 2px solid #40e01f;
+  border: 2px solid #3fe01f54;
 }
 
 .card-data__number-input-wrapper {
@@ -181,6 +181,7 @@
 .redirect-message-container {
   width: 50vw;
   text-align: center;
+  align-self: center;
 }
 
 .redirect-message-container__thank-you-text {
@@ -192,5 +193,5 @@
 .redirect-message-container__timer-text {
   font-weight: 400;
   font-size: 1.2rem;
-  color: #65635F;
+  color: #65635f;
 }

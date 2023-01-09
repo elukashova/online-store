@@ -88,11 +88,13 @@
   max-height: 12px;
   z-index: 2;
   transform: translateY(0.2rem);
-  animation:pulse .7s infinite;
+  animation: pulse 0.7s infinite;
 }
 
 @keyframes pulse {
-	10% {transform: scale(1.1)}
+  10% {
+    transform: scale(1.1);
+  }
 }
 
 .contacts-container__github-icons-wrapper {
@@ -102,7 +104,7 @@
 
 .contacts-container__github-first,
 .contacts-container__github-second {
-  transition: transform .3s;
+  transition: transform 0.3s;
 }
 
 .contacts-container__github-first {
@@ -124,7 +126,7 @@
 .contacts-container__rsschool {
   max-height: 30px;
   padding-top: 0.5%;
-  transition: transform .3s;
+  transition: transform 0.3s;
 }
 
 .contacts-container__rsschool:hover {
@@ -133,7 +135,7 @@
 
 .contacts-container__year {
   padding-top: 1%;
-  font-size: calc(.1em + 0.7vw);
+  font-size: calc(0.1em + 0.7vw);
 }
 
 @media screen and (max-width: 1000px) {
@@ -146,30 +148,27 @@
   }
 
   .contacts-container__title {
-    font-size: calc(.8em + 1vw);
+    font-size: calc(0.8em + 1vw);
   }
 
   .contacts-container__info-office,
   .contacts-container__info-phone,
   .contacts-container__info-email {
-    font-size: calc(.3em + 1vw);
+    font-size: calc(0.3em + 1vw);
   }
 
   .contacts-container__info-address,
   .contacts-container__info-phone-number,
   .contacts-container__info-email-address {
-    font-size: calc(.25em + 1vw);
+    font-size: calc(0.25em + 1vw);
   }
-  
 }
 
 @media screen and (max-width: 1200px) {
-
   .footer__container {
     grid-template-columns: auto 30%;
   }
 }
-  
 
 @media screen and (max-width: 1000px) {
   .footer {
@@ -186,13 +185,12 @@
   }
 
   .contacts-container__title {
-    font-size: calc(.7em + 1vw);
+    font-size: calc(0.7em + 1vw);
   }
 
   .contacts-container__github-logo {
     max-height: 30px;
   }
-  
 }
 
 @media screen and (max-width: 780px) {
@@ -205,7 +203,7 @@
   }
 
   .contacts-container__title {
-    font-size: calc(.5em + 1vw);
+    font-size: calc(0.5em + 1vw);
   }
 
   .contacts-container__github-logo {
@@ -216,9 +214,9 @@
     max-height: 25px;
     padding-top: 1.5%;
   }
-  
+
   .contacts-container__year {
-    font-size: calc(.3em + 0.7vw);
+    font-size: calc(0.3em + 0.7vw);
     padding-top: 4%;
   }
 

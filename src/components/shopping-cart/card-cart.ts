@@ -84,6 +84,7 @@ export default class CartCard extends BaseComponent {
     rendered('span', itemCard, 'cart-item__order', `${this.itemOrder}`);
     rendered('img', itemCard, 'cart-item__img', '', {
       src: this.images[0],
+      alt: 'poster image',
     });
     const firstItemDescr: HTMLElement = rendered('div', itemCard, 'cart-item__description');
     rendered('span', firstItemDescr, 'cart-item__description_title', this.title);
@@ -100,11 +101,13 @@ export default class CartCard extends BaseComponent {
     const changeAmountContainer: HTMLElement = rendered('div', itemAmountContainer, 'cart-amount__change-container');
     this.minusBtn = rendered('img', changeAmountContainer, 'cart-amount__btn-minus', '', {
       src: 'assets/icons/cart-btn__minus.svg',
+      alt: 'reduce the number of posters',
     });
     this.minusBtn.addEventListener('click', this.minusBtnCallback);
     this.itemAmountElement = rendered('span', changeAmountContainer, 'cart-amount__amount', `${this.itemAmount}`);
     this.plusBtn = rendered('img', changeAmountContainer, 'cart-amount__btn-plus', '', {
       src: 'assets/icons/cart-btn__plus.svg',
+      alt: ' increase the number of posters',
     });
     this.plusBtn.addEventListener('click', this.plusBtnCallback);
     const stockAmountContainer: HTMLElement = rendered('div', amountContainer, 'cart-amount__stock-container');
