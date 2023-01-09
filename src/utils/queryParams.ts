@@ -13,12 +13,7 @@ export const getQueryParams = (key: string): string | null => {
   return value;
 };
 
-export const getUrl = (): string | null => {
-  const currentUrl = window.location.href;
-  return currentUrl;
-};
-
-// функция удаления query параметров
+// функция удаления значений одного параметра
 export const deleteQueryParams = (key: string): void => {
   const params: URLSearchParams = new URLSearchParams(window.location.search);
   params.delete(key);
@@ -26,13 +21,24 @@ export const deleteQueryParams = (key: string): void => {
   window.history.pushState(null, '', newRelativePathQuery);
 };
 
-// функция удаления одного параметра
+// функция удаления значения одного параметра
 export const deleteOneQueryParam = (key: string, value: string): void => {
   const searchParams = new URLSearchParams(window.location.search);
-  const success = searchParams.getAll(key).toString().split('~');
-  success.splice(success.indexOf(value), 1);
-  const res = success.join('~').toString();
+  console.log(searchParams);
+  const splitParam = searchParams.getAll(key).toString().split('~');
+  splitParam.splice(splitParam.indexOf(value), 1);
+  const res = splitParam.join('~').toString();
   searchParams.set(key, res);
   const newRelativePathQuery = `${window.location.pathname}?${searchParams.toString()}`;
+  window.history.pushState(null, '', newRelativePathQuery);
+};
+
+// удаление всех параметров
+export const deleteAllQueryParams = (): void => {
+  const params: URLSearchParams = new URLSearchParams(window.location.search);
+  params.forEach((key) => {
+    params.delete(key);
+  });
+  const newRelativePathQuery = `${window.location.pathname}`;
   window.history.pushState(null, '', newRelativePathQuery);
 };

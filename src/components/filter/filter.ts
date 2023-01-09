@@ -89,11 +89,13 @@ export default class Filter {
     const [minCount, maxCount]: number[] = findMinAndMax(cardsData.products, str);
     const maxValue: string = str === 'price' ? `${maxPrice}` : `${maxCount}`;
     const minValue: string = str === 'price' ? `${minPrice}` : `${minCount}`;
-    this.minElement = rendered('span', valueWrapper, `${str}-value__from`, `${valuePrefix}${minValue}`, {
+    this.minElement = rendered('label', valueWrapper, `${str}-value__from`, `${valuePrefix}${minValue}`, {
       id: `from-${str}-value`,
+      for: `from-${str}`,
     });
-    this.maxElement = rendered('span', valueWrapper, `${str}-value__to`, `${valuePrefix}${maxValue}`, {
+    this.maxElement = rendered('label', valueWrapper, `${str}-value__to`, `${valuePrefix}${maxValue}`, {
       id: `to-${str}-value`,
+      for: `from-${str}`,
     });
 
     this.lowestInput = rendered('input', sliderWrapper, `filters__${str}_lowest`, '', {
@@ -122,11 +124,11 @@ export default class Filter {
         if (e.target && e.target instanceof HTMLElement) {
           if (e.target.id === RangeTypes.PriceFrom) {
             this.changeLowInput(lowestInput, highestInput, RangeTypes.PriceFrom);
-            this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`price, ${lowestInput.value}, ${highestInput.value}`);
           }
           if (e.target.id === RangeTypes.StockFrom) {
             this.changeLowInput(lowestInput, highestInput, RangeTypes.StockFrom);
-            this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`count, ${lowestInput.value}, ${highestInput.value}`);
           }
         }
       });
@@ -134,11 +136,11 @@ export default class Filter {
         if (e.target && e.target instanceof HTMLElement) {
           if (e.target.id === RangeTypes.PriceTo) {
             this.changeHighInput(lowestInput, highestInput, RangeTypes.PriceTo);
-            this.updateActiveFilters(`Price, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`price, ${lowestInput.value}, ${highestInput.value}`);
           }
           if (e.target.id === RangeTypes.StockTo) {
             this.changeHighInput(lowestInput, highestInput, RangeTypes.StockTo);
-            this.updateActiveFilters(`Count, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`count, ${lowestInput.value}, ${highestInput.value}`);
           }
         }
       });
