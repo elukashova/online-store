@@ -56,8 +56,8 @@ export default class App {
   public locationHandler = async (checkout?: boolean): Promise<void> => {
     const location: string = window.location.pathname.length === 0 ? '/' : window.location.pathname;
 
-    if (Number(location.slice(1)) <= cardsData.products.length) {
-      this.productID = location.slice(1);
+    if (Number(location.slice(9)) <= cardsData.products.length) {
+      this.productID = location.slice(9);
     }
 
     switch (location) {
@@ -76,7 +76,7 @@ export default class App {
         this.component = this.routes.cart.element;
         this.header.activateCartLink();
         break;
-      case `/${this.productID}`:
+      case `/product/${this.productID}`:
         this.routes.productPage = new ProductPage(Number(this.productID), this.route);
         this.routes.productPage.attachObserver(this.header);
         this.component = this.routes.productPage.element;

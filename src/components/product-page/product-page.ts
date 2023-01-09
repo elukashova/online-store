@@ -82,7 +82,6 @@ export default class ProductPage extends BaseComponent {
     this.storeAnchorElement = rendered('a', breadCrumbsContainer, 'breadcrump__store', 'Store', {
       href: '/',
     });
-    this.storeAnchorElement.addEventListener('click', this.backToStoreCallback);
     rendered('span', breadCrumbsContainer, 'breadcrump__breadcrumps', '>>');
     rendered('span', breadCrumbsContainer, 'breadcrump__category', `${this.category}`);
     rendered('span', breadCrumbsContainer, 'breadcrump__breadcrumps', '>>');
@@ -93,30 +92,22 @@ export default class ProductPage extends BaseComponent {
     const imagesContainer: HTMLElement = rendered('div', imagesCrumbsContainer, 'product__imgs-container');
     const miniImagesWrapper: HTMLElement = rendered('div', imagesContainer, 'product__mini-imgs-wrapper product-img');
     this.chosenImg = rendered('img', miniImagesWrapper, 'product-img__mini chosen', '', {
-      src: this.images[0],
+      src: `../${this.images[0]}`,
     });
     for (let i: number = 1; i < this.images.length; i += 1) {
       const img: HTMLElement = rendered('img', miniImagesWrapper, 'product-img__mini not-chosen', '', {
-        src: this.images[i],
+        src: `../${this.images[i]}`,
       });
       img.addEventListener('click', this.changeCurrentImgCallback);
     }
 
     const mainImgContainer: HTMLElement = rendered('div', imagesContainer, 'product__main-img-container');
     this.mainImage = rendered('img', mainImgContainer, 'product-img__main-img', '', {
-      src: this.images[0],
+      src: `../${this.images[0]}`,
     });
 
     // правая часть
     const productInfoContainer: HTMLElement = rendered('div', this.element, 'product__info-container product-info');
-    const backBtnAnchor: HTMLElement = rendered('a', productInfoContainer, 'product-info__back-btn-link', '', {
-      href: '/',
-    });
-    rendered('img', backBtnAnchor, 'product-info__back-btn', '', {
-      src: 'assets/icons/btn-back.svg',
-    });
-    rendered('span', backBtnAnchor, 'product-info__back-btn_text', 'back');
-    backBtnAnchor.addEventListener('click', this.backToStoreCallback);
     const productDescr: HTMLElement = rendered('div', productInfoContainer, 'product-info__description-block');
     rendered('span', productDescr, 'product-info__title', this.title);
     rendered('span', productDescr, 'product-info__category', this.category);
@@ -182,15 +173,6 @@ export default class ProductPage extends BaseComponent {
       this.callback(e, this.isCheckout);
     }
     this.isCheckout = false;
-  };
-
-  // возврат на главную страницу
-  private backToStoreCallback = (e: Event): void => {
-    e.preventDefault();
-    const { target } = e;
-    if (target && target instanceof HTMLAnchorElement) {
-      this.callback(e);
-    }
   };
 
   // колбэк для клика на новую картинку
