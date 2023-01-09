@@ -58,7 +58,6 @@ export default class App {
 
     if (Number(location.slice(9)) <= cardsData.products.length) {
       this.productID = location.slice(9);
-      console.log(this.productID);
     }
 
     switch (location) {

@@ -1,7 +1,7 @@
 .cart-container {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
+  height: fit-content;
 }
 
 .cart__items_container {
@@ -211,7 +211,7 @@
 
 .cart-amount__price-text,
 .cart-amount__price-num {
-  font-size: calc(1em + 1vw);
+  font-size: calc(.4em + 1.6vw);
   color: #FF7D15;
   font-weight: 700;
 }
@@ -223,12 +223,13 @@
   justify-content: center;
   gap: 1.8em;
   width: 25%;
-  height: 30em;
+  height: fit-content;
+  margin-top: 6.4em;
 }
 
 .cart-summary__title {
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: calc(.1em + 1vw);
   margin-bottom: 2%;
 }
 
@@ -245,7 +246,7 @@
 .cart-total-sum__text,
 .cart-total-sum__num {
   color: #65635F;
-  font-size: 1.1rem;
+  font-size: calc(.2em + 0.8vw);
   font-weight: 300;
 }
 
@@ -279,7 +280,7 @@
   margin-top: 1%;
   color: #65635F;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: calc(.2em + 0.7vw);
   text-transform: uppercase;
 }
 
@@ -295,7 +296,7 @@
 
 .cart-promocode__input::placeholder {
   color: #b8b8b8;
-  font-size: 1rem;
+  font-size: calc(.2em + 0.7vw);
 }
 
 .cart-promocode__input::-webkit-search-cancel-button {
@@ -312,7 +313,7 @@
 .cart-promocode__active-codes {
   color: #65635F;
   font-weight: 300;
-  font-size: 0.9rem;
+  font-size: calc(.2em + 0.6vw);
   user-select: text;
 }
 

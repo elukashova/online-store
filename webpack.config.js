@@ -14,11 +14,7 @@ const devServer = (isDev) =>
           hot: true,
           port: 8080,
           static: path.resolve(__dirname, './dist'),
-          historyApiFallback: {
-            rewrites: [
-              { from: /./, to: '/index.html' },
-            ],
-          },
+          historyApiFallback: true,
         },
       };
 
@@ -33,6 +29,7 @@ module.exports = ({ develop }) => ({
     filename: 'bundle.js',
     assetModuleFilename: 'assets/images/[name][ext]',
     clean: true,
+    publicPath: '/',
   },
   module: {
     rules: [
