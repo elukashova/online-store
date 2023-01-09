@@ -636,6 +636,7 @@ export default class Cart extends BaseComponent {
       this.cartContainer?.remove();
       this.summaryContainer?.remove();
       localStorage.removeItem('addedPosters');
+      localStorage.removeItem('appliedPromo');
     }
   }
 
