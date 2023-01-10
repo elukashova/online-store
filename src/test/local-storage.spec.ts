@@ -12,10 +12,6 @@ const mockCheckDataInLocalStorage = jest.fn((key: string): HeaderType | null => 
   return result;
 });
 
-afterEach(() => {
-  jest.restoreAllMocks();
-});
-
 describe('Local storage', () => {
   test('local storage mock function for setting data', () => {
     const testKey: string = 'header';
