@@ -141,8 +141,6 @@ export default class ModalWindow extends BaseComponent {
     const cvvWrapper: HTMLElement = rendered('div', dataAndCvvWrapper, 'card-data__cvv-wrapper');
     this.cardExpirationInput = rendered('input', dataWrapper, 'card-data__expiration-input input', '', {
       type: 'text',
-      pattern: '[0-9]*', //
-      inputmode: 'numeric', //
       placeholder: 'MM / YY',
       id: 'expiration',
       name: 'expiration',
@@ -152,6 +150,8 @@ export default class ModalWindow extends BaseComponent {
     });
     this.cardExpirationInput.addEventListener('keydown', this.autoSlashForDate);
     this.cardExpirationInput.addEventListener('keyup', this.autoSlashForDate);
+    this.cardExpirationInput.addEventListener('keydown', this.addOnlyNumbers);
+    /* this.cardExpirationInput.addEventListener('keyup', this.addOnlyNumbers); */
     const expirationLabel = rendered(
       'label',
       dataWrapper,
@@ -264,6 +264,12 @@ export default class ModalWindow extends BaseComponent {
       if (inputValue.length === 2 && key !== 'Backspace') {
         e.target.value = `${inputValue}/`;
       }
+    }
+  }
+
+  public addOnlyNumbers(e: KeyboardEvent): void {
+    if (e.key.length === 1 && /\D/.test(e.key)) {
+      e.preventDefault();
     }
   }
 
