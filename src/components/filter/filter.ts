@@ -51,7 +51,7 @@ export default class Filter {
       inputElement.addEventListener('change', () => this.updateActiveFilters(item));
       // устанавливаем слушатель на инпут при создании и передаем в cardfields измененные чекбоксы
       rendered('label', checkboxWrapper, `${str}__label-${ind + 1}`, `${item}`, {
-        for: `${str}-${ind + 1}`,
+        for: `${item}`,
       });
       const countWrapper: HTMLElement = rendered('div', inputWrapper, `${str}__count-wrapper`);
       this.countFrom = rendered('span', countWrapper, `${str}__out-from-to-${ind + 1}`, '1', {

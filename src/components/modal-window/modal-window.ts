@@ -118,7 +118,8 @@ export default class ModalWindow extends BaseComponent {
     });
     const cardWrapper: HTMLElement = rendered('div', cardNumberWrapper, 'card-data__card-wrapper');
     this.cardNumberInput = rendered('input', cardWrapper, 'card-data__number-input input', '', {
-      type: 'text',
+      type: 'number',
+      oninput: 'this.value = this.value.slice(0,this.maxLength)',
       placeholder: 'Card number',
       id: 'card',
       name: 'card',
@@ -140,6 +141,8 @@ export default class ModalWindow extends BaseComponent {
     const cvvWrapper: HTMLElement = rendered('div', dataAndCvvWrapper, 'card-data__cvv-wrapper');
     this.cardExpirationInput = rendered('input', dataWrapper, 'card-data__expiration-input input', '', {
       type: 'text',
+      pattern: '[0-9]*', //
+      inputmode: 'numeric', //
       placeholder: 'MM / YY',
       id: 'expiration',
       name: 'expiration',
@@ -159,7 +162,8 @@ export default class ModalWindow extends BaseComponent {
       },
     );
     this.cardCVVInput = rendered('input', cvvWrapper, 'card-data__cvv-input input', '', {
-      type: 'text',
+      type: 'number',
+      oninput: 'this.value = this.value.slice(0,this.maxLength)',
       placeholder: 'CVV',
       id: 'cvv',
       name: 'cvv',

@@ -22,7 +22,7 @@ export default class Footer extends BaseComponent {
     rendered('p', contactsInfo, 'contacts-container__info-email', 'Email ');
     rendered('p', contactsInfo, 'contacts-container__info-email-address', 'art.ificial@gmail.com');
     const contactsSocialMedia: HTMLElement = rendered('div', contactsInfo, 'contacts-container__social-media');
-    rendered('span', contactsSocialMedia, 'contacts-container__year', '2022');
+    rendered('span', contactsSocialMedia, 'contacts-container__year', '2023');
     const githubWrapper = rendered('div', contactsSocialMedia, 'contacts-container__github-wrapper');
     rendered('img', githubWrapper, 'contacts-container__github-heart', '', {
       src: '../assets/icons/heart.png',
