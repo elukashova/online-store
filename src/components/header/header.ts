@@ -23,11 +23,13 @@ export default class Header extends BaseComponent {
     totalPrice: 0,
   };
 
-  private storeLink: HTMLElement | null = null;
+  public storeLink: HTMLElement | null = null;
 
-  private aboutLink: HTMLElement | null = null;
+  public aboutLink: HTMLElement | null = null;
 
-  private shoppingCartLink: HTMLElement | null = null;
+  public shoppingCartLink: HTMLElement | null = null;
+
+  private menuLinks: HTMLElement[] = [];
 
   constructor(private callback: Callback) {
     super('header', 'header', 'header');
@@ -35,7 +37,8 @@ export default class Header extends BaseComponent {
     this.render();
   }
 
-  public render(): void {
+  // eslint-disable-next-line max-lines-per-function
+  private render(): void {
     const container: HTMLElement = rendered('div', this.element, 'header__container');
     const logoLink: HTMLElement = rendered('a', container, 'header__logo logo', '', { href: '/' });
     rendered('img', logoLink, 'logo__img', '', {
@@ -67,10 +70,11 @@ export default class Header extends BaseComponent {
       'cart__items-number',
       `${this.headerInfo.cartItems}`,
     );
-    this.storeLink.addEventListener('click', this.navLinkCallback);
-    this.aboutLink.addEventListener('click', this.navLinkCallback);
+    this.menuLinks.push(this.storeLink, this.aboutLink, this.shoppingCartLink);
+    this.menuLinks.forEach((link) => {
+      link.addEventListener('click', this.navLinkCallback);
+    });
     logoLink.addEventListener('click', this.imageLinkCallback);
-    this.shoppingCartLink.addEventListener('click', this.navLinkCallback);
     this.cartItemsElement.addEventListener('click', this.imageLinkCallback);
 
     this.updateInfoInHeader();
@@ -91,8 +95,8 @@ export default class Header extends BaseComponent {
     if (target && target instanceof HTMLAnchorElement) {
       this.callback(e);
     }
-    if (target && target instanceof HTMLSpanElement) {
-      this.activateCartLink();
+    if (target && target instanceof HTMLSpanElement && this.shoppingCartLink) {
+      this.activateLink(this.shoppingCartLink);
       window.history.pushState({}, '', '/cart');
       this.callback(e);
     }
@@ -104,36 +108,20 @@ export default class Header extends BaseComponent {
     }
   }
 
-  public activateCartLink(): void {
-    if (this.storeLink && this.aboutLink) {
-      this.deleteClass(this.storeLink);
-      this.deleteClass(this.aboutLink);
-    }
-    if (this.shoppingCartLink) {
-      this.shoppingCartLink.classList.remove('cart-hover');
-      this.shoppingCartLink.classList.add('active-link');
-    }
-  }
-
-  public activateStoreLink(): void {
-    if (this.shoppingCartLink && this.aboutLink) {
-      this.deleteClass(this.shoppingCartLink);
-      this.deleteClass(this.aboutLink);
-      this.shoppingCartLink.classList.add('cart-hover');
-    }
-    if (this.storeLink) {
-      this.storeLink.classList.add('active-link');
-    }
-  }
-
-  public activateAboutLink(): void {
-    if (this.shoppingCartLink && this.storeLink) {
-      this.deleteClass(this.shoppingCartLink);
-      this.deleteClass(this.storeLink);
-      this.shoppingCartLink.classList.add('cart-hover');
-    }
-    if (this.aboutLink) {
-      this.aboutLink.classList.add('active-link');
+  public activateLink(link: HTMLElement | null): void {
+    if (link !== null) {
+      for (let i: number = 0; i < this.menuLinks.length; i += 1) {
+        if (this.menuLinks[i] === link) {
+          link.classList.add('active-link');
+          if (link === this.shoppingCartLink) {
+            link.classList.remove('cart-hover');
+          } else {
+            this.shoppingCartLink?.classList.add('cart-hover');
+          }
+        } else {
+          this.deleteClass(this.menuLinks[i]);
+        }
+      }
     }
   }
 
@@ -179,8 +167,8 @@ export default class Header extends BaseComponent {
       } else if (subject.isAdded === false) {
         this.decreaseNumbers(subject.totalPrice, subject.totalAmount);
       }
-      if (subject.isCheckout === true) {
-        this.activateCartLink();
+      if (subject.isCheckout === true && this.shoppingCartLink) {
+        this.activateLink(this.shoppingCartLink);
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
