@@ -64,17 +64,17 @@ export default class App {
       case '/':
         this.routes.store = new CardsField(this.header, this.route);
         this.component = this.routes.store.element;
-        this.header.activateStoreLink();
+        this.header.activateLink(this.header.storeLink);
         break;
       case '/about':
         this.routes.about = new AboutPage(this.route);
         this.component = this.routes.about.element;
-        this.header.activateAboutLink();
+        this.header.activateLink(this.header.aboutLink);
         break;
       case '/cart':
         this.routes.cart = new Cart(this.header, this.route, this.rootElement, checkout);
         this.component = this.routes.cart.element;
-        this.header.activateCartLink();
+        this.header.activateLink(this.header.shoppingCartLink);
         break;
       case `/product/${this.productID}`:
         this.routes.productPage = new ProductPage(Number(this.productID), this.route);
