@@ -15,7 +15,7 @@ export default class ModalWindow extends BaseComponent {
 
   private cardNumberInput: HTMLElement | null = null;
 
-  private cardExpirationInput: HTMLElement | null = null;
+  public cardExpirationInput: HTMLElement | null = null;
 
   private cardCVVInput: HTMLElement | null = null;
 
@@ -151,7 +151,6 @@ export default class ModalWindow extends BaseComponent {
     this.cardExpirationInput.addEventListener('keydown', this.autoSlashForDate);
     this.cardExpirationInput.addEventListener('keyup', this.autoSlashForDate);
     this.cardExpirationInput.addEventListener('keydown', this.addOnlyNumbers);
-    /* this.cardExpirationInput.addEventListener('keyup', this.addOnlyNumbers); */
     const expirationLabel = rendered(
       'label',
       dataWrapper,
@@ -240,7 +239,7 @@ export default class ModalWindow extends BaseComponent {
     const input = element;
     if (inputReg) {
       const reg = new RegExp(inputReg);
-      if (reg.test(inputValue)) {
+      if (this.checkInputValue(reg, inputValue)) {
         input.classList.add('valid');
         input.classList.remove('invalid');
         if (!this.validInputs.includes(input)) {
@@ -255,6 +254,10 @@ export default class ModalWindow extends BaseComponent {
       }
     }
     this.checkAllIsValid(this.validInputs, this.inputsAll);
+  }
+
+  public checkInputValue(regex: RegExp, inputValue: string): boolean {
+    return regex.test(inputValue);
   }
 
   public autoSlashForDate(e: KeyboardEvent): void {
