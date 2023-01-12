@@ -23,7 +23,7 @@ export default class Cart extends BaseComponent {
 
   private cartItems: number;
 
-  private totalPrice: number;
+  public totalPrice: number;
 
   private totalSumContainer: HTMLElement | null = null;
 
@@ -89,12 +89,12 @@ export default class Cart extends BaseComponent {
 
   private currentPromoName: string = '';
 
-  private appliedPromos: string[] = [];
+  public appliedPromos: string[] = [];
 
   private isCheckout: boolean = false;
 
   // eslint-disable-next-line max-len
-  constructor(private header: Header, private callback: Callback, private root: HTMLElement, checkout?: boolean) {
+  constructor(private header: Header, private callback: Callback, private root?: HTMLElement, checkout?: boolean) {
     super('div', 'cart-container cart');
     if (checkout && checkout === true) {
       this.isCheckout = true;
@@ -229,10 +229,12 @@ export default class Cart extends BaseComponent {
   };
 
   private openModalCheckout(): void {
-    const modal: ModalWindow = new ModalWindow(this.root);
-    modal.attachObserver(this.header);
-    modal.attachObserver(this);
-    this.root.insertBefore(modal.element, this.header.element);
+    if (this.root) {
+      const modal: ModalWindow = new ModalWindow(this.root);
+      modal.attachObserver(this.header);
+      modal.attachObserver(this);
+      this.root.insertBefore(modal.element, this.header.element);
+    }
   }
 
   // колбэк для правой стрелки (пагинация)
@@ -336,7 +338,7 @@ export default class Cart extends BaseComponent {
   };
 
   // выбрать нужное значение промокода
-  private choosePromoValue(value: string): number {
+  public choosePromoValue(value: string): number {
     let result: number;
     if (value === PromoInputs.behappy) {
       this.currentPromoValue = PromoValues.behappy;
@@ -486,7 +488,7 @@ export default class Cart extends BaseComponent {
   }
 
   // считаем цену после примеренного промокода
-  private calculateNewPrice(): number {
+  public calculateNewPrice(): number {
     const promoValues: number[] = [];
     let result: number = 0;
     if (this.appliedPromos.length !== 0) {

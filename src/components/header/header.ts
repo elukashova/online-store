@@ -188,7 +188,7 @@ export default class Header extends BaseComponent {
     this.headerInfo.cartItems += 1;
   }
 
-  private decreaseNumbers(price: number, count?: number): void {
+  public decreaseNumbers(price: number, count?: number): void {
     this.headerInfo.totalPrice -= price;
     if (count) {
       this.headerInfo.cartItems -= count;
