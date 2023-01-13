@@ -24,7 +24,6 @@ export const deleteQueryParams = (key: string): void => {
 // функция удаления значения одного параметра
 export const deleteOneQueryParam = (key: string, value: string): void => {
   const searchParams = new URLSearchParams(window.location.search);
-  console.log(searchParams);
   const splitParam = searchParams.getAll(key).toString().split('~');
   splitParam.splice(splitParam.indexOf(value), 1);
   const res = splitParam.join('~').toString();

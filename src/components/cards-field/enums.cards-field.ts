@@ -1,8 +1,4 @@
-export enum SortTypes {
-  PriceAsc = 'price-asc',
-  PriceDesc = 'price-desc',
-  RatingAsc = 'rating-asc',
-  RatingDesc = 'rating-desc',
+export enum TypeOfView {
   ViewFour = 'four',
   ViewTwo = 'two',
 }
@@ -15,4 +11,9 @@ export enum QueryParameters {
   Search = 'search',
   Sorting = 'sorting',
   View = 'view',
+}
+
+export enum SortBy {
+  Asc = 'asc',
+  Desc = 'desc',
 }
