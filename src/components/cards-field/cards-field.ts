@@ -20,7 +20,8 @@ import {
   getQueryParams,
   setQueryParams,
 } from '../../utils/queryParams';
-import { QueryParameters, TypeOfView, SortBy } from './enums.cards-field';
+// eslint-disable-next-line object-curly-newline
+import { QueryParameters, TypeOfView, SortBy, CountForFilter } from './cards-field.types';
 import { Callback } from '../shopping-cart/shopping-cart.types';
 
 export default class CardsField extends BaseComponent {
@@ -77,14 +78,14 @@ export default class CardsField extends BaseComponent {
 
     // фильтр по категории
     this.categoryFilter = new Filter(filtersContainer, 'category', this.updateActiveFilters);
-    let uniqueCategories = cardsData.products.map((item) => item.category);
+    let uniqueCategories: string[] = cardsData.products.map((item) => item.category);
     uniqueCategories = Array.from(new Set(uniqueCategories));
     const categoryNames: HTMLElement = this.categoryFilter.renderCheckbox(uniqueCategories, 'category');
     filtersContainer.append(categoryNames);
 
     // фильтр по размеру
     this.sizeFilter = new Filter(filtersContainer, 'size', this.updateActiveFilters);
-    let uniqueSize = cardsData.products.map((item) => item.size);
+    let uniqueSize: string[] = cardsData.products.map((item) => item.size);
     uniqueSize = Array.from(new Set(uniqueSize));
     const sizeNames: HTMLElement = this.sizeFilter.renderCheckbox(uniqueSize, 'size');
     filtersContainer.append(sizeNames);
@@ -100,7 +101,7 @@ export default class CardsField extends BaseComponent {
     filtersContainer.append(stockTitles);
 
     const contentContainer: HTMLElement = rendered('div', this.element, 'cards__content');
-    const sortWrapper = rendered('div', contentContainer, 'cards__sort-wrapper');
+    const sortWrapper: HTMLElement = rendered('div', contentContainer, 'cards__sort-wrapper');
     this.selectInput = rendered('select', sortWrapper, 'cards__sort-products');
     this.cardsContainer = rendered('div', contentContainer, 'cards__container search', '', {
       id: 'cards__container',
@@ -109,28 +110,52 @@ export default class CardsField extends BaseComponent {
       value: 'no-sort',
       disabled: '',
     });
-    const priceAsc = rendered('option', this.selectInput, 'cards__sort-by-price-asc', 'Sort by price asc', {
-      value: 'price-asc',
-    });
-    const priceDesc = rendered('option', this.selectInput, 'cards__sort-by-price-desc', 'Sort by price desc', {
-      value: 'price-desc',
-    });
-    const RatingAsc = rendered('option', this.selectInput, 'cards__sort-by-rating-asc', 'Sort by rating asc', {
-      value: 'rating-asc',
-    });
-    const RatingDesc = rendered('option', this.selectInput, 'cards__sort-by-rating-desc', 'Sort by rating desc', {
-      value: 'rating-desc',
-    });
+    const priceAsc: HTMLElement = rendered(
+      'option',
+      this.selectInput,
+      'cards__sort-by-price-asc',
+      'Sort by price asc',
+      {
+        value: 'price-asc',
+      },
+    );
+    const priceDesc: HTMLElement = rendered(
+      'option',
+      this.selectInput,
+      'cards__sort-by-price-desc',
+      'Sort by price desc',
+      {
+        value: 'price-desc',
+      },
+    );
+    const RatingAsc: HTMLElement = rendered(
+      'option',
+      this.selectInput,
+      'cards__sort-by-rating-asc',
+      'Sort by rating asc',
+      {
+        value: 'rating-asc',
+      },
+    );
+    const RatingDesc: HTMLElement = rendered(
+      'option',
+      this.selectInput,
+      'cards__sort-by-rating-desc',
+      'Sort by rating desc',
+      {
+        value: 'rating-desc',
+      },
+    );
     this.allOptions = [this.defaultOption, priceAsc, priceDesc, RatingAsc, RatingDesc];
     this.postersFound = rendered('div', sortWrapper, 'cards__found-count', `Found: ${cardsData.products.length}`);
-    const searchInputWrapper = rendered('div', sortWrapper, 'cards__search-wrapper');
+    const searchInputWrapper: HTMLElement = rendered('div', sortWrapper, 'cards__search-wrapper');
     this.searchInput = rendered('input', searchInputWrapper, 'cards__search', '', {
       type: 'search',
       placeholder: 'Search poster',
       id: 'search',
     });
     rendered('img', searchInputWrapper, 'cards__search-icon', '', { src: 'assets/icons/search.svg', alt: '' });
-    const viewTypes = rendered('div', sortWrapper, 'cards__view-types');
+    const viewTypes: HTMLElement = rendered('div', sortWrapper, 'cards__view-types');
     this.viewFourProducts = rendered('img', viewTypes, 'cards__view-four change-type', '', {
       src: 'assets/icons/block4.png',
       id: 'four',
@@ -144,17 +169,18 @@ export default class CardsField extends BaseComponent {
     this.notFoundText = rendered('p', this.cardsContainer, 'cards__not-found hidden', 'Product not found', {
       id: 'cards__not-found',
     });
-    cardsData.products.forEach((data) => {
+    cardsData.products.forEach((data): void => {
       const card: Card = new Card(data, this.callback);
       card.attachObserver(this.header);
       card.attachObserver(this);
       this.cardsAll.push(card);
       if (this.cardsContainer) this.cardsContainer.append(card.element);
     });
+
     // слушатель для текстового поиска
-    this.searchInput.addEventListener('input', (e) => this.toDoWhenSearchInputListen(e));
+    this.searchInput.addEventListener('input', (e): void => this.toDoWhenSearchInputListen(e));
     // слушатель для сортировки
-    this.selectInput.addEventListener('change', () => {
+    this.selectInput.addEventListener('change', (): void => {
       if (this.cardsContainer && this.selectInput) {
         if (this.selectInput instanceof HTMLSelectElement) {
           this.sortCards(this.selectInput.value);
@@ -162,7 +188,7 @@ export default class CardsField extends BaseComponent {
       }
     });
     // слушатель смены вида
-    viewTypes.addEventListener('click', (e) => this.toDoWhenViewTypesListen(e));
+    viewTypes.addEventListener('click', (e): void => this.toDoWhenViewTypesListen(e));
   }
 
   /* Методы, вызываемые слушателями */
@@ -170,8 +196,8 @@ export default class CardsField extends BaseComponent {
   // получаем значение введенное в поиск, проверяем на пустое значение и вызываем методы
   public toDoWhenSearchInputListen(e: Event): void {
     if (e.currentTarget && e.currentTarget instanceof HTMLInputElement) {
-      const inputText = e.currentTarget.value.trim().toLowerCase();
-      const val = `search,${inputText}`;
+      const inputText: string = e.currentTarget.value.trim().toLowerCase();
+      const val: string = `search,${inputText}`;
       if (inputText === '') {
         if (this.notFoundText) {
           this.notFoundText.classList.add('hidden');
@@ -185,11 +211,11 @@ export default class CardsField extends BaseComponent {
   // меняем рейндж по новому значению
   public setNewRange(data: Card[]): void {
     if (data.length) {
-      const [priceMin, priceMax] = this.getRange(data, 'price');
-      const [stockMin, stockMax] = this.getRange(data, 'stock');
+      const [priceMin, priceMax]: number[] = this.getRange(data, 'price');
+      const [stockMin, stockMax]: number[] = this.getRange(data, 'stock');
       const changeValue = (typeFilter: Filter): void => {
         // eslint-disable-next-line object-curly-newline
-        const { lowestInput, highestInput, minElement, maxElement } = typeFilter;
+        const { lowestInput, highestInput, minElement, maxElement }: Filter = typeFilter;
         if (
           lowestInput &&
           highestInput &&
@@ -215,9 +241,11 @@ export default class CardsField extends BaseComponent {
 
   // получаю минимальное и максимальное число среди видимых карт
   public getRange(data: Card[], type: string): number[] {
-    const arrCopy = [...data];
-    const result = arrCopy.sort((a, b) => (type === QueryParameters.Price ? a.price - b.price : a.stock - b.stock));
-    const [resMin, resMax] =
+    const arrCopy: Card[] = [...data];
+    const result: Card[] = arrCopy.sort((a: Card, b: Card): number => {
+      return type === QueryParameters.Price ? a.price - b.price : a.stock - b.stock;
+    });
+    const [resMin, resMax]: number[] =
       type === 'price'
         ? [result[0].price, result[result.length - 1].price]
         : [result[0].stock, result[result.length - 1].stock];
@@ -231,8 +259,8 @@ export default class CardsField extends BaseComponent {
       setQueryParams('sorting', str);
       // добавляем selected выбранному option
       if (this.allOptions) {
-        this.allOptions.forEach((option) => option.removeAttribute('selected'));
-        this.allOptions.forEach((option) => {
+        this.allOptions.forEach((option): void => option.removeAttribute('selected'));
+        this.allOptions.forEach((option): void => {
           if (this.selectInput && this.selectInput instanceof HTMLSelectElement) {
             if (option instanceof HTMLOptionElement && str === option.value) {
               option.setAttribute('selected', 'selected');
@@ -240,7 +268,7 @@ export default class CardsField extends BaseComponent {
           }
         });
       } // аппендим карточки в контейнер в новом порядке
-      this.cardsAll.forEach((card) => {
+      this.cardsAll.forEach((card): void => {
         if (this.cardsContainer) {
           this.cardsContainer.append(card.element);
         }
@@ -262,7 +290,6 @@ export default class CardsField extends BaseComponent {
   public toDoWhenViewTypesListen(e: Event): void {
     if (this.cardsContainer) {
       if (e.target && e.target instanceof HTMLElement) {
-        console.log(e.target);
         this.changeViewOfProducts(e.target.id === TypeOfView.ViewFour ? TypeOfView.ViewFour : TypeOfView.ViewTwo);
       }
     }
@@ -299,7 +326,7 @@ export default class CardsField extends BaseComponent {
     const parameters: string = window.location.search;
     if (parameters.length > 1) {
       // если есть query, получаем их, чтобы применить фильтры
-      let decodedParams = decodeURI(parameters);
+      let decodedParams: string = decodeURI(parameters);
       decodedParams = decodedParams.slice(1);
       this.splitParametersIntoTypes(decodedParams);
     } else {
@@ -311,17 +338,17 @@ export default class CardsField extends BaseComponent {
 
   // разбиваем параметры
   public splitParametersIntoTypes = (decodedParams: string): void => {
-    const regex = /=|~/;
-    const splitedParams = decodedParams.split('&').map((elem) => elem.split(regex));
+    const regex: RegExp = /=|~/;
+    const splitedParams: string[][] = decodedParams.split('&').map((elem): string[] => elem.split(regex));
     const splitParameters = (value: string[], index: number): string => value[index];
     const updateFilters = (parameters: string[]): void => {
-      const values = parameters.splice(1);
+      const values: string[] = parameters.splice(1);
       if (values.length) {
-        values.forEach((value) => this.pushToActive(this.activeFilters, value));
+        values.forEach((value): number => this.pushToActive(this.activeFilters, value));
       }
     };
-    splitedParams.forEach((elem) => {
-      const type = splitParameters(elem, 0);
+    splitedParams.forEach((elem): void => {
+      const type: string = splitParameters(elem, 0);
       if (type === QueryParameters.View) {
         this.changeViewOfProducts(splitParameters(elem, 1));
       } else if (type === QueryParameters.Sorting) {
@@ -330,7 +357,7 @@ export default class CardsField extends BaseComponent {
         // если фильтры то обновляем this.activeFilters и передаем какие чекбоксы сделать checked
         if (type === QueryParameters.Category || type === QueryParameters.Size) {
           updateFilters(elem);
-          this.activeFilters.forEach((active) => {
+          this.activeFilters.forEach((active): void => {
             if (this.categoryFilter && this.sizeFilter) {
               this.addOrRemoveChecked(this.categoryFilter, active, true);
               this.addOrRemoveChecked(this.sizeFilter, active, true);
@@ -346,9 +373,9 @@ export default class CardsField extends BaseComponent {
             this.searchInput.value = splitParameters(elem, 1);
           }
         }
-        this.addClassesForCards(this.activeFilters, this.cardsAll);
       }
     });
+    this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
 
   // функция для пуша в активные фильтры
@@ -356,7 +383,7 @@ export default class CardsField extends BaseComponent {
 
   // добавляем/убираем чекбоксам checked
   public addOrRemoveChecked(filterType: Filter, filter: string, val: boolean): void {
-    filterType.checkboxes.forEach((type) => {
+    filterType.checkboxes.forEach((type): void => {
       if (type.id === filter) {
         if (val) {
           type.setAttribute('checked', 'checked');
@@ -383,8 +410,8 @@ export default class CardsField extends BaseComponent {
       }
     } else {
       // для значений категории и размера
-      const queryType = this.checkFilter(filter);
-      const prev = getQueryParams(queryType);
+      const queryType: string = this.checkFilter(filter);
+      const prev: string | null = getQueryParams(queryType);
       // если значение уже есть в активных фильтрах, мы его убираем
       if (this.activeFilters.includes(filter)) {
         this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
@@ -425,7 +452,7 @@ export default class CardsField extends BaseComponent {
 
   // добавление или замена фильтра в активные фильтры
   public addOrReplaceFilter(filterType: string, filter: string): void {
-    const prev = this.activeFilters.find((elem) => elem.startsWith(this.getPartOfString(filter, 0)));
+    const prev = this.activeFilters.find((elem): boolean => elem.startsWith(this.getPartOfString(filter, 0)));
     const query = this.composeQueryString(filter);
     if (prev === undefined) {
       this.pushToActive(this.activeFilters, filter);
@@ -445,9 +472,9 @@ export default class CardsField extends BaseComponent {
 
   // проверяем тип чекбокса
   public checkFilter(str: string): string {
-    let res;
+    let res: boolean = false;
     if (this.categoryFilter) {
-      res = this.categoryFilter.checkboxes.some((filter) => filter.id === str);
+      res = this.categoryFilter.checkboxes.some((filter): boolean => filter.id === str);
     }
     return res === true ? QueryParameters.Category : QueryParameters.Size;
   }
@@ -455,68 +482,50 @@ export default class CardsField extends BaseComponent {
   // добавляем и убираем классы
   public addClassesForCards(activeFilters: string[], cards: Card[]): void {
     this.resetClasses(activeFilters, cards); // сбрасываем классы
-    const bySize: Card[] = cards.filter(({ size }): boolean => {
-      return activeFilters.some((filter): boolean => size.includes(filter));
-    });
-    const byCategory: Card[] = cards.filter(({ category }): boolean => {
-      return activeFilters.some((filter): boolean => category.includes(filter));
-    });
-    const byPrice: Card[] = cards.filter((card): boolean => {
-      const [priceFrom, priceTo] = this.getPrice(activeFilters);
-      return card.price >= priceFrom && card.price <= priceTo;
-    });
-    const byCount: Card[] = cards.filter((card): boolean => {
-      const [countFrom, countTo] = this.getCount(activeFilters);
-      return card.stock >= countFrom && card.stock <= countTo;
-    });
-    const bySearch: Card[] = cards.filter(({ element }): boolean => {
-      return activeFilters.some((filter: string): boolean => {
-        const temp = this.getPartOfString(filter, 0);
-        if (temp !== QueryParameters.Search) return false;
-        return element.innerText.toLowerCase().includes(this.getPartOfString(filter, 1));
-      });
-    });
+    const byCategory: Card[] = this.filterByCategory(cards);
+    const bySize: Card[] = this.filterBySize(cards);
+    const byPrice: Card[] = this.filterByPrice(cards);
+    const byCount: Card[] = this.filterByCount(cards);
+    const bySearch: Card[] = this.filterBySearch(cards);
 
-    if (!bySearch.length && getQueryParams(QueryParameters.Search) !== null) {
-      this.visibleCards = [];
-      this.doNotFoundVisible();
-    } else if (!!byCategory.length || !!bySize.length || !!byPrice.length || !!byCount.length || !!bySearch.length) {
-      if (
-        (!!bySearch.length && getQueryParams(QueryParameters.Search) !== null) ||
-        (!bySearch.length && getQueryParams(QueryParameters.Search) == null)
-      ) {
+    // если у каких-либо массивов отфильтрованных карт есть длина
+    if (!!byCategory.length || !!bySize.length || !!byPrice.length || !!byCount.length || !!bySearch.length) {
+      // если отфильтрованный массив по поиску не имеет значений, но в query search-параметр есть - скрываем все карты
+      if (!bySearch.length && getQueryParams(QueryParameters.Search) !== null) {
+        this.visibleCards = [];
+        this.doNotFoundVisible();
+      } else {
         this.visibleCards = this.filterArrays(byCategory, bySize, byPrice, byCount, bySearch);
         // меняем количество товаров около чекбоксов на актуальное
-        if (this.categoryFilter) this.changeStartValueForNotEmpty(this.categoryFilter);
-        if (this.sizeFilter) this.changeStartValueForNotEmpty(this.sizeFilter);
+        if (this.categoryFilter) this.assignQuantity(this.categoryFilter);
+        if (this.sizeFilter) this.assignQuantity(this.sizeFilter);
         // скрываем надпись not found и делаем карточки видимыми
-        this.visibleCards.forEach((visibleCard) => {
+        this.visibleCards.forEach((visibleCard): void => {
           if (this.notFoundText) {
             this.notFoundText.classList.add('hidden');
           }
           visibleCard.element.classList.remove('hidden');
         });
-      } else {
-        this.visibleCards = [];
-        this.doNotFoundVisible();
       }
     } else {
-      this.visibleCards.length = 0;
       // если при применении фильтров значений нет, но активные фильтры не пустые
       // значит у нас нет пересечения между фильтрами. Выводим not found
-      if (this.activeFilters.length !== 0) {
+      // eslint-disable-next-line no-lonely-if
+      if (this.activeFilters.length && !this.visibleCards.length) {
+        this.visibleCards.length = 0;
         if (this.notFoundText) {
           this.notFoundText.classList.remove('hidden');
-          this.cardsAll.forEach((card) => {
+          this.cardsAll.forEach((card): void => {
             card.element.classList.add('hidden');
           });
         }
-        if (this.categoryFilter) this.changeStartValueForNotEmpty(this.categoryFilter);
-        if (this.sizeFilter) this.changeStartValueForNotEmpty(this.sizeFilter);
         this.doNotFoundVisible();
-      } else if (this.visibleCards.length === 0 && this.activeFilters.length === 0) {
-        if (this.categoryFilter) this.changeValueForEmpty(this.categoryFilter);
-        if (this.sizeFilter) this.changeValueForEmpty(this.sizeFilter);
+        if (this.categoryFilter) this.assignQuantity(this.categoryFilter);
+        if (this.sizeFilter) this.assignQuantity(this.sizeFilter);
+      } else {
+        this.visibleCards = this.cardsAll;
+        if (this.categoryFilter) this.assignQuantity(this.categoryFilter);
+        if (this.sizeFilter) this.assignQuantity(this.sizeFilter);
       }
     }
     this.setCountFrom(this.visibleCards);
@@ -524,50 +533,85 @@ export default class CardsField extends BaseComponent {
     this.changeFoundItemsCount();
   }
 
+  // сброс классов
+  public resetClasses(activeFilters: string[], cards: Card[]): void {
+    cards.forEach((card): void => {
+      if (activeFilters.length === 0) {
+        // если массив пустой, делаем все карточки видимыми
+        card.element.classList.remove('hidden');
+      } else {
+        card.element.classList.add('hidden');
+      }
+    });
+  }
+
+  public filterBySize(cards: Card[]): Card[] {
+    return cards.filter(({ size }): boolean => {
+      return this.activeFilters.some((filter): boolean => size.includes(filter));
+    });
+  }
+
+  public filterByCategory(cards: Card[]): Card[] {
+    return cards.filter(({ category }): boolean => {
+      return this.activeFilters.some((filter): boolean => category.includes(filter));
+    });
+  }
+
+  public filterByPrice(cards: Card[]): Card[] {
+    const [priceFrom, priceTo]: number[] = this.getCountAndPrice(this.activeFilters, QueryParameters.Price);
+    return cards.filter((card): boolean => {
+      return card.price >= priceFrom && card.price <= priceTo;
+    });
+  }
+
+  public filterByCount(cards: Card[]): Card[] {
+    const [countFrom, countTo]: number[] = this.getCountAndPrice(this.activeFilters, QueryParameters.Count);
+    return cards.filter((card): boolean => {
+      return card.stock >= countFrom && card.stock <= countTo;
+    });
+  }
+
+  public filterBySearch(cards: Card[]): Card[] {
+    return cards.filter(({ element }): boolean => {
+      return this.activeFilters.some((filter: string): boolean => {
+        const temp: string = this.getPartOfString(filter, 0);
+        if (temp !== QueryParameters.Search) return false;
+        return element.innerText.toLowerCase().includes(this.getPartOfString(filter, 1));
+      });
+    });
+  }
+
+  // делаем notFound видимым
   public doNotFoundVisible(): void {
     if (this.notFoundText) {
       this.notFoundText.classList.remove('hidden');
-      this.cardsAll.forEach((card) => {
+      this.cardsAll.forEach((card): void => {
         card.element.classList.add('hidden');
       });
     }
-    if (this.categoryFilter) this.changeStartValueForNotEmpty(this.categoryFilter);
-    if (this.sizeFilter) this.changeStartValueForNotEmpty(this.sizeFilter);
+    if (this.categoryFilter) this.assignQuantity(this.categoryFilter);
+    if (this.sizeFilter) this.assignQuantity(this.sizeFilter);
   }
 
-  // получаем изначальные значения количества товаров и указываем их
-  public changeValueForEmpty(filter: Filter): void {
-    if (filter && filter.allCountsFrom) {
-      filter.allCountsFrom.forEach((elem) => {
-        if (filter.allCountsTo) {
-          filter.allCountsTo.forEach((initialEl) => {
-            const temp = elem;
-            if (initialEl.className === elem.className) {
-              temp.textContent = `${initialEl.textContent}`;
-            }
-          });
-        }
-      });
-    }
+  // функция принимает отфильтрованные значения категории, размера, цены и остатка
+  // на складе в виде массивов карточек, проверяет, что массивы не пустые и в зависимости
+  // от этого фильтрует товары, исключая те, которые не подходят по всем активным фильтрам.
+  public filterArrays(arr1: Card[], arr2: Card[], arr3: Card[], arr4: Card[], arr5: Card[]): Card[] {
+    const allArr: Card[][] = [arr1, arr2, arr3, arr4, arr5].filter((arr): boolean => arr.length > 0);
+    const result: Card[] = allArr.reduce((acc: Card[], item: Card[]) => {
+      return acc.filter((elem: Card): boolean => item.includes(elem));
+    });
+    return result;
   }
 
-  public changeStartValueForNotEmpty(filter: Filter): void {
-    if (filter && filter.allCountsFrom) {
-      filter.allCountsFrom.forEach((elem) => {
-        const temp = elem;
-        temp.textContent = '0';
-      });
-    }
-  }
-
-  // установить количество текущих карточек для чекбоксов
+  // установить количество текущих карточек для всех чекбоксов
   public setCountFrom(data: Card[]): void {
     // получаю массив типов
-    const allCheckbox = [
+    const allCheckbox: CountForFilter[] = [
       ...findCountOfCurrentProducts(data, QueryParameters.Category),
       ...findCountOfCurrentProducts(data, QueryParameters.Size),
     ];
-    allCheckbox.forEach((subtype) => {
+    allCheckbox.forEach((subtype: CountForFilter): void => {
       this.assignQuantity(
         subtype.type === QueryParameters.Category ? this.categoryFilter : this.sizeFilter,
         subtype.key,
@@ -577,11 +621,13 @@ export default class CardsField extends BaseComponent {
   }
 
   // указываю количество в textcontent
-  public assignQuantity(filter: Filter | null, key: string, count: number): void {
+  public assignQuantity(filter: Filter | null, key?: string, count?: number): void {
     if (filter && filter.allCountsFrom) {
-      filter.allCountsFrom.forEach((elem) => {
-        const temp = elem;
-        if (elem.id === key) {
+      filter.allCountsFrom.forEach((elem): void => {
+        const temp: HTMLElement = elem;
+        if (!key && !count) {
+          temp.textContent = '0';
+        } else if (elem.id === key) {
           temp.textContent = `${count}`;
         }
       });
@@ -598,7 +644,7 @@ export default class CardsField extends BaseComponent {
       if (this.postersFound.textContent === 'Found: 0') {
         this.doNotFoundVisible();
       }
-      if (this.postersFound.textContent === 'Found: 32') {
+      if (this.postersFound.textContent === `Found: ${this.cardsAll.length}`) {
         if (!getQueryParams(QueryParameters.Price) && !getQueryParams(QueryParameters.Count)) {
           if (this.priceFilter) this.resetRange(this.priceFilter);
           if (this.stockFilter) this.resetRange(this.stockFilter);
@@ -607,10 +653,10 @@ export default class CardsField extends BaseComponent {
     }
   }
 
+  // сброс input range ползунков
   public resetRange(filterType: Filter): void {
     // eslint-disable-next-line object-curly-newline
     const { highestInput, lowestInput, maxElement, minElement } = filterType;
-
     if (lowestInput && lowestInput instanceof HTMLInputElement && minElement) {
       lowestInput.setAttribute('value', lowestInput.min);
       minElement.textContent = filterType === this.priceFilter ? `$ ${lowestInput.value}` : `${lowestInput.value}`;
@@ -621,41 +667,10 @@ export default class CardsField extends BaseComponent {
     }
   }
 
-  // функция принимает отфильтрованные значения категории, размера, цены и остатка
-  // на складе в виде массивов карточек, проверяет, что массивы не пустые и в зависимости
-  // от этого фильтрует товары, исключая те, которые не подходят по всем активным фильтрам.
-  public filterArrays(arr1: Card[], arr2: Card[], arr3: Card[], arr4: Card[], arr5: Card[]): Card[] {
-    const allArr: Card[][] = [arr1, arr2, arr3, arr4, arr5].filter((arr) => arr.length > 0);
-    const result = allArr.reduce((acc, item) => acc.filter((elem) => item.includes(elem)));
-    return result;
-  }
-
-  // сброс классов
-  public resetClasses(activeFilters: string[], cards: Card[]): void {
-    cards.forEach((card) => {
-      if (activeFilters.length === 0) {
-        // если массив пустой делаем все карточки видимыми
-        card.element.classList.remove('hidden');
-      } else {
-        card.element.classList.add('hidden');
-      }
-    });
-  }
-
-  public getPrice(activeFilters: string[]): number[] {
+  public getCountAndPrice(activeFilters: string[], type: string): number[] {
     let result: number[] = [];
-    activeFilters.forEach((filter) => {
-      if (this.getPartOfString(filter, 0) === 'price') {
-        result = [+this.getPartOfString(filter, 1), +this.getPartOfString(filter, 2)];
-      }
-    });
-    return result;
-  }
-
-  public getCount(activeFilters: string[]): number[] {
-    let result: number[] = [];
-    activeFilters.forEach((filter) => {
-      if (this.getPartOfString(filter, 0) === 'count') {
+    activeFilters.forEach((filter): void => {
+      if (this.getPartOfString(filter, 0) === type) {
         result = [+this.getPartOfString(filter, 1), +this.getPartOfString(filter, 2)];
       }
     });
@@ -667,7 +682,6 @@ export default class CardsField extends BaseComponent {
     e.preventDefault();
     deleteAllQueryParams();
     this.activeFilters.length = 0;
-
     this.addClassesForCards(this.activeFilters, this.cardsAll);
     this.checkUrlInfo();
   };
@@ -680,7 +694,7 @@ export default class CardsField extends BaseComponent {
       e.target.style.color = '#FF7D15';
       const url: string = window.location.href;
       navigator.clipboard.writeText(url);
-      setTimeout(() => {
+      setTimeout((): void => {
         if (e.target && e.target instanceof HTMLButtonElement) {
           e.target.textContent = 'Copy link';
           e.target.style.color = '#65635f';
@@ -704,7 +718,7 @@ export default class CardsField extends BaseComponent {
     }
 
     if (subject instanceof Card && !subject.element.classList.contains('added')) {
-      const index = this.addedItems.findIndex((i) => i.id === subject.id);
+      const index: number = this.addedItems.findIndex((i): boolean => i.id === subject.id);
       this.addedItems.splice(index, 1);
       if (this.addedItems.length > 0) {
         setDataToLocalStorage(this.addedItems, 'addedPosters');

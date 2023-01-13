@@ -1,3 +1,9 @@
+export type CountForFilter = {
+  type: string;
+  key: string;
+  count: number;
+};
+
 export enum TypeOfView {
   ViewFour = 'four',
   ViewTwo = 'two',

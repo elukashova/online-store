@@ -3,8 +3,8 @@ import rendered from '../../utils/render';
 import cardsData from '../../assets/json/data';
 import findMinAndMax from './utils/find.minmax';
 import RangeTypes from './enums.filter';
-import findCountOfProductsFromData from './utils/find.initial.count';
 import { CardDataType } from '../card/card.types';
+import findCountOfCurrentProducts from '../cards-field/utils/find.current.count';
 
 export default class Filter {
   public checkboxes: HTMLElement[] = [];
@@ -67,7 +67,7 @@ export default class Filter {
   }
 
   public setInitialCount(data: CardDataType[], field: string, name: string): void {
-    const dataObjects = findCountOfProductsFromData(data, field);
+    const dataObjects = findCountOfCurrentProducts(data, field);
     dataObjects.forEach((elem) => {
       const { type, key, count } = elem;
       if (field === type && name === key && this.countTo && this.countFrom) {

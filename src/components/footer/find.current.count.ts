@@ -1,14 +1,8 @@
-import { CardDataType } from '../../card/card.types';
+/* import { CardDataType } from '../../card/card.types';
+import { CountForFilter } from '../../cards-field/cards-field.types';
 
-function findCountOfProductsFromData(
-  data: CardDataType[],
-  field: string,
-): { type: string; key: string; count: number }[] {
-  const uniqueArray: {
-    type: string;
-    key: string;
-    count: number;
-  }[] = [];
+function findCountOfProductsFromData(data: CardDataType[], field: string): CountForFilter[] {
+  const uniqueArray: CountForFilter[] = [];
   data.forEach((item) => {
     let obj;
     let index;
@@ -28,4 +22,4 @@ function findCountOfProductsFromData(
   return uniqueArray;
 }
 
-export default findCountOfProductsFromData;
+export default findCountOfProductsFromData; */
