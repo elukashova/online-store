@@ -1,14 +1,8 @@
 import { CardDataType } from '../../card/card.types';
+import { CountForFilter } from '../cards-field.types';
 
-function findCountOfCurrentProducts(
-  data: CardDataType[],
-  field: string,
-): { type: string; key: string; count: number }[] {
-  const uniqueArray: {
-    type: string;
-    key: string;
-    count: number;
-  }[] = [];
+function findCountOfCurrentProducts(data: CardDataType[], field: string): CountForFilter[] {
+  const uniqueArray: CountForFilter[] = [];
   data.forEach((item) => {
     let obj;
     let index;

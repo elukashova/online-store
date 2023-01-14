@@ -2,9 +2,10 @@ import './filter.styles.css';
 import rendered from '../../utils/render';
 import cardsData from '../../assets/json/data';
 import findMinAndMax from './utils/find.minmax';
-import RangeTypes from './enums.filter';
-import findCountOfProductsFromData from './utils/find.initial.count';
 import { CardDataType } from '../card/card.types';
+import findCountOfCurrentProducts from '../cards-field/utils/find.current.count';
+import { CountForFilter } from '../cards-field/cards-field.types';
+import { FilterType, RangeTypes } from './enums.filter';
 
 export default class Filter {
   public checkboxes: HTMLElement[] = [];
@@ -34,7 +35,7 @@ export default class Filter {
   public renderCheckbox(data: string[], str: string): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str} ${str}`);
     rendered('legend', filterWrapper, `${str}__legend-1`, this.name);
-    data.forEach((item, ind) => {
+    data.forEach((item, ind): void => {
       const inputWrapper: HTMLElement = rendered('div', filterWrapper, `${str}__input-wrapper`);
       const checkboxWrapper: HTMLElement = rendered('div', inputWrapper, `${str}__checkbox-wrapper`);
       const inputElement: HTMLElement = rendered(
@@ -48,7 +49,7 @@ export default class Filter {
           name: `${str}`,
         },
       );
-      inputElement.addEventListener('change', () => this.updateActiveFilters(item));
+      inputElement.addEventListener('change', (): void => this.updateActiveFilters(item));
       // устанавливаем слушатель на инпут при создании и передаем в cardfields измененные чекбоксы
       rendered('label', checkboxWrapper, `${str}__label-${ind + 1}`, `${item}`, {
         for: `${item}`,
@@ -60,16 +61,18 @@ export default class Filter {
       rendered('span', countWrapper, `${str}__slash-${ind + 1}`, '/');
       this.countTo = rendered('span', countWrapper, `${str}__out-from-to-${ind + 1}`, '5');
       this.setInitialCount(cardsData.products, str, item);
-      if (this.allCountsFrom) this.allCountsFrom.push(this.countFrom);
+      if (this.allCountsFrom) {
+        this.allCountsFrom.push(this.countFrom);
+      }
       this.checkboxes.push(inputElement);
     });
     return filterWrapper;
   }
 
   public setInitialCount(data: CardDataType[], field: string, name: string): void {
-    const dataObjects = findCountOfProductsFromData(data, field);
-    dataObjects.forEach((elem) => {
-      const { type, key, count } = elem;
+    const dataObjects: CountForFilter[] = findCountOfCurrentProducts(data, field);
+    dataObjects.forEach((elem: CountForFilter): void => {
+      const { type, key, count }: CountForFilter = elem;
       if (field === type && name === key && this.countTo && this.countFrom) {
         this.countTo.textContent = `${count}`;
         this.countFrom.textContent = `${count}`;
@@ -120,27 +123,27 @@ export default class Filter {
 
   public addListenerToRange(lowestInput: HTMLElement, highestInput: HTMLElement): void {
     if (lowestInput instanceof HTMLInputElement && highestInput instanceof HTMLInputElement) {
-      lowestInput.addEventListener('input', (e) => {
+      lowestInput.addEventListener('input', (e: Event): void => {
         if (e.target && e.target instanceof HTMLElement) {
           if (e.target.id === RangeTypes.PriceFrom) {
             this.changeLowInput(lowestInput, highestInput, RangeTypes.PriceFrom);
-            this.updateActiveFilters(`price, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`${FilterType.Price}, ${lowestInput.value}, ${highestInput.value}`);
           }
           if (e.target.id === RangeTypes.StockFrom) {
             this.changeLowInput(lowestInput, highestInput, RangeTypes.StockFrom);
-            this.updateActiveFilters(`count, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`${FilterType.Count}, ${lowestInput.value}, ${highestInput.value}`);
           }
         }
       });
-      highestInput.addEventListener('input', (e) => {
+      highestInput.addEventListener('input', (e: Event): void => {
         if (e.target && e.target instanceof HTMLElement) {
           if (e.target.id === RangeTypes.PriceTo) {
             this.changeHighInput(lowestInput, highestInput, RangeTypes.PriceTo);
-            this.updateActiveFilters(`price, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`${FilterType.Price}, ${lowestInput.value}, ${highestInput.value}`);
           }
           if (e.target.id === RangeTypes.StockTo) {
             this.changeHighInput(lowestInput, highestInput, RangeTypes.StockTo);
-            this.updateActiveFilters(`count, ${lowestInput.value}, ${highestInput.value}`);
+            this.updateActiveFilters(`${FilterType.Count}, ${lowestInput.value}, ${highestInput.value}`);
           }
         }
       });
@@ -153,7 +156,7 @@ export default class Filter {
     const priceFrom: HTMLElement | null = document.getElementById('from-price-value');
     const countFrom: HTMLElement | null = document.getElementById('from-stock-value');
     if (low && high && low instanceof HTMLInputElement && high instanceof HTMLInputElement) {
-      const gap = 1;
+      const gap: number = 1;
       if (+high.value - +low.value < gap) {
         low.value = (+high.value - gap).toString();
       }
@@ -178,7 +181,7 @@ export default class Filter {
     const priceTo: HTMLElement | null = document.getElementById('to-price-value');
     const countTo: HTMLElement | null = document.getElementById('to-stock-value');
     if (low && high && low instanceof HTMLInputElement && high instanceof HTMLInputElement) {
-      const gap = 1;
+      const gap: number = 1;
       if (+high.value - +low.value < gap) {
         high.value = (+low.value + gap).toString();
       }

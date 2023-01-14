@@ -15,7 +15,7 @@ export default class ModalWindow extends BaseComponent {
 
   private cardNumberInput: HTMLElement | null = null;
 
-  private cardExpirationInput: HTMLElement | null = null;
+  public cardExpirationInput: HTMLElement | null = null;
 
   private cardCVVInput: HTMLElement | null = null;
 
@@ -54,7 +54,7 @@ export default class ModalWindow extends BaseComponent {
       'data-regex': "([A-Za-zА-Яа-яЁё'-]{3,}\\s[A-Za-zА-Яа-яЁё'-]{3,}\\s?)",
       required: 'required',
     });
-    const nameLabel = rendered(
+    const nameLabel: HTMLElement = rendered(
       'label',
       this.personalInfoForm,
       'pers-data__name-label label hidden',
@@ -69,7 +69,7 @@ export default class ModalWindow extends BaseComponent {
       'data-regex': '^[\\+][0-9]{9,}$',
       required: 'required',
     });
-    const phoneLabel = rendered(
+    const phoneLabel: HTMLElement = rendered(
       'label',
       this.personalInfoForm,
       'pers-data__phone-label label hidden',
@@ -84,7 +84,7 @@ export default class ModalWindow extends BaseComponent {
       'data-regex': '([A-Za-zА-Яа-яЁё]{5,}[,]?\\s[-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s[-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s?)',
       required: 'required',
     });
-    const addressLabel = rendered(
+    const addressLabel: HTMLElement = rendered(
       'label',
       this.personalInfoForm,
       'pers-data__address-label label hidden',
@@ -100,7 +100,7 @@ export default class ModalWindow extends BaseComponent {
         "^(?!\\.)(?!.*\\.$)(?!.*\\.\\.)([A-Za-z0-9!#$%&'*\\.\\.+-\\/=?^_`{|}~]{2,})@[A-Za-z0-9-\\._]{2,}\\.[A-Za-z]{2,4}$",
       required: 'required',
     });
-    const emailLabel = rendered(
+    const emailLabel: HTMLElement = rendered(
       'label',
       this.personalInfoForm,
       'pers-data__email-label label hidden',
@@ -127,7 +127,7 @@ export default class ModalWindow extends BaseComponent {
       required: 'required',
       maxlength: '16',
     });
-    const numberLabel = rendered(
+    const numberLabel: HTMLElement = rendered(
       'label',
       cardWrapper,
       'pers-data__number-label label hidden',
@@ -151,8 +151,7 @@ export default class ModalWindow extends BaseComponent {
     this.cardExpirationInput.addEventListener('keydown', this.autoSlashForDate);
     this.cardExpirationInput.addEventListener('keyup', this.autoSlashForDate);
     this.cardExpirationInput.addEventListener('keydown', this.addOnlyNumbers);
-    /* this.cardExpirationInput.addEventListener('keyup', this.addOnlyNumbers); */
-    const expirationLabel = rendered(
+    const expirationLabel: HTMLElement = rendered(
       'label',
       dataWrapper,
       'pers-data__expiration-label label hidden',
@@ -172,9 +171,16 @@ export default class ModalWindow extends BaseComponent {
       required: 'required',
       maxlength: '3',
     });
-    const cvvLabel = rendered('label', cvvWrapper, 'pers-data__cvv-label label hidden', '3 digits must be entered', {
-      for: 'cvv',
-    });
+    const cvvLabel: HTMLElement = rendered(
+      'label',
+      cvvWrapper,
+      'pers-data__cvv-label label hidden',
+      '3 digits must be entered',
+      {
+        for: 'cvv',
+      },
+    );
+
     // eslint-disable-next-line max-len
     this.labelsAll = [cvvLabel, expirationLabel, numberLabel, nameLabel, phoneLabel, addressLabel, emailLabel];
 
@@ -207,18 +213,19 @@ export default class ModalWindow extends BaseComponent {
 
     // слушатели
     this.personalInfoForm.addEventListener('input', this.inputHandler);
-    this.cardNumberInput.addEventListener('input', (e) => {
+    this.cardNumberInput.addEventListener('input', (e: Event): void => {
       if (this.cardNumberLogo) {
         this.changeLogoOfPaymentSystem(e);
       }
     });
-    this.confirmBtn.addEventListener('click', (e) => {
+    this.confirmBtn.addEventListener('click', (e: Event): void => {
       if (this.confirmBtnText) {
         this.buttonHandler(e);
       }
     });
   }
 
+  // закрытие модального окна
   private closeModalCallback = (e: Event): void => {
     e.preventDefault();
     if (e.currentTarget === e.target) {
@@ -226,6 +233,7 @@ export default class ModalWindow extends BaseComponent {
     }
   };
 
+  // проверяем наличие атрибута с регулярным выражением у инпута
   public inputHandler = (e: Event): void => {
     if (e.target && e.target instanceof HTMLInputElement) {
       if (e.target.hasAttribute('data-regex')) {
@@ -234,13 +242,14 @@ export default class ModalWindow extends BaseComponent {
     }
   };
 
+  // смена классов valid / invalid
   public addClasses(element: HTMLInputElement): void {
-    const inputValue = element.value;
-    const inputReg = element.dataset.regex;
-    const input = element;
+    const inputValue: string = element.value;
+    const inputReg: string | undefined = element.dataset.regex;
+    const input: HTMLInputElement = element;
     if (inputReg) {
-      const reg = new RegExp(inputReg);
-      if (reg.test(inputValue)) {
+      const reg: RegExp = new RegExp(inputReg);
+      if (this.checkInputValue(reg, inputValue)) {
         input.classList.add('valid');
         input.classList.remove('invalid');
         if (!this.validInputs.includes(input)) {
@@ -257,25 +266,32 @@ export default class ModalWindow extends BaseComponent {
     this.checkAllIsValid(this.validInputs, this.inputsAll);
   }
 
+  public checkInputValue(regex: RegExp, inputValue: string): boolean {
+    return regex.test(inputValue);
+  }
+
+  // добавление слэша в срок действия карты
   public autoSlashForDate(e: KeyboardEvent): void {
     if (e.target && e.target instanceof HTMLInputElement) {
-      const inputValue = e.target.value;
-      const { key } = e;
+      const inputValue: string = e.target.value;
+      const { key }: KeyboardEvent = e;
       if (inputValue.length === 2 && key !== 'Backspace') {
         e.target.value = `${inputValue}/`;
       }
     }
   }
 
+  // запрет на добавление нечисловых значений
   public addOnlyNumbers(e: KeyboardEvent): void {
     if (e.key.length === 1 && /\D/.test(e.key)) {
       e.preventDefault();
     }
   }
 
+  // метод смены логотипа платежной системы
   public changeLogoOfPaymentSystem(e: Event): void {
     if (e.target && e.target instanceof HTMLInputElement) {
-      const inputValue = e.target.value;
+      const inputValue: string = e.target.value;
       if (this.cardNumberLogo) {
         if (inputValue.startsWith('3')) {
           this.cardNumberLogo.setAttribute('src', '../../../assets/icons/american-express.png');
@@ -290,8 +306,10 @@ export default class ModalWindow extends BaseComponent {
     }
   }
 
+  // проверяем что все инпуты валидны
   public checkAllIsValid(valid: HTMLElement[], full: HTMLElement[]): void {
     if (this.confirmBtn) {
+      // сравниваем длину массива валидных инпутов с длиной массива всех инпутов
       this.confirmBtn.setAttribute('data-valid', valid.length < full.length ? 'invalid' : 'valid');
       if (this.confirmBtn.getAttribute('data-valid') === 'valid') {
         this.confirmBtn.classList.add('valid-btn');
@@ -304,6 +322,7 @@ export default class ModalWindow extends BaseComponent {
     }
   }
 
+  // добавляем или убираем классы для подсказок
   public checkLabel(labelsAll: HTMLElement[]): void {
     labelsAll.forEach((label) => {
       if (label && label instanceof HTMLLabelElement) {

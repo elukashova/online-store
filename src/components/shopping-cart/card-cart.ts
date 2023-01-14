@@ -130,7 +130,7 @@ export default class CartCard extends BaseComponent {
     this.callback(e);
   };
 
-  private minusBtnCallback = (): void => {
+  public minusBtnCallback = (): void => {
     this.minus = true;
     this.plus = false;
     if (this.itemAmount > 0) {
