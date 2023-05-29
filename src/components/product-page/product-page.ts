@@ -3,16 +3,16 @@ import BaseComponent from '../base-component/base-component';
 import cardsData from '../../assets/json/data';
 import './product-page.styles.css';
 import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
-import { PosterStorageType } from '../../utils/localStorage.types';
+import { PosterStorageInfo } from '../../utils/localStorage.types';
 import { Observer } from '../card/card.types';
 import { Callback } from '../shopping-cart/shopping-cart.types';
 
 export default class ProductPage extends BaseComponent {
   private observers: Observer[] = [];
 
-  private readonly storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageInfo[] | null = checkDataInLocalStorage('addedPosters');
 
-  private addedItems: PosterStorageType[] = [];
+  private addedItems: PosterStorageInfo[] = [];
 
   private id: number = 0;
 
@@ -209,7 +209,7 @@ export default class ProductPage extends BaseComponent {
   }
 
   private addItemToLocalStorage(): void {
-    const info: PosterStorageType = {
+    const info: PosterStorageInfo = {
       id: this.id,
       quantity: 1,
     };

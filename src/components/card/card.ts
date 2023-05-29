@@ -3,7 +3,7 @@ import rendered from '../../utils/render';
 import { CardDataType, Observer } from './card.types';
 import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
-import { PosterStorageType } from '../../utils/localStorage.types';
+import { PosterStorageInfo } from '../../utils/localStorage.types';
 import { Callback } from '../shopping-cart/shopping-cart.types';
 
 export default class Card extends BaseComponent {
@@ -39,7 +39,7 @@ export default class Card extends BaseComponent {
 
   private wasAdded: boolean = false;
 
-  private readonly storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageInfo[] | null = checkDataInLocalStorage('addedPosters');
 
   constructor(data: CardDataType, private callback: Callback) {
     super('div', 'cards__item card');
@@ -86,7 +86,7 @@ export default class Card extends BaseComponent {
     productPageBtn.addEventListener('click', this.productPageBtnCallback);
     // проверяем local storage, добавлена ли этот товар в корзину
     if (this.storageInfo !== null) {
-      const posters: PosterStorageType[] = this.storageInfo.slice();
+      const posters: PosterStorageInfo[] = this.storageInfo.slice();
       for (let i: number = 0; i < posters.length; i += 1) {
         if (posters[i].id === this.id) {
           this.totalPrice = posters[i].quantity * this.price;

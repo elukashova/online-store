@@ -1,19 +1,19 @@
 .about-container {
   display: flex;
   align-items: center;
-  width: 100%;
   justify-content: center;
   gap: 3%;
-  height: calc(.5em + 30vw);
+  width: 100%;
+  height: calc(0.5em + 30vw);
 }
 
 .about__img-wrapper {
-  width: 32%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #F0F0F0;
+  width: 32%;
   height: 100%;
+  background-color: #f0f0f0;
 }
 
 .about__image {
@@ -24,71 +24,68 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 42%;
   gap: 0.5rem;
+  width: 42%;
 }
 
 .about__title {
   font-weight: 500;
-  font-size: calc(.2em + 1.7vw);
+  font-size: calc(0.2em + 1.7vw);
   letter-spacing: 0.15em;
   color: #161412;
 }
 
 .about__text {
-  font-size: calc(.2em + 1vw);
-  color: #65635F;
+  font-size: calc(0.2em + 1vw);
   font-weight: 300;
+  color: #65635f;
 }
 
 .about__explore-btn {
   margin-top: 4rem;
-  cursor: pointer;
-  background-color: #FF7D15;
-  color: #FFF;
-  font-size: calc(.1em + 0.9vw);
-  text-transform: uppercase;
   height: 2.2em;
   width: 7em;
+  color: #fff;
+  font-size: calc(0.1em + 0.9vw);
+  text-transform: uppercase;
+  background-color: #ff7d15;
   border-radius: 0.15em;
-  transition: background-color .3s;
+  cursor: pointer;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  transition: background-color 0.3s;
 }
 
 .about__explore-btn:hover {
-  background-color:#65635F;
+  background-color: #65635f;
 }
 
 .about__explore-btn:active {
-  background-color:#251707;
+  background-color: #251707;
 }
 
 @media screen and (max-width: 1100px) {
-  
   .about__img-wrapper {
     width: 35%;
   }
-  
 }
 
 @media screen and (max-width: 550px) {
-
   .about-container {
     flex-direction: column;
-    gap: 0.5rem;
-    height: calc(.5em + 90vw);
     justify-content: space-between;
+    gap: 0.5rem;
+    height: calc(0.5em + 90vw);
   }
-  
+
   .about__img-wrapper {
-    width: 90%;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #F0F0F0;
+    width: 90%;
     height: 100%;
+    background-color: #f0f0f0;
   }
-  
+
   .about__image {
     width: 65%;
   }
@@ -102,6 +99,4 @@
     align-self: center;
     margin-top: 1em;
   }
-  
 }
-

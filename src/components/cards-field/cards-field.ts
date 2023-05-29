@@ -9,10 +9,10 @@ import cardsData from '../../assets/json/data';
 import Card from '../card/card';
 import Filter from '../filter/filter';
 import Header from '../header/header';
-import { ObservedSubject } from '../card/card.types';
+import { CardDataType, ObservedSubject } from '../card/card.types';
 import findCountOfCurrentProducts from './utils/find.current.count';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
-import { PosterStorageType } from '../../utils/localStorage.types';
+import { PosterStorageInfo } from '../../utils/localStorage.types';
 import {
   deleteAllQueryParams,
   deleteOneQueryParam,
@@ -31,7 +31,7 @@ export default class CardsField extends BaseComponent {
 
   public visibleCards: Card[] = []; // текущие видимые карточки (для сортировки)
 
-  public addedItems: PosterStorageType[] = []; // сохранение id добавленных товаров в local storage
+  public addedItems: PosterStorageInfo[] = []; // сохранение id добавленных товаров в local storage
 
   public allOptions: HTMLElement[] | null = null;
 
@@ -59,11 +59,11 @@ export default class CardsField extends BaseComponent {
 
   public viewTwoProducts: HTMLElement | null = null;
 
-  private readonly storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageInfo[] | null = checkDataInLocalStorage('addedPosters');
 
   constructor(public readonly header: Header, private callback: Callback) {
     super('div', 'content__container');
-    this.checkLocalStorage();
+    this.setAddedItemsFromLS();
     this.render();
     this.checkUrlInfo();
   }
@@ -78,15 +78,15 @@ export default class CardsField extends BaseComponent {
 
     // фильтр по категории
     this.categoryFilter = new Filter(filtersContainer, 'category', this.updateActiveFilters);
-    let uniqueCategories: string[] = cardsData.products.map((item) => item.category);
-    uniqueCategories = Array.from(new Set(uniqueCategories));
+    const categories: string[] = cardsData.products.map((item: CardDataType): string => item.category);
+    const uniqueCategories = Array.from(new Set(categories));
     const categoryNames: HTMLElement = this.categoryFilter.renderCheckbox(uniqueCategories, 'category');
     filtersContainer.append(categoryNames);
 
     // фильтр по размеру
     this.sizeFilter = new Filter(filtersContainer, 'size', this.updateActiveFilters);
-    let uniqueSize: string[] = cardsData.products.map((item) => item.size);
-    uniqueSize = Array.from(new Set(uniqueSize));
+    const size: string[] = cardsData.products.map((item: CardDataType): string => item.size);
+    const uniqueSize = Array.from(new Set(size));
     const sizeNames: HTMLElement = this.sizeFilter.renderCheckbox(uniqueSize, 'size');
     filtersContainer.append(sizeNames);
 
@@ -169,7 +169,7 @@ export default class CardsField extends BaseComponent {
     this.notFoundText = rendered('p', this.cardsContainer, 'cards__not-found hidden', 'Product not found', {
       id: 'cards__not-found',
     });
-    cardsData.products.forEach((data): void => {
+    cardsData.products.forEach((data: CardDataType): void => {
       const card: Card = new Card(data, this.callback);
       card.attachObserver(this.header);
       card.attachObserver(this);
@@ -178,7 +178,7 @@ export default class CardsField extends BaseComponent {
     });
 
     // слушатель для текстового поиска
-    this.searchInput.addEventListener('input', (e): void => this.toDoWhenSearchInputListen(e));
+    this.searchInput.addEventListener('input', (e: Event): void => this.toDoWhenSearchInputListen(e));
     // слушатель для сортировки
     this.selectInput.addEventListener('change', (): void => {
       if (this.cardsContainer && this.selectInput) {
@@ -188,7 +188,7 @@ export default class CardsField extends BaseComponent {
       }
     });
     // слушатель смены вида
-    viewTypes.addEventListener('click', (e): void => this.toDoWhenViewTypesListen(e));
+    viewTypes.addEventListener('click', (e: Event): void => this.toDoWhenViewTypesListen(e));
   }
 
   /* Методы, вызываемые слушателями */
@@ -259,8 +259,8 @@ export default class CardsField extends BaseComponent {
       setQueryParams('sorting', str);
       // добавляем selected выбранному option
       if (this.allOptions) {
-        this.allOptions.forEach((option): void => option.removeAttribute('selected'));
-        this.allOptions.forEach((option): void => {
+        this.allOptions.forEach((option: HTMLElement): void => option.removeAttribute('selected'));
+        this.allOptions.forEach((option: HTMLElement): void => {
           if (this.selectInput && this.selectInput instanceof HTMLSelectElement) {
             if (option instanceof HTMLOptionElement && str === option.value) {
               option.setAttribute('selected', 'selected');
@@ -268,7 +268,7 @@ export default class CardsField extends BaseComponent {
           }
         });
       } // аппендим карточки в контейнер в новом порядке
-      this.cardsAll.forEach((card): void => {
+      this.cardsAll.forEach((card: Card): void => {
         if (this.cardsContainer) {
           this.cardsContainer.append(card.element);
         }
@@ -278,7 +278,7 @@ export default class CardsField extends BaseComponent {
 
   // функция сортировки
   public sortByField(arr: Card[], field: string): Card[] {
-    return arr.sort((a, b): number => {
+    return arr.sort((a: Card, b: Card): number => {
       if (field.includes(SortBy.Asc)) {
         return field.includes(QueryParameters.Price) ? a.price - b.price : a.rating - b.rating;
       }
@@ -347,7 +347,7 @@ export default class CardsField extends BaseComponent {
         values.forEach((value): number => this.pushToActive(this.activeFilters, value));
       }
     };
-    splitedParams.forEach((elem): void => {
+    splitedParams.forEach((elem: string[]): void => {
       const type: string = splitParameters(elem, 0);
       if (type === QueryParameters.View) {
         this.changeViewOfProducts(splitParameters(elem, 1));
@@ -383,7 +383,7 @@ export default class CardsField extends BaseComponent {
 
   // добавляем/убираем чекбоксам checked
   public addOrRemoveChecked(filterType: Filter, filter: string, val: boolean): void {
-    filterType.checkboxes.forEach((type): void => {
+    filterType.checkboxes.forEach((type: HTMLElement): void => {
       if (type.id === filter) {
         if (val) {
           type.setAttribute('checked', 'checked');
@@ -452,7 +452,7 @@ export default class CardsField extends BaseComponent {
 
   // добавление или замена фильтра в активные фильтры
   public addOrReplaceFilter(filterType: string, filter: string): void {
-    const prev = this.activeFilters.find((elem): boolean => elem.startsWith(this.getPartOfString(filter, 0)));
+    const prev = this.activeFilters.find((elem: string): boolean => elem.startsWith(this.getPartOfString(filter, 0)));
     const query = this.composeQueryString(filter);
     if (prev === undefined) {
       this.pushToActive(this.activeFilters, filter);
@@ -707,7 +707,7 @@ export default class CardsField extends BaseComponent {
     чтобы сохранять добавленные товары в local storage */
   public update(subject: ObservedSubject): void {
     if (subject instanceof Card && subject.element.classList.contains('added')) {
-      const info: PosterStorageType = {
+      const info: PosterStorageInfo = {
         id: 0,
         quantity: 0,
       };
@@ -730,7 +730,7 @@ export default class CardsField extends BaseComponent {
 
   /* проверка данных в local storage, чтобы по возвращению из корзины на главную
     не обнулялись данные о добавленных товарах */
-  private checkLocalStorage(): void {
+  private setAddedItemsFromLS(): void {
     if (this.storageInfo !== null) {
       this.addedItems = this.storageInfo.slice();
     }

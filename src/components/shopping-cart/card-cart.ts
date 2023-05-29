@@ -2,13 +2,13 @@ import rendered from '../../utils/render';
 import { CardDataType, Observer } from '../card/card.types';
 import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
-import { PosterStorageType } from '../../utils/localStorage.types';
+import { PosterStorageInfo } from '../../utils/localStorage.types';
 import { Callback } from './shopping-cart.types';
 
 export default class CartCard extends BaseComponent {
-  private storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
+  private storageInfo: PosterStorageInfo[] | null = checkDataInLocalStorage('addedPosters');
 
-  private addedItems: PosterStorageType[] | null = [];
+  private addedItems: PosterStorageInfo[] | null = [];
 
   public id: number;
 
@@ -44,7 +44,7 @@ export default class CartCard extends BaseComponent {
 
   public itemAmount: number = 0;
 
-  public itemInfo: PosterStorageType | null = null;
+  public itemInfo: PosterStorageInfo | null = null;
 
   // эти два указателя мне нужны для обсервера на клик на + и -
   public minus: boolean = false;

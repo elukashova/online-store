@@ -4,7 +4,7 @@ import rendered from '../../utils/render';
 import { ObservedSubject } from '../card/card.types';
 import Card from '../card/card';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
-import { HeaderType } from './header.types';
+import { HeaderInfo } from './header.types';
 import { JsonObj } from '../../utils/localStorage.types';
 import CartCard from '../shopping-cart/card-cart';
 import ProductPage from '../product-page/product-page';
@@ -18,7 +18,7 @@ export default class Header extends BaseComponent {
 
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('headerInfo');
 
-  public headerInfo: HeaderType = {
+  public headerInfo: HeaderInfo = {
     cartItems: 0,
     totalPrice: 0,
   };
@@ -71,7 +71,7 @@ export default class Header extends BaseComponent {
       `${this.headerInfo.cartItems}`,
     );
     this.menuLinks.push(this.storeLink, this.aboutLink, this.shoppingCartLink);
-    this.menuLinks.forEach((link) => {
+    this.menuLinks.forEach((link: HTMLElement): void => {
       link.addEventListener('click', this.navLinkCallback);
     });
     logoLink.addEventListener('click', this.imageLinkCallback);
