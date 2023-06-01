@@ -1,6 +1,6 @@
 import './card.styles.css';
 import rendered from '../../utils/render';
-import { CardDataType, Observer } from './card.types';
+import { CardDataInfo, Observer } from './card.types';
 import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageInfo } from '../../utils/localStorage.types';
@@ -41,7 +41,7 @@ export default class Card extends BaseComponent {
 
   private readonly storageInfo: PosterStorageInfo[] | null = checkDataInLocalStorage('addedPosters');
 
-  constructor(data: CardDataType, private callback: Callback) {
+  constructor(data: CardDataInfo, private callback: Callback) {
     super('div', 'cards__item card');
     this.id = data.id;
     this.title = data.title;

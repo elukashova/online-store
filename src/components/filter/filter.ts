@@ -2,7 +2,7 @@ import './filter.styles.css';
 import rendered from '../../utils/render';
 import cardsData from '../../assets/json/data';
 import findMinAndMax from './utils/find.minmax';
-import { CardDataType } from '../card/card.types';
+import { CardDataInfoPart } from '../card/card.types';
 import findCountOfCurrentProducts from '../cards-field/utils/find.current.count';
 import { CountForFilter } from '../cards-field/cards-field.types';
 import { FilterType, RangeTypes } from './enums.filter';
@@ -18,72 +18,77 @@ export default class Filter {
 
   public highestInput: HTMLElement | null = null;
 
-  public allCountsFrom: HTMLElement[] | null = [];
+  public allCountsFrom: HTMLElement[] = [];
 
-  public allCountsTo: HTMLElement[] | null = [];
+  public allCountsTo: HTMLElement[] = [];
 
   public minElement: HTMLElement | null = null;
 
   public maxElement: HTMLElement | null = null;
 
-  constructor(
-    private readonly container: HTMLElement,
-    private readonly name: string,
-    public updateActiveFilters: (elem: string) => void,
-  ) {}
+  private counts: Record<string, Record<string, number>> = {};
 
-  public renderCheckbox(data: string[], str: string): HTMLElement {
-    const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str} ${str}`);
-    rendered('legend', filterWrapper, `${str}__legend-1`, this.name);
-    data.forEach((item, ind): void => {
-      const inputWrapper: HTMLElement = rendered('div', filterWrapper, `${str}__input-wrapper`);
-      const checkboxWrapper: HTMLElement = rendered('div', inputWrapper, `${str}__checkbox-wrapper`);
+  // eslint-disable-next-line max-len
+  constructor(private readonly container: HTMLElement, public updateActiveFilters: (filter: string) => void) {}
+
+  // eslint-disable-next-line max-lines-per-function
+  public renderCheckbox(data: string[], filterName: keyof CardDataInfoPart): HTMLElement {
+    const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${filterName} ${filterName}`);
+    rendered('legend', filterWrapper, `${filterName}__legend-1`, filterName);
+
+    // eslint-disable-next-line max-len
+    const dataObjects: CountForFilter[] = findCountOfCurrentProducts(cardsData.products, filterName);
+    this.counts[filterName] = {};
+
+    dataObjects.forEach(({ key, count }: CountForFilter): void => {
+      this.counts[filterName][key] = count;
+    });
+
+    data.forEach((filter: string, index: number): void => {
+      const inputWrapper: HTMLElement = rendered('div', filterWrapper, `${filterName}__input-wrapper`);
+      const checkboxWrapper: HTMLElement = rendered('div', inputWrapper, `${filterName}__checkbox-wrapper`);
       const inputElement: HTMLElement = rendered(
         'input',
         checkboxWrapper,
-        `${str}__input-${ind + 1} ${item} ${str}-item`,
+        `${filterName}__input-${index + 1} ${filter} ${filterName}-item`,
         '',
         {
-          id: `${item}`,
+          id: `${filter}`,
           type: 'checkbox',
-          name: `${str}`,
+          name: `${filterName}`,
         },
       );
-      inputElement.addEventListener('change', (): void => this.updateActiveFilters(item));
-      // устанавливаем слушатель на инпут при создании и передаем в cardfields измененные чекбоксы
-      rendered('label', checkboxWrapper, `${str}__label-${ind + 1}`, `${item}`, {
-        for: `${item}`,
+      inputElement.addEventListener('change', (): void => this.updateActiveFilters(filter));
+      rendered('label', checkboxWrapper, `${filterName}__label-${index + 1}`, `${filter}`, {
+        for: `${filter}`,
       });
-      const countWrapper: HTMLElement = rendered('div', inputWrapper, `${str}__count-wrapper`);
-      this.countFrom = rendered('span', countWrapper, `${str}__out-from-to-${ind + 1}`, '1', {
-        id: `${item}`,
+      const countWrapper: HTMLElement = rendered('div', inputWrapper, `${filterName}__count-wrapper`);
+      this.countFrom = rendered('span', countWrapper, `${filterName}__out-from-to-${index + 1}`, '1', {
+        id: `${filter}`,
       });
-      rendered('span', countWrapper, `${str}__slash-${ind + 1}`, '/');
-      this.countTo = rendered('span', countWrapper, `${str}__out-from-to-${ind + 1}`, '5');
-      this.setInitialCount(cardsData.products, str, item);
-      if (this.allCountsFrom) {
-        this.allCountsFrom.push(this.countFrom);
-      }
+      rendered('span', countWrapper, `${filterName}__slash-${index + 1}`, '/');
+      this.countTo = rendered('span', countWrapper, `${filterName}__out-from-to-${index + 1}`, '5');
+      this.setInitialCount(filterName, filter);
+
+      this.allCountsFrom.push(this.countFrom);
+
       this.checkboxes.push(inputElement);
     });
     return filterWrapper;
   }
 
-  public setInitialCount(data: CardDataType[], field: string, name: string): void {
-    const dataObjects: CountForFilter[] = findCountOfCurrentProducts(data, field);
-    dataObjects.forEach((elem: CountForFilter): void => {
-      const { type, key, count }: CountForFilter = elem;
-      if (field === type && name === key && this.countTo && this.countFrom) {
-        this.countTo.textContent = `${count}`;
-        this.countFrom.textContent = `${count}`;
-        if (this.allCountsTo) this.allCountsTo.push(this.countTo);
-      }
-    });
+  public setInitialCount(field: keyof CardDataInfoPart, name: string): void {
+    const count = this.counts[field]?.[name] ?? 0;
+    if (this.countTo && this.countFrom) {
+      this.countTo.textContent = `${count}`;
+      this.countFrom.textContent = `${count}`;
+      this.allCountsTo.push(this.countTo);
+    }
   }
 
   public renderInputRange(str: string): HTMLElement {
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str}`);
-    rendered('legend', filterWrapper, `filters__${str}_legend`, this.name);
+    rendered('legend', filterWrapper, `filters__${str}_legend`);
     const inputWrapper: HTMLElement = rendered('div', filterWrapper, `filters__${str}_wrapper`);
     const sliderWrapper: HTMLElement = rendered('div', inputWrapper, `filters__${str}_slider`);
     const valueWrapper: HTMLElement = rendered('div', inputWrapper, `filters__${str}_value-wrapper ${str}-value`);

@@ -23,3 +23,10 @@ export enum SortBy {
   Asc = 'asc',
   Desc = 'desc',
 }
+
+export enum FilterNames {
+  CATEGORY = 'category',
+  SIZE = 'size',
+  PRICE = 'price',
+  STOCK = 'stock',
+}
