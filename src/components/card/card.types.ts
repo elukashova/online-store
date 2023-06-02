@@ -15,6 +15,7 @@ export type CardDataInfoPart = {
   category: string;
   size: string;
 };
+
 export interface ObservedSubject {
   attachObserver(observer: Observer): void;
   removeObserver(observer: Observer): void;

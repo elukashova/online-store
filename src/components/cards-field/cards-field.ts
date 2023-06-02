@@ -1,3 +1,4 @@
+/* eslint-disable object-curly-newline */
 /* eslint-disable arrow-body-style */
 /* eslint-disable max-len */
 /* eslint-disable operator-linebreak */
@@ -13,25 +14,18 @@ import { CardDataInfo, ObservedSubject } from '../card/card.types';
 import findCountOfCurrentProducts from './utils/find.current.count';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageInfo } from '../../utils/localStorage.types';
-import {
-  deleteAllQueryParams,
-  /* deleteOneQueryParam, */
-  deleteQueryParams,
-  getQueryParams,
-  setQueryParams,
-} from '../../utils/queryParams';
-// eslint-disable-next-line object-curly-newline
+import { deleteAllQueryParams, deleteQueryParams, getQueryParams, setQueryParams } from '../../utils/queryParams';
 import { QueryParameters, TypeOfView, SortBy, CountForFilter, FilterNames } from './cards-field.types';
 import { Callback } from '../shopping-cart/shopping-cart.types';
 
 export default class CardsField extends BaseComponent {
-  public cardsAll: Card[] = []; // все карточки
+  public cardsAll: Card[] = [];
 
-  public activeFilters: string[] = []; // активные фильтры
+  public activeFilters: string[] = [];
 
-  public visibleCards: Card[] = []; // текущие видимые карточки (для сортировки)
+  public visibleCards: Card[] = [];
 
-  public addedItems: PosterStorageInfo[] = []; // сохранение id добавленных товаров в local storage
+  public addedItems: PosterStorageInfo[] = [];
 
   public allOptions: HTMLElement[] | null = null;
 
@@ -75,23 +69,23 @@ export default class CardsField extends BaseComponent {
     const copyLinkButton: HTMLButtonElement = rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
     copyLinkButton.addEventListener('click', () => this.copyLink(copyLinkButton));
 
-    this.categoryFilter = new Filter(filtersContainer, this.updateActiveFilters);
+    this.categoryFilter = new Filter(filtersContainer, this.updateActiveFilters, FilterNames.CATEGORY);
     const categories: string[] = cardsData.products.map((item: CardDataInfo): string => item.category);
     const uniqueCategories = Array.from(new Set(categories));
-    const categoryNames: HTMLElement = this.categoryFilter.renderCheckbox(uniqueCategories, FilterNames.CATEGORY);
+    const categoryNames: HTMLElement = this.categoryFilter.renderCheckbox(uniqueCategories);
     filtersContainer.append(categoryNames);
 
-    this.sizeFilter = new Filter(filtersContainer, this.updateActiveFilters);
+    this.sizeFilter = new Filter(filtersContainer, this.updateActiveFilters, FilterNames.SIZE);
     const size: string[] = cardsData.products.map((item: CardDataInfo): string => item.size);
     const uniqueSize = Array.from(new Set(size));
-    const sizeNames: HTMLElement = this.sizeFilter.renderCheckbox(uniqueSize, FilterNames.SIZE);
+    const sizeNames: HTMLElement = this.sizeFilter.renderCheckbox(uniqueSize);
     filtersContainer.append(sizeNames);
 
-    this.priceFilter = new Filter(filtersContainer, this.updateActiveFilters);
+    this.priceFilter = new Filter(filtersContainer, this.updateActiveFilters, FilterNames.PRICE);
     const pricesTitles: HTMLElement = this.priceFilter.renderInputRange(FilterNames.PRICE);
     filtersContainer.append(pricesTitles);
 
-    this.stockFilter = new Filter(filtersContainer, this.updateActiveFilters);
+    this.stockFilter = new Filter(filtersContainer, this.updateActiveFilters, FilterNames.STOCK);
     const stockTitles: HTMLElement = this.stockFilter.renderInputRange(FilterNames.STOCK);
     filtersContainer.append(stockTitles);
 
@@ -172,6 +166,9 @@ export default class CardsField extends BaseComponent {
       if (this.cardsContainer) this.cardsContainer.append(card.element);
     });
 
+    this.setCountFrom(this.cardsAll);
+    this.setCountsToInitialValue();
+
     this.searchInput.addEventListener('input', (e: Event): void => this.toDoWhenSearchInputListen(e));
     this.selectInput.addEventListener('change', (): void => {
       if (this.cardsContainer && this.selectInput) {
@@ -181,6 +178,11 @@ export default class CardsField extends BaseComponent {
       }
     });
     viewTypes.addEventListener('click', (e: Event): void => this.toDoWhenViewTypesListen(e));
+  }
+
+  public setCountsToInitialValue(): void {
+    if (this.categoryFilter) this.categoryFilter.setCountsTo(this.cardsAll);
+    if (this.sizeFilter) this.sizeFilter.setCountsTo(this.cardsAll);
   }
 
   public toDoWhenSearchInputListen(e: Event): void {
@@ -230,12 +232,12 @@ export default class CardsField extends BaseComponent {
   public getRange(data: Card[], type: string): number[] {
     const arrCopy: Card[] = [...data];
     const result: Card[] = arrCopy.sort((a: Card, b: Card): number => {
-      return type === QueryParameters.Price ? a.price - b.price : a.stock - b.stock;
+      return type === QueryParameters.Price ? a.products.price - b.products.price : a.products.stock - b.products.stock;
     });
     const [resMin, resMax]: number[] =
       type === 'price'
-        ? [result[0].price, result[result.length - 1].price]
-        : [result[0].stock, result[result.length - 1].stock];
+        ? [result[0].products.price, result[result.length - 1].products.price]
+        : [result[0].products.stock, result[result.length - 1].products.stock];
     return [resMin, resMax];
   }
 
@@ -264,9 +266,13 @@ export default class CardsField extends BaseComponent {
   public sortByField(arr: Card[], field: string): Card[] {
     return arr.sort((a: Card, b: Card): number => {
       if (field.includes(SortBy.Asc)) {
-        return field.includes(QueryParameters.Price) ? a.price - b.price : a.rating - b.rating;
+        return field.includes(QueryParameters.Price)
+          ? a.products.price - b.products.price
+          : a.products.rating - b.products.rating;
       }
-      return field.includes(QueryParameters.Price) ? b.price - a.price : b.rating - a.rating;
+      return field.includes(QueryParameters.Price)
+        ? b.products.price - a.products.price
+        : b.products.rating - a.products.rating;
     });
   }
 
@@ -522,13 +528,15 @@ export default class CardsField extends BaseComponent {
   }
 
   public filterBySize(cards: Card[]): Card[] {
-    return cards.filter(({ size }): boolean => {
+    return cards.filter(({ products }): boolean => {
+      const { size } = products;
       return this.activeFilters.some((filter): boolean => size.includes(filter));
     });
   }
 
   public filterByCategory(cards: Card[]): Card[] {
-    return cards.filter(({ category }): boolean => {
+    return cards.filter(({ products }): boolean => {
+      const { category } = products;
       return this.activeFilters.some((filter): boolean => category.includes(filter));
     });
   }
@@ -536,14 +544,14 @@ export default class CardsField extends BaseComponent {
   public filterByPrice(cards: Card[]): Card[] {
     const [priceFrom, priceTo]: number[] = this.getCountAndPrice(this.activeFilters, QueryParameters.Price);
     return cards.filter((card): boolean => {
-      return card.price >= priceFrom && card.price <= priceTo;
+      return card.products.price >= priceFrom && card.products.price <= priceTo;
     });
   }
 
   public filterByCount(cards: Card[]): Card[] {
     const [countFrom, countTo]: number[] = this.getCountAndPrice(this.activeFilters, QueryParameters.Count);
     return cards.filter((card): boolean => {
-      return card.stock >= countFrom && card.stock <= countTo;
+      return card.products.stock >= countFrom && card.products.stock <= countTo;
     });
   }
 
@@ -582,6 +590,7 @@ export default class CardsField extends BaseComponent {
       ...findCountOfCurrentProducts(data, QueryParameters.Size),
     ];
 
+    /* this.categoryFilter?.updateCount(allCheckbox); */
     allCheckbox.forEach((subtype: CountForFilter): void => {
       this.assignQuantity(
         subtype.type === QueryParameters.Category ? this.categoryFilter : this.sizeFilter,
@@ -670,14 +679,14 @@ export default class CardsField extends BaseComponent {
         id: 0,
         quantity: 0,
       };
-      info.id = subject.id;
+      info.id = subject.products.id;
       info.quantity += 1;
       this.addedItems.push(info);
       setDataToLocalStorage(this.addedItems, 'addedPosters');
     }
 
     if (subject instanceof Card && !subject.element.classList.contains('added')) {
-      const index: number = this.addedItems.findIndex((i): boolean => i.id === subject.id);
+      const index: number = this.addedItems.findIndex((i): boolean => i.id === subject.products.id);
       this.addedItems.splice(index, 1);
       if (this.addedItems.length > 0) {
         setDataToLocalStorage(this.addedItems, 'addedPosters');

@@ -1,4 +1,6 @@
-const posters = {
+import { CardDataInfo } from '../../components/card/card.types';
+
+const posters: { products: CardDataInfo[] } = {
   products: [
     {
       id: 1,
