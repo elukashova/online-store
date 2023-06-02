@@ -56,7 +56,7 @@ export default class Header extends BaseComponent {
       'span',
       priceNumber,
       'total-price__sum',
-      `$ ${this.headerInfo.totalPrice.toLocaleString('en-US')}`,
+      `$ ${this.headerInfo.totalPrice ? this.headerInfo.totalPrice.toLocaleString('en-US') : '0'}`,
     );
     const shoppingCart: HTMLElement = rendered('div', menu, 'menu__item cart');
     this.shoppingCartLink = rendered('a', shoppingCart, 'cart__link cart-hover', '', { href: '/cart' });
@@ -140,13 +140,13 @@ export default class Header extends BaseComponent {
     // если это ново-добавленный элемент, добавляю его цену к тотал и увеличиваю кол-во в корзине
     if (subject instanceof Card) {
       if (subject.element.classList.contains('added')) {
-        this.increaseNumbers(subject.price);
+        this.increaseNumbers(subject.products.price);
       } else if (!subject.element.classList.contains('added')) {
         // если нет, наоборот
         if (subject.totalPrice !== 0) {
           this.decreaseNumbers(subject.totalPrice, subject.itemQuantity);
         } else {
-          this.decreaseNumbers(subject.price, 1);
+          this.decreaseNumbers(subject.products.price, 1);
         }
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
@@ -213,7 +213,8 @@ export default class Header extends BaseComponent {
 
   private updateInfoInHeader(): void {
     if (this.totalPriceElement && this.cartItemsElement) {
-      this.totalPriceElement.textContent = `$ ${this.headerInfo.totalPrice.toLocaleString('en-US')}`;
+      const totalPrice = `$ ${this.headerInfo.totalPrice ? this.headerInfo.totalPrice.toLocaleString('en-US') : '0'}`;
+      this.totalPriceElement.textContent = totalPrice;
       this.cartItemsElement.textContent = `${this.headerInfo.cartItems}`;
       this.checkSize();
     }

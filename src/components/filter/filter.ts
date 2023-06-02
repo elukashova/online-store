@@ -37,7 +37,6 @@ export default class Filter {
     this.filterName = filterName;
   }
 
-  // eslint-disable-next-line max-lines-per-function
   public renderCheckbox(data: string[]): HTMLElement {
     const filterWrapper: HTMLElement = rendered(
       'fieldset',
@@ -46,37 +45,47 @@ export default class Filter {
     );
     rendered('legend', filterWrapper, `${this.filterName}__legend-1`, this.filterName);
 
-    data.forEach((filter: string, index: number): void => {
-      const inputWrapper: HTMLElement = rendered('div', filterWrapper, `${this.filterName}__input-wrapper`);
-      const checkboxWrapper: HTMLElement = rendered('div', inputWrapper, `${this.filterName}__checkbox-wrapper`);
-      const inputElement: HTMLElement = rendered(
-        'input',
-        checkboxWrapper,
-        `${this.filterName}__input-${index + 1} ${filter} ${this.filterName}-item`,
-        '',
-        {
-          id: `${filter}`,
-          type: 'checkbox',
-          name: `${this.filterName}`,
-        },
-      );
-      inputElement.addEventListener('change', (): void => this.updateActiveFilters(filter));
-      rendered('label', checkboxWrapper, `${this.filterName}__label-${index + 1}`, `${filter}`, {
-        for: `${filter}`,
-      });
-      const countWrapper: HTMLElement = rendered('div', inputWrapper, `${this.filterName}__count-wrapper`);
-      this.countFrom = rendered('span', countWrapper, `${this.filterName}__out-from-to-${index + 1}`, '0', {
-        id: `${filter}`,
-      });
-      this.allCountsFrom.push(this.countFrom);
-      rendered('span', countWrapper, `${this.filterName}__slash-${index + 1}`, '/');
-      this.countTo = rendered('span', countWrapper, `${this.filterName}__out-from-to-${index + 1}-to`, '0', {
-        id: `${filter}-to`,
-      });
-      this.allCountsTo.push(this.countTo);
-      this.checkboxes.push(inputElement);
-    });
+    this.renderCheckboxInLoop(data, this.renderCheckboxItem.bind(this, filterWrapper));
+
     return filterWrapper;
+  }
+
+  private renderCheckboxItem(filterWrapper: HTMLElement, filter: string, index: number): void {
+    const inputWrapper: HTMLElement = rendered('div', filterWrapper, `${this.filterName}__input-wrapper`);
+    const checkboxWrapper: HTMLElement = rendered('div', inputWrapper, `${this.filterName}__checkbox-wrapper`);
+    const inputElement: HTMLElement = rendered(
+      'input',
+      checkboxWrapper,
+      `${this.filterName}__input-${index + 1} ${filter} ${this.filterName}-item`,
+      '',
+      {
+        id: `${filter}`,
+        type: 'checkbox',
+        name: `${this.filterName}`,
+      },
+    );
+    inputElement.addEventListener('change', (): void => this.updateActiveFilters(filter));
+    rendered('label', checkboxWrapper, `${this.filterName}__label-${index + 1}`, `${filter}`, {
+      for: `${filter}`,
+    });
+    const countWrapper: HTMLElement = rendered('div', inputWrapper, `${this.filterName}__count-wrapper`);
+    this.countFrom = rendered('span', countWrapper, `${this.filterName}__out-from-to-${index + 1}`, '0', {
+      id: `${filter}`,
+    });
+    this.allCountsFrom.push(this.countFrom);
+    rendered('span', countWrapper, `${this.filterName}__slash-${index + 1}`, '/');
+    this.countTo = rendered('span', countWrapper, `${this.filterName}__out-from-to-${index + 1}-to`, '0', {
+      id: `${filter}-to`,
+    });
+    this.allCountsTo.push(this.countTo);
+    this.checkboxes.push(inputElement);
+  }
+
+  // eslint-disable-next-line max-len
+  private renderCheckboxInLoop(dataForLoop: string[], renderFunction: (item: string, index: number) => void): void {
+    dataForLoop.forEach((item, index) => {
+      renderFunction(item, index);
+    });
   }
 
   public setCountsTo(cardsAll: Card[]): void {
