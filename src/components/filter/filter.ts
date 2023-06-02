@@ -37,7 +37,7 @@ export default class Filter {
     this.filterName = filterName;
   }
 
-  public renderCheckbox(data: string[]): HTMLElement {
+  public createCheckbox(data: string[]): HTMLElement {
     const filterWrapper: HTMLElement = rendered(
       'fieldset',
       this.container,
@@ -45,12 +45,12 @@ export default class Filter {
     );
     rendered('legend', filterWrapper, `${this.filterName}__legend-1`, this.filterName);
 
-    this.renderCheckboxInLoop(data, this.renderCheckboxItem.bind(this, filterWrapper));
+    this.createCheckboxInLoop(data, this.createCheckboxItem.bind(this, filterWrapper));
 
     return filterWrapper;
   }
 
-  private renderCheckboxItem(filterWrapper: HTMLElement, filter: string, index: number): void {
+  private createCheckboxItem(filterWrapper: HTMLElement, filter: string, index: number): void {
     const inputWrapper: HTMLElement = rendered('div', filterWrapper, `${this.filterName}__input-wrapper`);
     const checkboxWrapper: HTMLElement = rendered('div', inputWrapper, `${this.filterName}__checkbox-wrapper`);
     const inputElement: HTMLElement = rendered(
@@ -82,7 +82,7 @@ export default class Filter {
   }
 
   // eslint-disable-next-line max-len
-  private renderCheckboxInLoop(dataForLoop: string[], renderFunction: (item: string, index: number) => void): void {
+  private createCheckboxInLoop(dataForLoop: string[], renderFunction: (item: string, index: number) => void): void {
     dataForLoop.forEach((item, index) => {
       renderFunction(item, index);
     });
@@ -98,7 +98,8 @@ export default class Filter {
     });
   }
 
-  public renderInputRange(str: string): HTMLElement {
+  public createInputRange(str: string): HTMLElement {
+    console.log(this.filterName);
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str}`);
     rendered('legend', filterWrapper, `filters__${str}_legend`);
     const inputWrapper: HTMLElement = rendered('div', filterWrapper, `filters__${str}_wrapper`);

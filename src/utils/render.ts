@@ -1,6 +1,6 @@
 const rendered = <K extends keyof HTMLElementTagNameMap>(
   element: K,
-  parent: Element,
+  parent: HTMLElement,
   classes: string,
   content?: string,
   attributes?: { [key: string]: string } | undefined,

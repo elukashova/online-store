@@ -15,7 +15,7 @@ import findCountOfCurrentProducts from './utils/find.current.count';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageInfo } from '../../utils/localStorage.types';
 import { deleteAllQueryParams, deleteQueryParams, getQueryParams, setQueryParams } from '../../utils/queryParams';
-import { QueryParameters, TypeOfView, SortBy, CountForFilter, FilterNames } from './cards-field.types';
+import { QueryParameters, TypeOfView, SortBy, CountForFilter, FilterNames, optionsData } from './cards-field.types';
 import { Callback } from '../shopping-cart/shopping-cart.types';
 
 export default class CardsField extends BaseComponent {
@@ -35,7 +35,7 @@ export default class CardsField extends BaseComponent {
 
   public postersFound: HTMLElement | null = null;
 
-  public selectInput: HTMLElement | null = null;
+  public selectInput!: HTMLElement;
 
   public searchInput: HTMLElement | null = null;
 
@@ -69,73 +69,34 @@ export default class CardsField extends BaseComponent {
     const copyLinkButton: HTMLButtonElement = rendered('button', buttonsContainer, 'filters__btn-copy', 'Copy link');
     copyLinkButton.addEventListener('click', () => this.copyLink(copyLinkButton));
 
-    this.categoryFilter = new Filter(filtersContainer, this.updateActiveFilters, FilterNames.CATEGORY);
-    const categories: string[] = cardsData.products.map((item: CardDataInfo): string => item.category);
-    const uniqueCategories = Array.from(new Set(categories));
-    const categoryNames: HTMLElement = this.categoryFilter.renderCheckbox(uniqueCategories);
-    filtersContainer.append(categoryNames);
-
-    this.sizeFilter = new Filter(filtersContainer, this.updateActiveFilters, FilterNames.SIZE);
-    const size: string[] = cardsData.products.map((item: CardDataInfo): string => item.size);
-    const uniqueSize = Array.from(new Set(size));
-    const sizeNames: HTMLElement = this.sizeFilter.renderCheckbox(uniqueSize);
-    filtersContainer.append(sizeNames);
-
-    this.priceFilter = new Filter(filtersContainer, this.updateActiveFilters, FilterNames.PRICE);
-    const pricesTitles: HTMLElement = this.priceFilter.renderInputRange(FilterNames.PRICE);
-    filtersContainer.append(pricesTitles);
-
-    this.stockFilter = new Filter(filtersContainer, this.updateActiveFilters, FilterNames.STOCK);
-    const stockTitles: HTMLElement = this.stockFilter.renderInputRange(FilterNames.STOCK);
-    filtersContainer.append(stockTitles);
+    this.categoryFilter = this.createFilter(
+      'checkbox',
+      FilterNames.CATEGORY,
+      filtersContainer,
+      this.updateActiveFilters,
+    );
+    this.sizeFilter = this.createFilter('checkbox', FilterNames.SIZE, filtersContainer, this.updateActiveFilters);
+    this.priceFilter = this.createFilter('inputRange', FilterNames.PRICE, filtersContainer, this.updateActiveFilters);
+    this.stockFilter = this.createFilter('inputRange', FilterNames.STOCK, filtersContainer, this.updateActiveFilters);
 
     const contentContainer: HTMLElement = rendered('div', this.element, 'cards__content');
     const sortWrapper: HTMLElement = rendered('div', contentContainer, 'cards__sort-wrapper');
     this.selectInput = rendered('select', sortWrapper, 'cards__sort-products');
-    this.cardsContainer = rendered('div', contentContainer, 'cards__container search', '', {
-      id: 'cards__container',
-    });
+    this.cardsContainer = rendered('div', contentContainer, 'cards__container search', '');
     this.defaultOption = rendered('option', this.selectInput, 'cards__sort-standart-value', 'Sort posters', {
       value: 'no-sort',
       disabled: '',
     });
-    const priceAsc: HTMLElement = rendered(
-      'option',
-      this.selectInput,
-      'cards__sort-by-price-asc',
-      'Sort by price asc',
-      {
-        value: 'price-asc',
-      },
-    );
-    const priceDesc: HTMLElement = rendered(
-      'option',
-      this.selectInput,
-      'cards__sort-by-price-desc',
-      'Sort by price desc',
-      {
-        value: 'price-desc',
-      },
-    );
-    const RatingAsc: HTMLElement = rendered(
-      'option',
-      this.selectInput,
-      'cards__sort-by-rating-asc',
-      'Sort by rating asc',
-      {
-        value: 'rating-asc',
-      },
-    );
-    const RatingDesc: HTMLElement = rendered(
-      'option',
-      this.selectInput,
-      'cards__sort-by-rating-desc',
-      'Sort by rating desc',
-      {
-        value: 'rating-desc',
-      },
-    );
-    this.allOptions = [this.defaultOption, priceAsc, priceDesc, RatingAsc, RatingDesc];
+    if (this.selectInput instanceof HTMLElement) {
+      const options = optionsData.map((option: { value: string; label: string }) => {
+        return rendered('option', this.selectInput, `cards__sort-by-${option.value}`, option.label, {
+          value: option.value,
+        });
+      });
+
+      this.allOptions = [this.defaultOption, ...options];
+    }
+
     this.postersFound = rendered('div', sortWrapper, 'cards__found-count', `Found: ${cardsData.products.length}`);
     const searchInputWrapper: HTMLElement = rendered('div', sortWrapper, 'cards__search-wrapper');
     this.searchInput = rendered('input', searchInputWrapper, 'cards__search', '', {
@@ -158,18 +119,20 @@ export default class CardsField extends BaseComponent {
     this.notFoundText = rendered('p', this.cardsContainer, 'cards__not-found hidden', 'Product not found', {
       id: 'cards__not-found',
     });
-    cardsData.products.forEach((data: CardDataInfo): void => {
+    this.cardsAll = cardsData.products.map((data) => {
       const card: Card = new Card(data, this.callback);
       card.attachObserver(this.header);
       card.attachObserver(this);
-      this.cardsAll.push(card);
       if (this.cardsContainer) this.cardsContainer.append(card.element);
+      return card;
     });
 
     this.setCountFrom(this.cardsAll);
     this.setCountsToInitialValue();
 
-    this.searchInput.addEventListener('input', (e: Event): void => this.toDoWhenSearchInputListen(e));
+    this.searchInput.addEventListener('input', (): void => {
+      this.toDoWhenSearchInputListen();
+    });
     this.selectInput.addEventListener('change', (): void => {
       if (this.cardsContainer && this.selectInput) {
         if (this.selectInput instanceof HTMLSelectElement) {
@@ -185,18 +148,37 @@ export default class CardsField extends BaseComponent {
     if (this.sizeFilter) this.sizeFilter.setCountsTo(this.cardsAll);
   }
 
-  public toDoWhenSearchInputListen(e: Event): void {
-    if (e.currentTarget && e.currentTarget instanceof HTMLInputElement) {
-      const inputText: string = e.currentTarget.value.trim().toLowerCase();
-      const val: string = `search,${inputText}`;
-      if (inputText === '') {
-        if (this.notFoundText) {
-          this.notFoundText.classList.add('hidden');
-        }
+  public toDoWhenSearchInputListen(): void {
+    if (this.searchInput instanceof HTMLInputElement) {
+      const inputText: string = this.searchInput.value.trim().toLowerCase();
+      const searchInputValue: string = `search,${inputText}`;
+      if (inputText === '' && this.notFoundText) {
+        this.notFoundText.classList.add('hidden');
       }
       this.setNewRange(this.cardsAll);
-      this.updateActiveFilters(val);
+      this.updateActiveFilters(searchInputValue);
     }
+  }
+
+  public createFilter(
+    filterType: 'checkbox' | 'inputRange',
+    filterName: keyof CardDataInfo,
+    filtersContainer: HTMLElement,
+    updateActiveFilters: (filter: string) => void,
+  ): Filter {
+    const filter: Filter = new Filter(filtersContainer, updateActiveFilters, filterName as FilterNames);
+    const values: string[] = cardsData.products.map((item: CardDataInfo): string => String(item[filterName]));
+    const uniqueValues = Array.from(new Set(values));
+    let filterElem: HTMLElement;
+
+    if (filterType === 'checkbox') {
+      filterElem = filter.createCheckbox(uniqueValues);
+    } else {
+      filterElem = filter.createInputRange(filterName);
+    }
+
+    filtersContainer.append(filterElem);
+    return filter;
   }
 
   public setNewRange(data: Card[]): void {

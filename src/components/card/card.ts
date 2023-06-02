@@ -41,13 +41,7 @@ export default class Card extends BaseComponent {
     cardImg.addEventListener('click', this.productPageBtnCallback);
     const cardInfo: HTMLElement = rendered('div', this.element, 'card__info');
     const cardInfoWrapper: HTMLElement = rendered('div', cardInfo, 'card__info_wrapper');
-    rendered('p', cardInfoWrapper, 'card__name', `${this.products.title}`);
-    rendered('p', cardInfoWrapper, 'card__category', `${this.products.category}`);
-    rendered('p', cardInfoWrapper, 'card__size', `Size: ${this.products.size}`);
-    rendered('p', cardInfoWrapper, 'card__stock', `Stock: ${this.products.stock}`);
-    rendered('p', cardInfoWrapper, 'card__rating', `Rating: ${this.products.rating}`);
-    rendered('p', cardInfoWrapper, 'card__price', `$ ${this.products.price}`);
-    rendered('p', cardInfoWrapper, 'card__description', `${this.products.description.split('.')[0]}`);
+    this.fillCardInfoWrapper(cardInfoWrapper);
     const discountAndBtnsWrapper: HTMLElement = rendered('div', cardInfo, 'card__discount-btns-wrapper');
     rendered('p', discountAndBtnsWrapper, 'card__discount', `Sale: ${this.products.discountPercentage}%`);
     const buttonsWrapper: HTMLElement = rendered('div', discountAndBtnsWrapper, 'card__btns');
@@ -59,11 +53,10 @@ export default class Card extends BaseComponent {
     productPageBtn.addEventListener('click', this.productPageBtnCallback);
     // проверяем local storage, добавлена ли этот товар в корзину
     if (this.storageInfo !== null) {
-      const posters: PosterStorageInfo[] = this.storageInfo.slice();
-      for (let i: number = 0; i < posters.length; i += 1) {
-        if (posters[i].id === this.products.id) {
-          this.totalPrice = posters[i].quantity * this.products.price;
-          this.itemQuantity = posters[i].quantity;
+      for (let i: number = 0; i < this.storageInfo.length; i += 1) {
+        if (this.storageInfo[i].id === this.products.id) {
+          this.totalPrice = this.storageInfo[i].quantity * this.products.price;
+          this.itemQuantity = this.storageInfo[i].quantity;
           this.element.classList.add('added');
           this.wasAdded = true;
         }
@@ -82,6 +75,22 @@ export default class Card extends BaseComponent {
     });
     // вешаем слушатель на кнопку
     this.buyButton.addEventListener('click', this.buyBtnCallback);
+  }
+
+  private fillCardInfoWrapper(cardInfoWrapper: HTMLElement): void {
+    const fields = [
+      { label: 'Name', value: this.products.title },
+      { label: 'Category', value: this.products.category },
+      { label: 'Size', value: this.products.size },
+      { label: 'Stock', value: this.products.stock },
+      { label: 'Rating', value: this.products.rating },
+      { label: 'Price', value: `$ ${this.products.price}` },
+      { label: 'Description', value: this.products.description.split('.')[0] },
+    ];
+
+    fields.forEach((field) => {
+      rendered('p', cardInfoWrapper, `card__${field.label.toLowerCase()}`, `${field.label}: ${field.value}`);
+    });
   }
 
   // колбэк для рутинга

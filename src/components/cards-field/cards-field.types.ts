@@ -30,3 +30,10 @@ export enum FilterNames {
   PRICE = 'price',
   STOCK = 'stock',
 }
+
+export const optionsData = [
+  { value: 'price-asc', label: 'Price asc' },
+  { value: 'price-desc', label: 'Price desc' },
+  { value: 'rating-asc', label: 'Rating asc' },
+  { value: 'rating-desc', label: 'Rating desc' },
+];
