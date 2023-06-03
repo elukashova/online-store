@@ -29,12 +29,18 @@ export default class Filter {
 
   public filterName!: keyof CardDataInfo;
 
+  public prefix: string = '';
+
   constructor(
     private readonly container: HTMLElement,
     public updateActiveFilters: (filter: string) => void,
     filterName: keyof CardDataInfo,
+    prefix?: string,
   ) {
     this.filterName = filterName;
+    if (prefix) {
+      this.prefix = prefix;
+    }
   }
 
   public createCheckbox(data: string[]): HTMLElement {
@@ -99,7 +105,7 @@ export default class Filter {
   }
 
   public createInputRange(str: string): HTMLElement {
-    console.log(this.filterName);
+    console.log(this.prefix);
     const filterWrapper: HTMLElement = rendered('fieldset', this.container, `filters__${str}`);
     rendered('legend', filterWrapper, `filters__${str}_legend`);
     const inputWrapper: HTMLElement = rendered('div', filterWrapper, `filters__${str}_wrapper`);

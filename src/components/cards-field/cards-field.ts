@@ -15,8 +15,22 @@ import findCountOfCurrentProducts from './utils/find.current.count';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageInfo } from '../../utils/localStorage.types';
 import { deleteAllQueryParams, deleteQueryParams, getQueryParams, setQueryParams } from '../../utils/queryParams';
-import { QueryParameters, TypeOfView, SortBy, CountForFilter, FilterNames, optionsData } from './cards-field.types';
+import {
+  QueryParameters,
+  TypeOfView,
+  SortBy,
+  CountForFilter,
+  FilterNames,
+  optionsData,
+  QUERY_SEPARATOR,
+} from './cards-field.types';
 import { Callback } from '../shopping-cart/shopping-cart.types';
+
+type FilterInfo = {
+  type: 'checkbox' | 'inputRange';
+  name: FilterNames.PRICE | FilterNames.STOCK;
+  filter: Filter | null;
+};
 
 export default class CardsField extends BaseComponent {
   public cardsAll: Card[] = [];
@@ -166,7 +180,12 @@ export default class CardsField extends BaseComponent {
     filtersContainer: HTMLElement,
     updateActiveFilters: (filter: string) => void,
   ): Filter {
-    const filter: Filter = new Filter(filtersContainer, updateActiveFilters, filterName as FilterNames);
+    const filter: Filter = new Filter(
+      filtersContainer,
+      updateActiveFilters,
+      filterName,
+      filterName === 'price' ? '$' : 'undefined',
+    );
     const values: string[] = cardsData.products.map((item: CardDataInfo): string => String(item[filterName]));
     const uniqueValues = Array.from(new Set(values));
     let filterElem: HTMLElement;
@@ -174,6 +193,7 @@ export default class CardsField extends BaseComponent {
     if (filterType === 'checkbox') {
       filterElem = filter.createCheckbox(uniqueValues);
     } else {
+      console.log(filter);
       filterElem = filter.createInputRange(filterName);
     }
 
@@ -182,45 +202,52 @@ export default class CardsField extends BaseComponent {
   }
 
   public setNewRange(data: Card[]): void {
-    if (data.length) {
-      const [priceMin, priceMax]: number[] = this.getRange(data, 'price');
-      const [stockMin, stockMax]: number[] = this.getRange(data, 'stock');
-      const changeValue = (typeFilter: Filter): void => {
-        // eslint-disable-next-line object-curly-newline
-        const { lowestInput, highestInput, minElement, maxElement }: Filter = typeFilter;
-        if (
-          lowestInput &&
-          highestInput &&
-          lowestInput instanceof HTMLInputElement &&
-          highestInput instanceof HTMLInputElement
-        ) {
-          lowestInput.setAttribute('value', typeFilter === this.priceFilter ? `${priceMin}` : `${stockMin}`);
-          highestInput.setAttribute('value', typeFilter === this.priceFilter ? `${priceMax}` : `${stockMax}`);
-          if (minElement) {
-            minElement.textContent = `${typeFilter === this.priceFilter ? '$' : ''} ${lowestInput.value}`;
-          }
-          if (maxElement) {
-            maxElement.textContent = `${typeFilter === this.priceFilter ? '$' : ''} ${highestInput.value}`;
-          }
-        }
-      };
-      if (this.priceFilter && this.stockFilter) {
-        changeValue(this.priceFilter);
-        changeValue(this.stockFilter);
-      }
+    if (!data.length) {
+      return;
     }
+
+    const changeValue = (filter: Filter, min: number, max: number): void => {
+      const { lowestInput, highestInput, minElement, maxElement } = filter;
+
+      if (lowestInput instanceof HTMLInputElement && highestInput instanceof HTMLInputElement) {
+        lowestInput.setAttribute('value', `${min}`);
+        highestInput.setAttribute('value', `${max}`);
+
+        if (minElement) {
+          minElement.textContent = `${this.getPrefix(filter)} ${lowestInput.value}`;
+        }
+        if (maxElement) {
+          maxElement.textContent = `${this.getPrefix(filter)} ${highestInput.value}`;
+        }
+      }
+    };
+
+    const filters: FilterInfo[] = [
+      { type: 'inputRange', name: FilterNames.PRICE, filter: this.priceFilter },
+      { type: 'inputRange', name: FilterNames.STOCK, filter: this.stockFilter },
+    ];
+
+    filters
+      .filter((filter) => filter.type === 'inputRange' && filter.filter !== null)
+      .forEach((filter) => {
+        const [min, max] = this.getRange(data, filter.name);
+        if (filter.filter) {
+          changeValue(filter.filter, min, max);
+        }
+      });
   }
 
-  public getRange(data: Card[], type: string): number[] {
+  public getRange(data: Card[], field: FilterNames.PRICE | FilterNames.STOCK): number[] {
     const arrCopy: Card[] = [...data];
     const result: Card[] = arrCopy.sort((a: Card, b: Card): number => {
-      return type === QueryParameters.Price ? a.products.price - b.products.price : a.products.stock - b.products.stock;
+      return a.products[field] - b.products[field];
     });
-    const [resMin, resMax]: number[] =
-      type === 'price'
-        ? [result[0].products.price, result[result.length - 1].products.price]
-        : [result[0].products.stock, result[result.length - 1].products.stock];
+    const [resMin, resMax]: number[] = [result[0].products[field], result[result.length - 1].products[field]];
     return [resMin, resMax];
+  }
+
+  private getPrefix(typeFilter: Filter): string {
+    return typeFilter === this.priceFilter ? '$' : '';
   }
 
   public sortCards(str: string): void {
@@ -308,7 +335,9 @@ export default class CardsField extends BaseComponent {
     const updateFilters = (parameters: string[]): void => {
       const values: string[] = parameters.splice(1);
       if (values.length) {
-        values.forEach((value): number => this.pushToActive(this.activeFilters, value));
+        values.forEach((value): void => {
+          this.activeFilters.push(value);
+        });
       }
     };
     splitedParams.forEach((elem: string[]): void => {
@@ -328,10 +357,10 @@ export default class CardsField extends BaseComponent {
           });
         }
         if (type === QueryParameters.Price || type === QueryParameters.Count) {
-          this.pushToActive(this.activeFilters, elem.toString());
+          this.activeFilters.push(elem.toString());
         }
         if (type === QueryParameters.Search) {
-          this.pushToActive(this.activeFilters, elem.toString());
+          this.activeFilters.push(elem.toString());
           if (this.searchInput && this.searchInput instanceof HTMLInputElement) {
             this.searchInput.value = splitParameters(elem, 1);
           }
@@ -341,15 +370,13 @@ export default class CardsField extends BaseComponent {
     this.addClassesForCards(this.activeFilters, this.cardsAll);
   };
 
-  public pushToActive = (array: string[], value: string): number => array.push(value);
-
-  public addOrRemoveChecked(filterType: Filter, filter: string, val: boolean): void {
-    filterType.checkboxes.forEach((type: HTMLElement): void => {
-      if (type.id === filter) {
-        if (val) {
-          type.setAttribute('checked', 'checked');
+  public addOrRemoveChecked(filter: Filter, value: string, isChecked: boolean): void {
+    filter.checkboxes.forEach((checkbox: HTMLElement): void => {
+      if (checkbox.id === value) {
+        if (isChecked) {
+          checkbox.setAttribute('checked', 'checked');
         } else {
-          type.removeAttribute('checked');
+          checkbox.removeAttribute('checked');
         }
       }
     });
@@ -402,9 +429,9 @@ export default class CardsField extends BaseComponent {
   };
 
   private addFilter = (filter: string, queryType: string, prev: string | null): void => {
-    this.pushToActive(this.activeFilters, filter);
+    this.activeFilters.push(filter);
     if (prev !== null) {
-      setQueryParams(queryType, `${prev}~${filter}`);
+      setQueryParams(queryType, `${prev}${QUERY_SEPARATOR}${filter}`);
     } else {
       setQueryParams(queryType, filter);
     }
@@ -430,7 +457,7 @@ export default class CardsField extends BaseComponent {
     const prev = this.activeFilters.find((elem: string): boolean => elem.startsWith(this.getPartOfString(filter, 0)));
     const query = this.composeQueryString(filter);
     if (prev === undefined) {
-      this.pushToActive(this.activeFilters, filter);
+      this.activeFilters.push(filter);
     } else {
       this.activeFilters.splice(this.activeFilters.indexOf(prev), 1, filter);
     }
@@ -439,7 +466,7 @@ export default class CardsField extends BaseComponent {
 
   public composeQueryString(str: string): string {
     if (this.getPartOfString(str, 0) !== QueryParameters.Search) {
-      return `${this.getPartOfString(str, 1).trim()}~${this.getPartOfString(str, 2).trim()}`;
+      return `${this.getPartOfString(str, 1).trim()}${QUERY_SEPARATOR}${this.getPartOfString(str, 2).trim()}`;
     }
     return `${this.getPartOfString(str, 1).toLowerCase()}`;
   }
@@ -478,21 +505,13 @@ export default class CardsField extends BaseComponent {
     } else {
       // eslint-disable-next-line no-lonely-if
       if (this.activeFilters.length && !this.visibleCards.length) {
-        this.visibleCards.length = 0;
-        if (this.notFoundText) {
-          this.notFoundText.classList.remove('hidden');
-          this.cardsAll.forEach((card): void => {
-            card.element.classList.add('hidden');
-          });
-        }
         this.doNotFoundVisible();
         if (this.categoryFilter) this.assignQuantity(this.categoryFilter);
-        if (this.sizeFilter) this.assignQuantity(this.sizeFilter);
       } else {
         this.visibleCards = this.cardsAll;
         if (this.categoryFilter) this.assignQuantity(this.categoryFilter);
-        if (this.sizeFilter) this.assignQuantity(this.sizeFilter);
       }
+      if (this.sizeFilter) this.assignQuantity(this.sizeFilter);
     }
     this.setCountFrom(this.visibleCards);
     this.setNewRange(this.visibleCards);
@@ -500,24 +519,24 @@ export default class CardsField extends BaseComponent {
   }
 
   public resetClasses(activeFilters: string[], cards: Card[]): void {
-    cards.forEach((card): void => {
-      if (activeFilters.length === 0) {
-        card.element.classList.remove('hidden');
-      } else {
+    cards.forEach((card: Card): void => {
+      if (activeFilters.length) {
         card.element.classList.add('hidden');
+      } else {
+        card.element.classList.remove('hidden');
       }
     });
   }
 
   public filterBySize(cards: Card[]): Card[] {
-    return cards.filter(({ products }): boolean => {
+    return cards.filter(({ products }: Card): boolean => {
       const { size } = products;
       return this.activeFilters.some((filter): boolean => size.includes(filter));
     });
   }
 
   public filterByCategory(cards: Card[]): Card[] {
-    return cards.filter(({ products }): boolean => {
+    return cards.filter(({ products }: Card): boolean => {
       const { category } = products;
       return this.activeFilters.some((filter): boolean => category.includes(filter));
     });
@@ -525,20 +544,20 @@ export default class CardsField extends BaseComponent {
 
   public filterByPrice(cards: Card[]): Card[] {
     const [priceFrom, priceTo]: number[] = this.getCountAndPrice(this.activeFilters, QueryParameters.Price);
-    return cards.filter((card): boolean => {
+    return cards.filter((card: Card): boolean => {
       return card.products.price >= priceFrom && card.products.price <= priceTo;
     });
   }
 
   public filterByCount(cards: Card[]): Card[] {
     const [countFrom, countTo]: number[] = this.getCountAndPrice(this.activeFilters, QueryParameters.Count);
-    return cards.filter((card): boolean => {
+    return cards.filter((card: Card): boolean => {
       return card.products.stock >= countFrom && card.products.stock <= countTo;
     });
   }
 
   public filterBySearch(cards: Card[]): Card[] {
-    return cards.filter(({ element }): boolean => {
+    return cards.filter(({ element }: Card): boolean => {
       return this.activeFilters.some((filter: string): boolean => {
         const temp: string = this.getPartOfString(filter, 0);
         if (temp !== QueryParameters.Search) return false;
@@ -550,12 +569,12 @@ export default class CardsField extends BaseComponent {
   public doNotFoundVisible(): void {
     if (this.notFoundText) {
       this.notFoundText.classList.remove('hidden');
-      this.cardsAll.forEach((card): void => {
+      this.cardsAll.forEach((card: Card): void => {
         card.element.classList.add('hidden');
       });
     }
-    if (this.categoryFilter) this.assignQuantity(this.categoryFilter);
-    if (this.sizeFilter) this.assignQuantity(this.sizeFilter);
+    /*    if (this.categoryFilter) this.assignQuantity(this.categoryFilter);
+    if (this.sizeFilter) this.assignQuantity(this.sizeFilter); */
   }
 
   public filterArrays(arr1: Card[], arr2: Card[], arr3: Card[], arr4: Card[], arr5: Card[]): Card[] {

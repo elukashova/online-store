@@ -37,3 +37,5 @@ export const optionsData = [
   { value: 'rating-asc', label: 'Rating asc' },
   { value: 'rating-desc', label: 'Rating desc' },
 ];
+
+export const QUERY_SEPARATOR = '~';
