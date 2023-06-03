@@ -4,7 +4,7 @@ import rendered from '../../utils/render';
 import { ObservedSubject } from '../card/card.types';
 import Card from '../card/card';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
-import { HeaderType } from './header.types';
+import { HeaderInfo } from './header.types';
 import { JsonObj } from '../../utils/localStorage.types';
 import CartCard from '../shopping-cart/card-cart';
 import ProductPage from '../product-page/product-page';
@@ -18,7 +18,7 @@ export default class Header extends BaseComponent {
 
   private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('headerInfo');
 
-  public headerInfo: HeaderType = {
+  public headerInfo: HeaderInfo = {
     cartItems: 0,
     totalPrice: 0,
   };
@@ -56,7 +56,7 @@ export default class Header extends BaseComponent {
       'span',
       priceNumber,
       'total-price__sum',
-      `$ ${this.headerInfo.totalPrice.toLocaleString('en-US')}`,
+      `$ ${this.headerInfo.totalPrice ? this.headerInfo.totalPrice.toLocaleString('en-US') : '0'}`,
     );
     const shoppingCart: HTMLElement = rendered('div', menu, 'menu__item cart');
     this.shoppingCartLink = rendered('a', shoppingCart, 'cart__link cart-hover', '', { href: '/cart' });
@@ -71,7 +71,7 @@ export default class Header extends BaseComponent {
       `${this.headerInfo.cartItems}`,
     );
     this.menuLinks.push(this.storeLink, this.aboutLink, this.shoppingCartLink);
-    this.menuLinks.forEach((link) => {
+    this.menuLinks.forEach((link: HTMLElement): void => {
       link.addEventListener('click', this.navLinkCallback);
     });
     logoLink.addEventListener('click', this.imageLinkCallback);
@@ -140,13 +140,13 @@ export default class Header extends BaseComponent {
     // если это ново-добавленный элемент, добавляю его цену к тотал и увеличиваю кол-во в корзине
     if (subject instanceof Card) {
       if (subject.element.classList.contains('added')) {
-        this.increaseNumbers(subject.price);
+        this.increaseNumbers(subject.products.price);
       } else if (!subject.element.classList.contains('added')) {
         // если нет, наоборот
         if (subject.totalPrice !== 0) {
           this.decreaseNumbers(subject.totalPrice, subject.itemQuantity);
         } else {
-          this.decreaseNumbers(subject.price, 1);
+          this.decreaseNumbers(subject.products.price, 1);
         }
       }
       setDataToLocalStorage(this.headerInfo, 'headerInfo');
@@ -213,7 +213,8 @@ export default class Header extends BaseComponent {
 
   private updateInfoInHeader(): void {
     if (this.totalPriceElement && this.cartItemsElement) {
-      this.totalPriceElement.textContent = `$ ${this.headerInfo.totalPrice.toLocaleString('en-US')}`;
+      const totalPrice = `$ ${this.headerInfo.totalPrice ? this.headerInfo.totalPrice.toLocaleString('en-US') : '0'}`;
+      this.totalPriceElement.textContent = totalPrice;
       this.cartItemsElement.textContent = `${this.headerInfo.cartItems}`;
       this.checkSize();
     }

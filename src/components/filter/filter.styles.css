@@ -8,8 +8,8 @@
 .category__checkbox-wrapper,
 .size__checkbox-wrapper {
   display: flex;
-  gap: 0.5em;
   align-items: center;
+  gap: 0.5em;
   font-size: calc(0.2rem + 0.8vw);
 }
 
@@ -26,11 +26,11 @@
 .size__legend-1,
 .filters__price_legend,
 .filters__stock_legend {
+  margin-bottom: 0.3em;
   font-size: calc(0.2em + 0.7vw);
   text-transform: uppercase;
   font-weight: 500;
   color: #ff7d15;
-  margin-bottom: 0.3em;
 }
 
 .category__input-wrapper,
@@ -38,22 +38,22 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.1em;
   justify-content: space-between;
+  gap: 0.1em;
 }
 
 .category-item,
 .size-item {
-  appearance: none;
-  background-color: #fff;
   display: grid;
   place-content: center;
   width: 1.1em;
   height: 1.1em;
-  border-radius: 0.15em;
   margin: 0;
   padding: 0;
+  background-color: #fff;
+  border-radius: 0.15em;
   border: 1px solid #65635f;
+  appearance: none;
 }
 
 .category-item::before,
@@ -62,8 +62,8 @@
   width: 0.8em;
   height: 0.8em;
   transform: scale(0);
-  transition: 120ms transform ease-in-out;
   box-shadow: inset 1em 1em #ff7d15;
+  transition: 120ms transform ease-in-out;
 }
 
 .category-item:checked:before,
@@ -102,21 +102,21 @@
 .filters__price_highest,
 .filters__stock_lowest,
 .filters__stock_highest {
+  position: absolute;
   margin-top: 0;
   margin-bottom: 0;
-  -webkit-appearance: none;
-  appearance: none;
-  position: absolute;
   height: 2px;
   width: 100%;
   background-color: #65635f;
   pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .filters__price_lowest,
 .filters__stock_lowest {
-  margin-top: 1px;
   z-index: 1;
+  margin-top: 1px;
   height: 0;
 }
 
@@ -132,21 +132,21 @@
   border-radius: 50%;
   box-shadow: 0 0 0 1px #9a9191;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background-color 0.3s;
 }
 
 .filters__price_lowest::-webkit-slider-thumb:hover,
 .filters__price_highest::-webkit-slider-thumb:hover,
 .filters__stock_lowest::-webkit-slider-thumb:hover,
 .filters__stock_highest::-webkit-slider-thumb:hover {
-  background: #ff7d15;
+  background-color: #ff7d15;
 }
 
 .filters__price_lowest::-webkit-slider-thumb:active,
 .filters__price_highest::-webkit-slider-thumb:active,
 .filters__stock_lowest::-webkit-slider-thumb:active,
 .filters__stock_highest::-webkit-slider-thumb:active {
-  background: #65635f;
+  background-color: #65635f;
 }
 
 @media screen and (max-width: 1000px) {
@@ -162,7 +162,7 @@
     width: 0.6em;
     height: 0.6em;
     transform: scale(0);
-    transition: 120ms transform ease-in-out;
     box-shadow: inset 1em 1em #ff7d15;
+    transition: 120ms transform ease-in-out;
   }
 }

@@ -20,7 +20,7 @@ export default class App {
 
   private productID: string = '';
 
-  private component: Element | null = null;
+  private component: HTMLElement | null = null;
 
   constructor(private readonly rootElement: HTMLElement) {
     this.header = new Header(this.route);
@@ -31,9 +31,7 @@ export default class App {
 
   public init(): void {
     this.rootElement.classList.add('root');
-    this.rootElement.append(this.header.element);
-    this.rootElement.append(this.mainContainer.element);
-    this.rootElement.append(this.footer.element);
+    this.rootElement.append(this.header.element, this.mainContainer.element, this.footer.element);
     this.locationHandler();
   }
 

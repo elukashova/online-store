@@ -5,31 +5,31 @@ import { Observer } from '../card/card.types';
 import './modal-window.styles.css';
 
 export default class ModalWindow extends BaseComponent {
-  private nameInput: HTMLElement | null = null;
+  private nameInput: HTMLInputElement | null = null;
 
-  private phoneInput: HTMLElement | null = null;
+  private phoneInput: HTMLInputElement | null = null;
 
-  private addressInput: HTMLElement | null = null;
+  private addressInput: HTMLInputElement | null = null;
 
-  private emailInput: HTMLElement | null = null;
+  private emailInput: HTMLInputElement | null = null;
 
-  private cardNumberInput: HTMLElement | null = null;
+  private cardNumberInput: HTMLInputElement | null = null;
 
-  public cardExpirationInput: HTMLElement | null = null;
+  public cardExpirationInput: HTMLInputElement | null = null;
 
-  private cardCVVInput: HTMLElement | null = null;
+  private cardCVVInput: HTMLInputElement | null = null;
 
-  private validInputs: HTMLElement[] = [];
+  private validInputs: HTMLInputElement[] = [];
 
-  private inputsAll: HTMLElement[] = [];
+  private inputsAll: HTMLInputElement[] = [];
 
-  private labelsAll: HTMLElement[] = [];
+  private labelsAll: HTMLLabelElement[] = [];
 
-  private confirmBtn: HTMLElement | null = null;
+  private confirmBtn: HTMLInputElement | null = null;
 
   private confirmBtnText: HTMLElement | null = null;
 
-  private personalInfoForm: HTMLElement | null = null;
+  private personalInfoForm: HTMLFormElement | null = null;
 
   private cardNumberLogo: HTMLElement | null = null;
 
@@ -54,7 +54,7 @@ export default class ModalWindow extends BaseComponent {
       'data-regex': "([A-Za-zА-Яа-яЁё'-]{3,}\\s[A-Za-zА-Яа-яЁё'-]{3,}\\s?)",
       required: 'required',
     });
-    const nameLabel: HTMLElement = rendered(
+    const nameLabel: HTMLLabelElement = rendered(
       'label',
       this.personalInfoForm,
       'pers-data__name-label label hidden',
@@ -69,7 +69,7 @@ export default class ModalWindow extends BaseComponent {
       'data-regex': '^[\\+][0-9]{9,}$',
       required: 'required',
     });
-    const phoneLabel: HTMLElement = rendered(
+    const phoneLabel: HTMLLabelElement = rendered(
       'label',
       this.personalInfoForm,
       'pers-data__phone-label label hidden',
@@ -84,7 +84,7 @@ export default class ModalWindow extends BaseComponent {
       'data-regex': '([A-Za-zА-Яа-яЁё]{5,}[,]?\\s[-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s[-.A-Za-zА-Яа-яЁё]{5,}[,]?\\s?)',
       required: 'required',
     });
-    const addressLabel: HTMLElement = rendered(
+    const addressLabel: HTMLLabelElement = rendered(
       'label',
       this.personalInfoForm,
       'pers-data__address-label label hidden',
@@ -100,7 +100,7 @@ export default class ModalWindow extends BaseComponent {
         "^(?!\\.)(?!.*\\.$)(?!.*\\.\\.)([A-Za-z0-9!#$%&'*\\.\\.+-\\/=?^_`{|}~]{2,})@[A-Za-z0-9-\\._]{2,}\\.[A-Za-z]{2,4}$",
       required: 'required',
     });
-    const emailLabel: HTMLElement = rendered(
+    const emailLabel: HTMLLabelElement = rendered(
       'label',
       this.personalInfoForm,
       'pers-data__email-label label hidden',
@@ -127,7 +127,7 @@ export default class ModalWindow extends BaseComponent {
       required: 'required',
       maxlength: '16',
     });
-    const numberLabel: HTMLElement = rendered(
+    const numberLabel: HTMLLabelElement = rendered(
       'label',
       cardWrapper,
       'pers-data__number-label label hidden',
@@ -144,14 +144,13 @@ export default class ModalWindow extends BaseComponent {
       placeholder: 'MM / YY',
       id: 'expiration',
       name: 'expiration',
-      'data-regex': '((0[1-9])|(1[0-2]))\\/((2[3-9])|(3[0-9])|(4[0-9])|(5[0-9])|(6[0-9])|(7[0-9])|(8[0-9])|(9[0-9]))',
+      'data-regex': '((0[1-9])|(1[0-2]))\\/((2[3-9])|([3-9][0-9]))',
       required: 'required',
       maxlength: '5',
     });
     this.cardExpirationInput.addEventListener('keydown', this.autoSlashForDate);
-    this.cardExpirationInput.addEventListener('keyup', this.autoSlashForDate);
     this.cardExpirationInput.addEventListener('keydown', this.addOnlyNumbers);
-    const expirationLabel: HTMLElement = rendered(
+    const expirationLabel: HTMLLabelElement = rendered(
       'label',
       dataWrapper,
       'pers-data__expiration-label label hidden',
@@ -171,7 +170,7 @@ export default class ModalWindow extends BaseComponent {
       required: 'required',
       maxlength: '3',
     });
-    const cvvLabel: HTMLElement = rendered(
+    const cvvLabel: HTMLLabelElement = rendered(
       'label',
       cvvWrapper,
       'pers-data__cvv-label label hidden',
@@ -213,14 +212,14 @@ export default class ModalWindow extends BaseComponent {
 
     // слушатели
     this.personalInfoForm.addEventListener('input', this.inputHandler);
-    this.cardNumberInput.addEventListener('input', (e: Event): void => {
+    this.cardNumberInput.addEventListener('input', (): void => {
       if (this.cardNumberLogo) {
-        this.changeLogoOfPaymentSystem(e);
+        this.changeLogoOfPaymentSystem(this.cardNumberInput?.value);
       }
     });
-    this.confirmBtn.addEventListener('click', (e: Event): void => {
+    this.confirmBtn.addEventListener('click', (): void => {
       if (this.confirmBtnText) {
-        this.buttonHandler(e);
+        this.confirmButtonHandler();
       }
     });
   }
@@ -234,12 +233,12 @@ export default class ModalWindow extends BaseComponent {
   };
 
   // проверяем наличие атрибута с регулярным выражением у инпута
-  public inputHandler = (e: Event): void => {
-    if (e.target && e.target instanceof HTMLInputElement) {
-      if (e.target.hasAttribute('data-regex')) {
-        this.addClasses(e.target);
+  public inputHandler = (): void => {
+    this.inputsAll.forEach((input) => {
+      if (input instanceof HTMLInputElement && input.hasAttribute('data-regex')) {
+        this.addClasses(input);
       }
-    }
+    });
   };
 
   // смена классов valid / invalid
@@ -289,19 +288,21 @@ export default class ModalWindow extends BaseComponent {
   }
 
   // метод смены логотипа платежной системы
-  public changeLogoOfPaymentSystem(e: Event): void {
-    if (e.target && e.target instanceof HTMLInputElement) {
-      const inputValue: string = e.target.value;
-      if (this.cardNumberLogo) {
-        if (inputValue.startsWith('3')) {
+  public changeLogoOfPaymentSystem(value: string | undefined): void {
+    if (this.cardNumberLogo) {
+      switch (value?.charAt(0)) {
+        case '3':
           this.cardNumberLogo.setAttribute('src', '../../../assets/icons/american-express.png');
-        } else if (inputValue.startsWith('4')) {
+          break;
+        case '4':
           this.cardNumberLogo.setAttribute('src', '../../../assets/icons/visa.png');
-        } else if (inputValue.startsWith('5')) {
+          break;
+        case '5':
           this.cardNumberLogo.setAttribute('src', '../../../assets/icons/mastercard.png');
-        } else {
+          break;
+        default:
           this.cardNumberLogo.setAttribute('src', '../../../assets/icons/payment.png');
-        }
+          break;
       }
     }
   }
@@ -337,17 +338,16 @@ export default class ModalWindow extends BaseComponent {
     });
   }
 
-  public buttonHandler(e: Event): void {
-    if (e.target && e.target instanceof HTMLInputElement) {
-      if (e.target.hasAttribute('data-valid')) {
-        if (e.target.getAttribute('data-valid') !== 'invalid') {
-          this.confirmBtnCallback(e);
-        }
+  public confirmButtonHandler(): void {
+    if (this.confirmBtn && this.confirmBtn.hasAttribute('data-valid')) {
+      if (this.confirmBtn.getAttribute('data-valid') !== 'invalid') {
+        this.confirmBtnCallback();
       }
     }
   }
 
-  private confirmBtnCallback = (e: Event): void => {
+  private confirmBtnCallback = (): void => {
+    const e = new Event('confirm');
     e.preventDefault();
     this.root.removeChild(this.element);
     this.notifyObserver(e);

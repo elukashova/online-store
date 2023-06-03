@@ -6,20 +6,20 @@ import rendered from '../../utils/render';
 import CartCard from './card-cart';
 import Header from '../header/header';
 import { checkDataInLocalStorage, setDataToLocalStorage } from '../../utils/localStorage';
-import { PosterStorageType } from '../../utils/localStorage.types';
+import { PosterStorageInfo } from '../../utils/localStorage.types';
 import { ObservedSubject } from '../card/card.types';
 import { Callback, PromoInputs, PromoValues } from './shopping-cart.types';
 import ModalWindow from '../modal-window/modal-window';
 import { setQueryParams, getQueryParams } from '../../utils/queryParams';
 
 export default class Cart extends BaseComponent {
-  private storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
+  private storageInfo: PosterStorageInfo[] | null = checkDataInLocalStorage('addedPosters');
 
   private promoStorageInfo: string[] | null = checkDataInLocalStorage('appliedPromo');
 
   private itemsOrder: number = 0;
 
-  private addedItems: PosterStorageType[] = [];
+  private addedItems: PosterStorageInfo[] = [];
 
   private cartItems: number;
 
@@ -203,7 +203,7 @@ export default class Cart extends BaseComponent {
   }
 
   // функция создания карточек
-  private createItemsCards(array: PosterStorageType[], callback: (event: Event) => void): void {
+  private createItemsCards(array: PosterStorageInfo[], callback: (event: Event) => void): void {
     for (let i: number = 0; i < array.length; i += 1) {
       cardsData.products.forEach((data) => {
         if (array[i].id === data.id) {

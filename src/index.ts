@@ -5,8 +5,6 @@ import App from './components/app/app';
 const app: App = new App(document.body);
 
 window.onload = (): void => {
-  // добавила зачистку localstorage для удобства тестирования
-  // localStorage.clear();
   app.init();
 };
 

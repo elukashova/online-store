@@ -1,28 +1,28 @@
 .checkout-modal-container {
-  display: flex;
-  background-color: rgba(255, 255, 255, 0.7);
-  width: 100%;
-  height: 100%;
-  z-index: 20;
   position: fixed;
+  z-index: 20;
+  display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
   transition: all ease 1s;
 }
 
 .checkout-modal {
-  background: white;
-  border: 1px solid rgba(0, 0, 0, 0.5);
-  width: 40%;
-  opacity: 1;
-  box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 5%;
-  position: absolute;
+  width: 40%;
   height: 40vw;
   padding-bottom: 3%;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  opacity: 1;
+  box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
 }
 
 .checkout__pers-data_wrapper,
@@ -36,9 +36,9 @@
 
 .pers-data__title,
 .card-data__title {
-  font-weight: 700;
-  font-size: calc(.1em + 1vw);
   margin: 1.2em 0;
+  font-weight: 700;
+  font-size: calc(0.1em + 1vw);
 }
 
 .pers-data__title {
@@ -54,15 +54,15 @@
 }
 
 .input {
-  border: 2px solid rgba(0, 0, 0, 0.5);
+  padding: 0;
+  margin: 0.35em;
   width: 80%;
-  font-size: calc(.1em + 1vw);
+  font-size: calc(0.1em + 1vw);
   font-weight: 400;
   color: #65635f;
   text-align: center;
   line-height: 1.5em;
-  padding: 0;
-  margin: 0.35em;
+  border: 2px solid rgba(0, 0, 0, 0.5);
 }
 
 .invalid {
@@ -74,9 +74,9 @@
 }
 
 .card-data__number-input-wrapper {
-  width: 80%;
   display: grid;
   grid-template-columns: 13% 1fr;
+  width: 80%;
 }
 
 .card-data__number-input {
@@ -99,18 +99,18 @@
 }
 
 .card-data__data-cvv-wrapper {
-  width: 80%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2%;
+  width: 80%;
 }
 
 .card-data__data-wrapper,
 .card-data__cvv-wrapper,
 .card-data__card-wrapper {
-  width: 100%;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .card-data__data-cvv-label-wrapper {
@@ -124,7 +124,7 @@
 .card-data__number-input::placeholder,
 .card-data__expiration-input::placeholder,
 .card-data__cvv-input::placeholder {
-  font-size: calc(.1em + 1vw);
+  font-size: calc(0.1em + 1vw);
   font-weight: 300;
   color: #ff7d15;
   text-align: center;
@@ -134,12 +134,12 @@
 .label,
 .checkout__confirm-btn-text {
   width: 95%;
-  font-size: calc(.25em + 0.5vw);
+  padding: 0;
+  margin: 0;
+  font-size: calc(0.25em + 0.5vw);
   font-weight: 400;
   color: #65635f93;
   text-align: center;
-  padding: 0;
-  margin: 0;
 }
 
 .card-data__number-logo-wrapper {
@@ -147,31 +147,30 @@
 }
 
 .card-data__number-input-image {
-  background-size: contain;
   width: 80%;
+  background-size: contain;
 }
 
 .checkout__confirm-btn-wrapper {
-  margin-top: 0.5em;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
+  margin-top: 0.5em;
 }
 
 .checkout__confirm-btn {
-  background-color: #ff7e155d;
+  width: 80%;
+  height: 2.3em;
+  margin-bottom: 0.5rem;
+  font-size: calc(0.1em + 1vw);
   color: #fff;
   text-transform: uppercase;
-  width: 80%;
-  margin-bottom: 0.5rem;
-  height: 2.3em;
-  transition: background-color .3s;
+  background-color: #ff7e155d;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
   border-radius: 0.15em;
-  font-size: calc(.1em + 1vw);
+  transition: background-color 0.3s;
 }
-
 
 .checkout__confirm-btn.valid-btn {
   background-color: #ff7d15;
@@ -179,11 +178,11 @@
 }
 
 .checkout__confirm-btn.valid-btn:hover {
-  background-color: #65635F;
+  background-color: #65635f;
 }
 
 .checkout__confirm-btn.valid-btn:active {
-  background-color:#251707;
+  background-color: #251707;
 }
 
 .checkout__confirm-btn-text {
@@ -196,8 +195,8 @@
 
 .redirect-message-container {
   width: 50vw;
-  text-align: center;
   align-self: center;
+  text-align: center;
 }
 
 .redirect-message-container__thank-you-text {
@@ -209,7 +208,7 @@
 .redirect-message-container__timer-text {
   font-weight: 400;
   font-size: 1.2rem;
-  color: #65635F;
+  color: #65635f;
 }
 
 @media screen and (max-width: 1200px) {

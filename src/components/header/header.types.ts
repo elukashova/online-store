@@ -1,4 +1,4 @@
-export type HeaderType = {
+export type HeaderInfo = {
   cartItems: number;
   totalPrice: number;
 };

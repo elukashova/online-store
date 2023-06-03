@@ -1,25 +1,22 @@
-import { CardDataType } from '../../card/card.types';
+import Card from '../../card/card';
+import { CardDataInfo } from '../../card/card.types';
 import { CountForFilter } from '../cards-field.types';
 
-function findCountOfCurrentProducts(data: CardDataType[], field: string): CountForFilter[] {
-  const uniqueArray: CountForFilter[] = [];
-  data.forEach((item) => {
-    let obj;
-    let index;
-    if (field === 'category') {
-      obj = { type: field, key: item.category, count: 1 };
-      index = uniqueArray.findIndex((elem) => elem.key === item.category);
-    } else {
-      obj = { type: field, key: item.size, count: 1 };
-      index = uniqueArray.findIndex((elem) => elem.key === item.size);
+// eslint-disable-next-line max-len
+function findCountOfCurrentProducts(data: Card[], field: keyof CardDataInfo): CountForFilter[] {
+  const uniqueItems: CountForFilter[] = data.reduce((acc: CountForFilter[], card: Card) => {
+    if (card.products) {
+      const key: string = card.products[field].toString();
+      const index = acc.findIndex((elem: CountForFilter): boolean => elem.key === key);
+      if (index !== -1) {
+        acc[index].count += 1;
+      } else {
+        acc.push({ type: field.toLowerCase(), key, count: 1 });
+      }
     }
-    if (index !== -1) {
-      uniqueArray[index].count += 1;
-    } else {
-      uniqueArray.push(obj);
-    }
-  });
-  return uniqueArray;
+    return acc;
+  }, []);
+  return uniqueItems;
 }
 
 export default findCountOfCurrentProducts;

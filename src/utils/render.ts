@@ -1,11 +1,11 @@
-const rendered = (
-  element: string,
-  parent: Element,
+const rendered = <K extends keyof HTMLElementTagNameMap>(
+  element: K,
+  parent: HTMLElement,
   classes: string,
   content?: string,
   attributes?: { [key: string]: string } | undefined,
-): HTMLElement => {
-  const newElement: HTMLElement | null = document.createElement(element);
+): HTMLElementTagNameMap[K] => {
+  const newElement = document.createElement(element);
   parent.append(newElement);
   newElement.classList.add(...classes.split(' ')); // чтобы принимал и один, и несколько классов
 

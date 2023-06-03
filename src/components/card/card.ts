@@ -1,31 +1,13 @@
 import './card.styles.css';
 import rendered from '../../utils/render';
-import { CardDataType, Observer } from './card.types';
+import { CardDataInfo, Observer } from './card.types';
 import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
-import { PosterStorageType } from '../../utils/localStorage.types';
+import { PosterStorageInfo } from '../../utils/localStorage.types';
 import { Callback } from '../shopping-cart/shopping-cart.types';
 
 export default class Card extends BaseComponent {
-  public id: number;
-
-  public title: string;
-
-  public category: string;
-
-  public size: string;
-
-  public stock: number;
-
-  public price: number;
-
-  public description: string;
-
-  public rating: number;
-
-  public discountPercentage: number;
-
-  public images: string[];
+  public products: CardDataInfo;
 
   public buyButton: HTMLElement | null = null;
 
@@ -39,58 +21,42 @@ export default class Card extends BaseComponent {
 
   private wasAdded: boolean = false;
 
-  private readonly storageInfo: PosterStorageType[] | null = checkDataInLocalStorage('addedPosters');
+  private readonly storageInfo: PosterStorageInfo[] | null = checkDataInLocalStorage('addedPosters');
 
-  constructor(data: CardDataType, private callback: Callback) {
+  constructor(product: CardDataInfo, private callback: Callback) {
     super('div', 'cards__item card');
-    this.id = data.id;
-    this.title = data.title;
-    this.category = data.category;
-    this.size = data.size;
-    this.stock = data.stock;
-    this.price = data.price;
-    this.description = data.description;
-    this.rating = data.rating;
-    this.discountPercentage = data.discountPercentage;
-    this.images = data.images.slice();
+    this.products = product;
     this.render();
   }
 
   // eslint-disable-next-line max-lines-per-function
   public render(): void {
-    this.element.classList.add(`${this.category}`);
+    this.element.classList.add(`${this.products.category}`);
     const cardImg: HTMLElement = rendered('figure', this.element, 'card__img-holder');
     rendered('img', cardImg, 'card__img', '', {
-      src: this.images[0],
-      id: `img${this.id}`,
+      src: this.products.images[0],
+      id: `img${this.products.id}`,
       alt: 'photo of poster',
     });
     cardImg.addEventListener('click', this.productPageBtnCallback);
     const cardInfo: HTMLElement = rendered('div', this.element, 'card__info');
     const cardInfoWrapper: HTMLElement = rendered('div', cardInfo, 'card__info_wrapper');
-    rendered('p', cardInfoWrapper, 'card__name', `${this.title}`);
-    rendered('p', cardInfoWrapper, 'card__category', `${this.category}`);
-    rendered('p', cardInfoWrapper, 'card__size', `Size: ${this.size}`);
-    rendered('p', cardInfoWrapper, 'card__stock', `Stock: ${this.stock}`);
-    rendered('p', cardInfoWrapper, 'card__rating', `Rating: ${this.rating}`);
-    rendered('p', cardInfoWrapper, 'card__price', `$ ${this.price}`);
-    rendered('p', cardInfoWrapper, 'card__description', `${this.description.split('.')[0]}`);
+    this.fillCardInfoWrapper(cardInfoWrapper);
     const discountAndBtnsWrapper: HTMLElement = rendered('div', cardInfo, 'card__discount-btns-wrapper');
-    rendered('p', discountAndBtnsWrapper, 'card__discount', `Sale: ${this.discountPercentage}%`);
+    rendered('p', discountAndBtnsWrapper, 'card__discount', `Sale: ${this.products.discountPercentage}%`);
     const buttonsWrapper: HTMLElement = rendered('div', discountAndBtnsWrapper, 'card__btns');
     const productPageBtn: HTMLElement = rendered('img', buttonsWrapper, 'card__btn_open-card', '', {
       src: 'assets/icons/button-open-card.svg',
-      id: `${this.id}`,
+      id: `${this.products.id}`,
       alt: 'open product info',
     });
     productPageBtn.addEventListener('click', this.productPageBtnCallback);
     // проверяем local storage, добавлена ли этот товар в корзину
     if (this.storageInfo !== null) {
-      const posters: PosterStorageType[] = this.storageInfo.slice();
-      for (let i: number = 0; i < posters.length; i += 1) {
-        if (posters[i].id === this.id) {
-          this.totalPrice = posters[i].quantity * this.price;
-          this.itemQuantity = posters[i].quantity;
+      for (let i: number = 0; i < this.storageInfo.length; i += 1) {
+        if (this.storageInfo[i].id === this.products.id) {
+          this.totalPrice = this.storageInfo[i].quantity * this.products.price;
+          this.itemQuantity = this.storageInfo[i].quantity;
           this.element.classList.add('added');
           this.wasAdded = true;
         }
@@ -111,10 +77,26 @@ export default class Card extends BaseComponent {
     this.buyButton.addEventListener('click', this.buyBtnCallback);
   }
 
+  private fillCardInfoWrapper(cardInfoWrapper: HTMLElement): void {
+    const fields = [
+      { label: 'Name', value: this.products.title },
+      { label: 'Category', value: this.products.category },
+      { label: 'Size', value: this.products.size },
+      { label: 'Stock', value: this.products.stock },
+      { label: 'Rating', value: this.products.rating },
+      { label: 'Price', value: `$ ${this.products.price}` },
+      { label: 'Description', value: this.products.description.split('.')[0] },
+    ];
+
+    fields.forEach((field) => {
+      rendered('p', cardInfoWrapper, `card__${field.label.toLowerCase()}`, `${field.label}: ${field.value}`);
+    });
+  }
+
   // колбэк для рутинга
   private productPageBtnCallback = (e: Event): void => {
     e.preventDefault();
-    window.history.pushState({}, '', `product/${this.id}`);
+    window.history.pushState({}, '', `product/${this.products.id}`);
     this.callback(e);
     window.scrollTo({
       top: 0,
