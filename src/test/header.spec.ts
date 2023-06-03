@@ -1,4 +1,3 @@
-// import Cart from '../components/shopping-cart/shopping-cart';
 import CartCard from '../components/shopping-cart/card-cart';
 import cardsData from '../assets/json/data';
 import App from '../components/app/app';

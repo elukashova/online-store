@@ -9,3 +9,7 @@ export enum RangeFilters {
   Price = 'price',
   Count = 'count',
 }
+
+export type RangeTypeToSetting = {
+  [key: string]: RangeSettings;
+};

@@ -195,7 +195,6 @@ export default class CardsField extends BaseComponent {
     if (filterType === 'checkbox') {
       filterElem = filter.createCheckbox(uniqueValues);
     } else {
-      console.log(filter);
       filterElem = filter.createInputRange(filterName);
     }
 
@@ -386,7 +385,6 @@ export default class CardsField extends BaseComponent {
 
   public updateActiveFilters = (filter: string): void => {
     const filterType = this.getPartOfString(filter, 0);
-    console.log(filterType, filter);
     switch (filterType) {
       case QueryParameters.Price:
         this.addOrReplaceFilter(QueryParameters.Price, filter);
@@ -416,7 +414,6 @@ export default class CardsField extends BaseComponent {
   private updateOtherFilters = (filter: string): void => {
     const queryType = this.checkFilter(filter);
 
-    console.log(filter);
     const prev = getQueryParams(queryType);
 
     if (this.activeFilters.includes(filter)) {

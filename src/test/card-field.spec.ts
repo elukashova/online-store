@@ -6,16 +6,16 @@ import CardsField from '../components/cards-field/cards-field';
 const app: App = new App(document.body);
 const callback: Callback = app.route;
 const header: Header = new Header(callback);
-const cardsfield: CardsField = new CardsField(header, callback);
+const cardsField: CardsField = new CardsField(header, callback);
 
 describe('CardsField class', () => {
   test('defines composeQueryString() method', () => {
-    expect(cardsfield.composeQueryString).toBeDefined();
+    expect(cardsField.composeQueryString).toBeDefined();
   });
 
   test('composeQueryString() method return right value for all filters', () => {
-    expect(cardsfield.composeQueryString('price, 73, 106')).toBe('73~106');
-    expect(cardsfield.composeQueryString('count, 3, 20')).toBe('3~20');
-    expect(cardsfield.composeQueryString('search,where is my mind')).toBe('where is my mind');
+    expect(cardsField.composeQueryString('price, 73, 106')).toBe('73~106');
+    expect(cardsField.composeQueryString('count, 3, 20')).toBe('3~20');
+    expect(cardsField.composeQueryString('search,where is my mind')).toBe('where is my mind');
   });
 });
