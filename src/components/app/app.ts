@@ -1,9 +1,10 @@
 import Header from '../header/header';
 import Footer from '../footer/footer';
-import { Routes } from './app-types';
+import { RoutesComponents } from './app-types';
+import Routes from './routes.types';
 import Main from '../main/main-component';
 import CardsField from '../cards-field/cards-field';
-import Cart from '../shopping-cart/shopping-cart';
+import ShoppingCart from '../shopping-cart/shopping-cart';
 import ProductPage from '../product-page/product-page';
 import Page404 from '../404/404';
 import AboutPage from '../about-page/about-page';
@@ -16,7 +17,7 @@ export default class App {
 
   private readonly footer: Footer = new Footer();
 
-  private readonly routes: Routes;
+  private readonly routes: RoutesComponents;
 
   private productID: string = '';
 
@@ -35,14 +36,7 @@ export default class App {
     this.locationHandler();
   }
 
-  public route = (event: Event, checkout?: boolean): void => {
-    const e: Event = event || window.event;
-    e.preventDefault();
-
-    if (e.target instanceof HTMLAnchorElement) {
-      window.history.pushState({}, '', e.target.href);
-    }
-
+  public route = (checkout?: boolean): void => {
     if (checkout && checkout === true) {
       this.locationHandler(checkout);
     } else {
@@ -52,47 +46,51 @@ export default class App {
 
   // eslint-disable-next-line max-lines-per-function
   public locationHandler = async (checkout?: boolean): Promise<void> => {
-    const location: string = window.location.pathname.length === 0 ? '/' : window.location.pathname;
+    const { length } = window.location.pathname;
+    const location: string = !length ? Routes.Home : window.location.pathname;
+    const productIdFromLocation: string = location.replace(/^\D+/g, '');
 
-    if (Number(location.slice(9)) <= cardsData.products.length) {
-      this.productID = location.slice(9);
+    if (Number(productIdFromLocation) <= cardsData.products.length) {
+      this.productID = productIdFromLocation;
     }
 
     switch (location) {
-      case '/':
+      case Routes.Home:
         this.routes.store = new CardsField(this.header, this.route);
-        this.component = this.routes.store.element;
-        this.header.activateLink(this.header.storeLink);
+        this.handleCurrentComponentRoute(this.routes.store.element, this.header.storeLink);
         break;
-      case '/about':
+      case Routes.About:
         this.routes.about = new AboutPage(this.route);
-        this.component = this.routes.about.element;
-        this.header.activateLink(this.header.aboutLink);
+        this.handleCurrentComponentRoute(this.routes.about.element, this.header.aboutLink);
         break;
-      case '/cart':
-        this.routes.cart = new Cart(this.header, this.route, this.rootElement, checkout);
-        this.component = this.routes.cart.element;
-        this.header.activateLink(this.header.shoppingCartLink);
+      case Routes.Cart:
+        this.routes.cart = new ShoppingCart(this.header, this.route, this.rootElement, checkout);
+        this.handleCurrentComponentRoute(this.routes.cart.element, this.header.shoppingCartLink);
         break;
-      case `/product/${this.productID}`:
+      case `${Routes.Product}/${this.productID}`:
         this.routes.productPage = new ProductPage(Number(this.productID), this.route);
         this.routes.productPage.attachObserver(this.header);
-        this.component = this.routes.productPage.element;
-        this.header.deleteActiveClass();
+        this.handleCurrentComponentRoute(this.routes.productPage.element);
         break;
       default:
         this.routes.notfound = new Page404();
-        this.component = this.routes.notfound.element;
-        this.header.deleteActiveClass();
+        this.handleCurrentComponentRoute(this.routes.notfound.element);
     }
 
-    if (!this.mainContainer.element.hasChildNodes()) {
+    const child: ChildNode | null = this.mainContainer.element.firstChild;
+    if (!child && this.component) {
       this.mainContainer.setContent(this.component);
-    } else {
-      const child: ChildNode | null = this.mainContainer.element.firstChild;
-      if (child) {
-        this.mainContainer.element.replaceChild(this.component, child);
-      }
+    } else if (child && this.component) {
+      this.mainContainer.element.replaceChild(this.component, child);
     }
   };
+
+  private handleCurrentComponentRoute(element: HTMLElement, link?: HTMLElement | null): void {
+    this.component = element;
+    if (link) {
+      this.header.activateLink(link);
+    } else {
+      this.header.deleteAllActiveClasses();
+    }
+  }
 }

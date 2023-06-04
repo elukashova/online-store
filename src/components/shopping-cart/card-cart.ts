@@ -4,10 +4,9 @@ import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageInfo } from '../../utils/localStorage.types';
 import { Callback } from './shopping-cart.types';
+import Routes from '../app/routes.types';
 
 export default class CartCard extends BaseComponent {
-  private storageInfo: PosterStorageInfo[] | null = checkDataInLocalStorage('addedPosters');
-
   private addedItems: PosterStorageInfo[] | null = [];
 
   public id: number;
@@ -44,7 +43,7 @@ export default class CartCard extends BaseComponent {
 
   public itemAmount: number = 0;
 
-  public itemInfo: PosterStorageInfo | null = null;
+  public itemInfo: PosterStorageInfo | undefined = undefined;
 
   // эти два указателя мне нужны для обсервера на клик на + и -
   public minus: boolean = false;
@@ -64,11 +63,13 @@ export default class CartCard extends BaseComponent {
     this.stock = this.data.stock;
     this.price = this.data.price;
     this.discount = this.data.discountPercentage;
-    if (this.storageInfo !== null) {
-      this.addedItems = this.storageInfo.slice();
-      const idx = this.addedItems.findIndex((i) => i.id === this.id);
-      this.itemInfo = this.storageInfo[idx];
-      this.itemAmount = this.itemInfo.quantity;
+    const storageInfo: PosterStorageInfo[] | null = <PosterStorageInfo[]>checkDataInLocalStorage('addedPosters');
+    if (storageInfo !== null) {
+      this.addedItems = storageInfo.slice();
+      this.itemInfo = this.addedItems.find((item: PosterStorageInfo) => item.id === this.id);
+      if (this.itemInfo) {
+        this.itemAmount = this.itemInfo.quantity;
+      }
       this.totalPrice = this.itemAmount * this.price;
     }
     this.render();
@@ -87,13 +88,7 @@ export default class CartCard extends BaseComponent {
       alt: 'poster image',
     });
     const firstItemDescr: HTMLElement = rendered('div', itemCard, 'cart-item__description');
-    rendered('span', firstItemDescr, 'cart-item__description_title', this.title);
-    rendered('span', firstItemDescr, 'cart-item__description_category', this.category);
-    rendered('span', firstItemDescr, 'cart-item__description_size', `Size ${this.size}`);
-    rendered('span', firstItemDescr, 'cart-item__description_rating', `Rating: ${this.rating}`);
-    rendered('span', firstItemDescr, 'cart-item__description_price', `Price: $ ${this.price}`);
-    rendered('span', firstItemDescr, 'cart-item__description_discount', `Discount: ${this.discount}`);
-    rendered('p', firstItemDescr, 'cart-item__description_text', this.description);
+    this.fillCardInfo(firstItemDescr);
 
     // правая часть с возможностью поменять количество
     const amountContainer = rendered('div', this.element, 'cart-item__amount_container');
@@ -124,10 +119,25 @@ export default class CartCard extends BaseComponent {
     );
   }
 
-  private productPageCallback = (e: Event): void => {
-    e.preventDefault();
-    window.history.pushState({}, '', `product/${this.id}`);
-    this.callback(e);
+  private fillCardInfo(cardInfoWrapper: HTMLElement): void {
+    const fields = [
+      { label: 'Title', value: this.title },
+      { label: 'Category', value: this.category },
+      { label: 'Size', value: `Size ${this.size}` },
+      { label: 'Rating', value: `Rating: ${this.rating}` },
+      { label: 'Price', value: `Price: $ ${this.price}` },
+      { label: 'Discount', value: `Discount: ${this.discount}` },
+      { label: 'Text', value: this.description },
+    ];
+
+    fields.forEach((field) => {
+      rendered('span', cardInfoWrapper, `cart-item__description_${field.label.toLowerCase()}`, `${field.value}`);
+    });
+  }
+
+  private productPageCallback = (): void => {
+    window.history.pushState({}, '', `${Routes.Product}/${this.id}`);
+    this.callback();
   };
 
   public minusBtnCallback = (): void => {
@@ -160,28 +170,19 @@ export default class CartCard extends BaseComponent {
       }
       this.notifyObserver();
       if (this.itemAmount === this.stock && e.target instanceof HTMLElement) {
-        e.target.classList.add('disabled');
+        this.plusBtn?.classList.add('disabled');
       }
     }
   };
 
   // три метода, нужные для обсервера
   public attachObserver(observer: Observer): void {
-    const isExist = this.observers.includes(observer);
-    if (isExist) {
-      console.log('Subject: Observer has been attached already.');
-    }
     this.observers.push(observer);
   }
 
   public removeObserver(observer: Observer): void {
-    const observerIndex = this.observers.indexOf(observer);
-    if (observerIndex === -1) {
-      console.log('Subject: Nonexistent observer.');
-    }
-
+    const observerIndex: number = this.observers.indexOf(observer);
     this.observers.splice(observerIndex, 1);
-    console.log('Subject: Detached an observer.');
   }
 
   public notifyObserver(): void {

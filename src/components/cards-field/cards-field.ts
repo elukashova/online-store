@@ -681,11 +681,9 @@ export default class CardsField extends BaseComponent {
   public update(subject: ObservedSubject): void {
     if (subject instanceof Card && subject.element.classList.contains('added')) {
       const info: PosterStorageInfo = {
-        id: 0,
-        quantity: 0,
+        id: subject.products.id,
+        quantity: 1,
       };
-      info.id = subject.products.id;
-      info.quantity += 1;
       this.addedItems.push(info);
       setDataToLocalStorage(this.addedItems, 'addedPosters');
     }

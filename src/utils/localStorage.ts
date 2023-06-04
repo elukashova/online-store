@@ -6,13 +6,12 @@ export const checkDataInLocalStorage = <T>(key: string): T | null => {
     try {
       return JSON.parse(response);
     } catch (e) {
-      console.log(e);
+      return null;
     }
   }
   return null;
 };
 
 export const setDataToLocalStorage = (data: DataToSet, key: string): void => {
-  localStorage.removeItem(key);
   localStorage.setItem(key, JSON.stringify(data));
 };

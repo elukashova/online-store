@@ -5,31 +5,29 @@ import { ObservedSubject } from '../card/card.types';
 import Card from '../card/card';
 import { setDataToLocalStorage, checkDataInLocalStorage } from '../../utils/localStorage';
 import { HeaderInfo } from './header.types';
-import { JsonObj } from '../../utils/localStorage.types';
 import CartCard from '../shopping-cart/card-cart';
 import ProductPage from '../product-page/product-page';
 import ModalWindow from '../modal-window/modal-window';
 import { Callback } from '../shopping-cart/shopping-cart.types';
+import Routes from '../app/routes.types';
 
 export default class Header extends BaseComponent {
   public totalPriceElement: HTMLElement | null = null;
 
   public cartItemsElement: HTMLElement | null = null;
 
-  private readonly storageInfo: JsonObj | null = checkDataInLocalStorage('headerInfo');
-
   public headerInfo: HeaderInfo = {
     cartItems: 0,
     totalPrice: 0,
   };
 
-  public storeLink: HTMLElement | null = null;
+  public storeLink: HTMLAnchorElement | null = null;
 
-  public aboutLink: HTMLElement | null = null;
+  public aboutLink: HTMLAnchorElement | null = null;
 
-  public shoppingCartLink: HTMLElement | null = null;
+  public shoppingCartLink: HTMLAnchorElement | null = null;
 
-  private menuLinks: HTMLElement[] = [];
+  private menuLinks: HTMLAnchorElement[] = [];
 
   constructor(private callback: Callback) {
     super('header', 'header', 'header');
@@ -40,15 +38,15 @@ export default class Header extends BaseComponent {
   // eslint-disable-next-line max-lines-per-function
   private render(): void {
     const container: HTMLElement = rendered('div', this.element, 'header__container');
-    const logoLink: HTMLElement = rendered('a', container, 'header__logo logo', '', { href: '/' });
+    const logoLink: HTMLAnchorElement = rendered('a', container, 'header__logo logo', '', { href: Routes.Home });
     rendered('img', logoLink, 'logo__img', '', {
       src: '../assets/images/logo6.png',
       alt: 'atrificial poster shop logotype',
     });
     const menu: HTMLElement = rendered('div', container, 'header__menu menu');
-    this.storeLink = rendered('a', menu, 'menu__link store-link', 'Store', { href: '/' });
+    this.storeLink = rendered('a', menu, 'menu__link store-link', 'Store', { href: Routes.Home });
     this.storeLink.classList.add('active-link');
-    this.aboutLink = rendered('a', menu, 'menu__link about-link', 'About us', { href: '/about' });
+    this.aboutLink = rendered('a', menu, 'menu__link about-link', 'About us', { href: Routes.About });
     const priceContainer: HTMLElement = rendered('div', menu, 'total-price__container');
     rendered('span', priceContainer, 'total-price', 'Total:');
     const priceNumber: HTMLElement = rendered('div', priceContainer, 'total-price__text');
@@ -59,7 +57,7 @@ export default class Header extends BaseComponent {
       `$ ${this.headerInfo.totalPrice ? this.headerInfo.totalPrice.toLocaleString('en-US') : '0'}`,
     );
     const shoppingCart: HTMLElement = rendered('div', menu, 'menu__item cart');
-    this.shoppingCartLink = rendered('a', shoppingCart, 'cart__link cart-hover', '', { href: '/cart' });
+    this.shoppingCartLink = rendered('a', shoppingCart, 'cart__link cart-hover', '', { href: Routes.Cart });
     rendered('img', this.shoppingCartLink, 'cart__icon', '', {
       src: '../assets/icons/cart.svg',
       alt: 'cart icon',
@@ -71,41 +69,36 @@ export default class Header extends BaseComponent {
       `${this.headerInfo.cartItems}`,
     );
     this.menuLinks.push(this.storeLink, this.aboutLink, this.shoppingCartLink);
-    this.menuLinks.forEach((link: HTMLElement): void => {
-      link.addEventListener('click', this.navLinkCallback);
+    this.menuLinks.forEach((link: HTMLAnchorElement): void => {
+      link.addEventListener('click', () => this.navLinkCallback(link.href));
     });
-    logoLink.addEventListener('click', this.imageLinkCallback);
-    this.cartItemsElement.addEventListener('click', this.imageLinkCallback);
+    logoLink.addEventListener('click', () => this.imageLinkCallback(logoLink.href));
+    this.cartItemsElement.addEventListener('click', () => this.imageLinkCallback);
 
     this.updateInfoInHeader();
   }
 
   // колбэк для рутинга
-  private navLinkCallback = (e: Event): void => {
-    e.preventDefault();
-    const { target } = e;
-    if (target && target instanceof HTMLAnchorElement) {
-      this.callback(e);
-    }
+  private navLinkCallback = (url: string): void => {
+    this.changeRoute(url);
   };
 
-  private imageLinkCallback = (e: Event): void => {
-    e.preventDefault();
-    const { target } = e;
-    if (target && target instanceof HTMLAnchorElement) {
-      this.callback(e);
-    }
-    if (target && target instanceof HTMLSpanElement && this.shoppingCartLink) {
+  private imageLinkCallback = (url?: string): void => {
+    if (url) {
+      this.changeRoute(url);
+    } else {
       this.activateLink(this.shoppingCartLink);
-      window.history.pushState({}, '', '/cart');
-      this.callback(e);
+      this.changeRoute(Routes.Cart);
     }
   };
 
-  private deleteClass(element: HTMLElement): void {
-    if (element.classList.contains('active-link')) {
-      element.classList.remove('active-link');
-    }
+  private changeRoute(href: string): void {
+    window.history.pushState({}, '', href);
+    this.callback();
+  }
+
+  private deleteActiveLinkClass(element: HTMLElement): void {
+    element.classList.remove('active-link');
   }
 
   public activateLink(link: HTMLElement | null): void {
@@ -119,17 +112,15 @@ export default class Header extends BaseComponent {
             this.shoppingCartLink?.classList.add('cart-hover');
           }
         } else {
-          this.deleteClass(this.menuLinks[i]);
+          this.deleteActiveLinkClass(this.menuLinks[i]);
         }
       }
     }
   }
 
-  public deleteActiveClass(): void {
+  public deleteAllActiveClasses(): void {
     if (this.storeLink && this.aboutLink && this.shoppingCartLink) {
-      this.deleteClass(this.storeLink);
-      this.deleteClass(this.aboutLink);
-      this.deleteClass(this.shoppingCartLink);
+      this.menuLinks.forEach((link: HTMLAnchorElement) => this.deleteActiveLinkClass(link));
       this.shoppingCartLink.classList.add('cart-hover');
     }
   }
@@ -143,13 +134,12 @@ export default class Header extends BaseComponent {
         this.increaseNumbers(subject.products.price);
       } else if (!subject.element.classList.contains('added')) {
         // если нет, наоборот
-        if (subject.totalPrice !== 0) {
-          this.decreaseNumbers(subject.totalPrice, subject.itemQuantity);
+        if (subject.totalPriceInCart !== 0) {
+          this.decreaseNumbers(subject.totalPriceInCart, subject.itemQuantityInCart);
         } else {
           this.decreaseNumbers(subject.products.price, 1);
         }
       }
-      setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
     // обсервер на увеличение количество отдельных товаров в корзине
     if (subject instanceof CartCard) {
@@ -158,7 +148,6 @@ export default class Header extends BaseComponent {
       } else if (subject.minus === true && subject.itemAmount >= 0) {
         this.decreaseNumbers(subject.price, 1);
       }
-      setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
     // обсервер на увеличение количество отдельных товаров в корзине
     if (subject instanceof ProductPage) {
@@ -170,16 +159,15 @@ export default class Header extends BaseComponent {
       if (subject.isCheckout === true && this.shoppingCartLink) {
         this.activateLink(this.shoppingCartLink);
       }
-      setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
 
     // обсервер на закрытие модалки
     if (subject instanceof ModalWindow) {
       this.headerInfo.totalPrice = 0;
       this.headerInfo.cartItems = 0;
-
-      setDataToLocalStorage(this.headerInfo, 'headerInfo');
     }
+
+    setDataToLocalStorage(this.headerInfo, 'headerInfo');
     this.updateInfoInHeader();
   }
 
@@ -196,9 +184,10 @@ export default class Header extends BaseComponent {
   }
 
   private checkLocalStorage(): void {
-    if (this.storageInfo !== null) {
-      this.headerInfo.cartItems = this.storageInfo.cartItems;
-      this.headerInfo.totalPrice = this.storageInfo.totalPrice;
+    const storageInfo: HeaderInfo | null = <HeaderInfo>checkDataInLocalStorage('headerInfo');
+    if (storageInfo) {
+      this.headerInfo.cartItems = storageInfo.cartItems;
+      this.headerInfo.totalPrice = storageInfo.totalPrice;
     }
   }
 

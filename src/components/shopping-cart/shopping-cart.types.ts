@@ -14,4 +14,4 @@ export enum PromoInputs {
   smile = 'SMILE',
 }
 
-export type Callback = (event: Event, checkout?: boolean) => void;
+export type Callback = (checkout?: boolean) => void;

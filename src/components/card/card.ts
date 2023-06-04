@@ -5,6 +5,7 @@ import BaseComponent from '../base-component/base-component';
 import { checkDataInLocalStorage } from '../../utils/localStorage';
 import { PosterStorageInfo } from '../../utils/localStorage.types';
 import { Callback } from '../shopping-cart/shopping-cart.types';
+import Routes from '../app/routes.types';
 
 export default class Card extends BaseComponent {
   public products: CardDataInfo;
@@ -13,9 +14,9 @@ export default class Card extends BaseComponent {
 
   public itemPrice: number = 0;
 
-  public itemQuantity: number = 0;
+  public itemQuantityInCart: number = 0;
 
-  public totalPrice: number = 0;
+  public totalPriceInCart: number = 0;
 
   private observers: Observer[] = [];
 
@@ -55,20 +56,15 @@ export default class Card extends BaseComponent {
     if (this.storageInfo !== null) {
       for (let i: number = 0; i < this.storageInfo.length; i += 1) {
         if (this.storageInfo[i].id === this.products.id) {
-          this.totalPrice = this.storageInfo[i].quantity * this.products.price;
-          this.itemQuantity = this.storageInfo[i].quantity;
+          this.totalPriceInCart = this.storageInfo[i].quantity * this.products.price;
+          this.itemQuantityInCart = this.storageInfo[i].quantity;
           this.element.classList.add('added');
           this.wasAdded = true;
         }
       }
     }
     // подбираем нужную картинку для кнопки, в завимимости от того, есть ли карточка в корзине
-    let imgSource: string;
-    if (this.element.classList.contains('added')) {
-      imgSource = 'assets/icons/button-close.svg';
-    } else {
-      imgSource = 'assets/icons/button-buy.svg';
-    }
+    const imgSource: string = this.wasAdded ? 'assets/icons/button-close.svg' : 'assets/icons/button-buy.svg';
     this.buyButton = rendered('img', buttonsWrapper, 'card__btn_buy', '', {
       src: `${imgSource}`,
       alt: 'add to cart',
@@ -94,10 +90,9 @@ export default class Card extends BaseComponent {
   }
 
   // колбэк для рутинга
-  private productPageBtnCallback = (e: Event): void => {
-    e.preventDefault();
-    window.history.pushState({}, '', `product/${this.products.id}`);
-    this.callback(e);
+  private productPageBtnCallback = (): void => {
+    window.history.pushState({}, '', `${Routes.Product}/${this.products.id}`);
+    this.callback();
     window.scrollTo({
       top: 0,
       behavior: 'auto',
@@ -105,37 +100,26 @@ export default class Card extends BaseComponent {
   };
 
   private buyBtnCallback = (): void => {
-    if (!this.element.classList.contains('added')) {
+    if (!this.wasAdded) {
       this.element.classList.add('added');
       this.buyButton?.setAttribute('src', 'assets/icons/button-close.svg');
-      this.notifyObserver();
     } else {
       this.element.classList.remove('added');
       this.buyButton?.setAttribute('src', 'assets/icons/button-buy.svg');
-      this.notifyObserver();
-      if (this.wasAdded === true) {
-        this.wasAdded = false;
-        this.totalPrice = 0;
-        this.itemQuantity = 0;
-      }
+      this.wasAdded = false;
+      this.totalPriceInCart = 0;
+      this.itemQuantityInCart = 0;
     }
+    this.notifyObserver();
   };
 
   // три метода, нужные для обсервера
   public attachObserver(observer: Observer): void {
-    const isExist = this.observers.includes(observer);
-    if (isExist) {
-      console.log('Subject: Observer has been attached already.');
-    }
     this.observers.push(observer);
   }
 
   public removeObserver(observer: Observer): void {
-    const observerIndex = this.observers.indexOf(observer);
-    if (observerIndex === -1) {
-      console.log('Subject: Nonexistent observer.');
-    }
-
+    const observerIndex: number = this.observers.indexOf(observer);
     this.observers.splice(observerIndex, 1);
   }
 

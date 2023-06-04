@@ -11,12 +11,9 @@ import { ObservedSubject } from '../card/card.types';
 import { Callback, PromoInputs, PromoValues } from './shopping-cart.types';
 import ModalWindow from '../modal-window/modal-window';
 import { setQueryParams, getQueryParams } from '../../utils/queryParams';
+import Routes from '../app/routes.types';
 
-export default class Cart extends BaseComponent {
-  private storageInfo: PosterStorageInfo[] | null = checkDataInLocalStorage('addedPosters');
-
-  private promoStorageInfo: string[] | null = checkDataInLocalStorage('appliedPromo');
-
+export default class ShoppingCart extends BaseComponent {
   private itemsOrder: number = 0;
 
   private addedItems: PosterStorageInfo[] = [];
@@ -41,7 +38,7 @@ export default class Cart extends BaseComponent {
 
   private currentPageElement: HTMLElement | null = null;
 
-  private itemsPerPageElement: HTMLElement | null = null;
+  private itemsPerPageElement: HTMLInputElement | null = null;
 
   private buyNowButton: HTMLElement | null = null;
 
@@ -65,7 +62,7 @@ export default class Cart extends BaseComponent {
   // элементы для промокода
   private promocodeContainer: HTMLElement | null = null;
 
-  private promoInputElement: HTMLElement | null = null;
+  private promoInputElement: HTMLInputElement | null = null;
 
   private promoApplyWrapper: HTMLElement | null = null;
 
@@ -93,28 +90,31 @@ export default class Cart extends BaseComponent {
 
   private isCheckout: boolean = false;
 
+  private totalDiscount: number = 0;
+
   // eslint-disable-next-line max-len
   constructor(private header: Header, private callback: Callback, private root?: HTMLElement, checkout?: boolean) {
     super('div', 'cart-container cart');
-    if (checkout && checkout === true) {
+    if (checkout) {
       this.isCheckout = true;
     }
     this.cartItems = this.header.headerInfo.cartItems;
     this.totalPrice = this.header.headerInfo.totalPrice;
-    if (this.storageInfo !== null) {
+    const storageInfo: PosterStorageInfo[] | null = <PosterStorageInfo[]>checkDataInLocalStorage('addedPosters');
+    const promoStorageInfo: string[] | null = <string[]>checkDataInLocalStorage('appliedPromo');
+    if (storageInfo) {
       // сохраняю инфу из local storage для создания карточек
-      this.addedItems = this.storageInfo.slice();
+      this.addedItems = storageInfo.slice();
       // считаю количество страниц в пагинации
       this.pagesNumber = Math.ceil(this.addedItems.length / this.itemsPerPage);
       this.render();
       // проверяем, было ли уже применены скидки
-      if (this.promoStorageInfo !== null) {
-        this.appliedPromos = this.promoStorageInfo.slice();
+      if (promoStorageInfo) {
+        this.appliedPromos = promoStorageInfo.slice();
         this.appliedPromos.forEach((promo) => {
-          const name: string = promo;
-          const key: number = this.choosePromoValue(name);
+          const key: number = this.choosePromoValue(promo);
           this.afterPromoPrice = this.calculateNewPrice();
-          this.createElementsForAppliedPromo(name, key);
+          this.createElementsForAppliedPromo(promo, key);
         });
       }
     } else {
@@ -134,7 +134,8 @@ export default class Cart extends BaseComponent {
       min: '1',
       max: `${this.addedItems.length}`,
     });
-    this.itemsPerPageElement.addEventListener('change', this.itemsNumberInputCallback);
+    // eslint-disable-next-line prettier/prettier
+    this.itemsPerPageElement.addEventListener('change', () => this.itemsNumberInputCallback(this.itemsPerPageElement?.value));
     const totalPagesWrapper: HTMLElement = rendered('div', cartInfoContainer, 'cart-items__info_pages info-pages');
     rendered('span', totalPagesWrapper, 'cart-items__info_pages_text', 'Pages:');
     const buttonsWrapper: HTMLElement = rendered('div', totalPagesWrapper, 'info-pages__btns');
@@ -156,7 +157,7 @@ export default class Cart extends BaseComponent {
       // передаем первые два товара на первую страницу пагинации
       this.createItemsCards(this.addedItems.slice(0, this.itemsPerPage), this.callback);
       // активируем кнопку и добавляем листенер
-      this.activateRightButton();
+      this.activateNextPageBtn();
     } else if (this.addedItems.length > this.itemsPerPage && this.currentPage !== 1) {
       this.itemsNumChange = true;
       this.showNotFirstPage();
@@ -203,7 +204,7 @@ export default class Cart extends BaseComponent {
   }
 
   // функция создания карточек
-  private createItemsCards(array: PosterStorageInfo[], callback: (event: Event) => void): void {
+  private createItemsCards(array: PosterStorageInfo[], callback: () => void): void {
     for (let i: number = 0; i < array.length; i += 1) {
       cardsData.products.forEach((data) => {
         if (array[i].id === data.id) {
@@ -223,8 +224,7 @@ export default class Cart extends BaseComponent {
   }
 
   // колбэк для кнопки покупки
-  private buyNowBtnCallback = (e: Event): void => {
-    e.preventDefault();
+  private buyNowBtnCallback = (): void => {
     this.openModalCheckout();
   };
 
@@ -238,15 +238,14 @@ export default class Cart extends BaseComponent {
   }
 
   // колбэк для правой стрелки (пагинация)
-  private rightBtnCallback = (e: Event): void => {
+  private nextPageBtnCallback = (): void => {
     this.slideBack = false;
-    e.preventDefault();
     // меняем номер страницы
     this.currentPage += 1;
     setQueryParams('page', `${this.currentPage}`);
     this.updatePageNumber();
     // активируем левую кнопку и вешаем слушатель
-    this.activateLeftButton();
+    this.activatePrevPageBtn();
     // удаляем старые карточки
     this.deleteCards();
     // проверяем количнство следующих карточек
@@ -255,7 +254,7 @@ export default class Cart extends BaseComponent {
     if (this.addedItems.slice(this.startIdx).length <= this.itemsPerPage) {
       this.createItemsCards(this.addedItems.slice(this.startIdx), this.callback);
       if (this.currentPage === this.pagesNumber && this.rightArrowBtn) {
-        this.deactivateRightButton();
+        this.deactivateNextPageBtn();
       }
     } else {
       this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx), this.callback);
@@ -264,11 +263,11 @@ export default class Cart extends BaseComponent {
 
   // создание карточек после чтения query с номером страницы, которая не равна 1
   private showNotFirstPage(): void {
-    this.activateLeftButton();
+    this.activatePrevPageBtn();
     if (this.currentPage === this.pagesNumber && this.rightArrowBtn) {
-      this.deactivateRightButton();
+      this.deactivateNextPageBtn();
     } else {
-      this.activateRightButton();
+      this.activateNextPageBtn();
     }
     this.startIdx = this.currentPage * this.itemsPerPage - this.itemsPerPage;
     this.endIdx = this.startIdx + this.itemsPerPage;
@@ -276,8 +275,7 @@ export default class Cart extends BaseComponent {
   }
 
   // колбэк для левой стрелки (пагинация)
-  private leftBtnCallback = (e: Event): void => {
-    e.preventDefault();
+  private prevPageBtnCallback = (): void => {
     this.slideBack = true;
     // меняем номер страницы
     this.currentPage -= 1;
@@ -286,7 +284,7 @@ export default class Cart extends BaseComponent {
     // активируем правую кнопку, если речь о предпоследней странице
     if (this.rightArrowBtn && this.currentPage === this.pagesNumber - 1) {
       this.updateBtnState(this.rightArrowBtn);
-      this.rightArrowBtn.addEventListener('click', this.rightBtnCallback);
+      this.rightArrowBtn.addEventListener('click', this.nextPageBtnCallback);
     }
     // удаляем старые карточки
     this.deleteCards();
@@ -296,23 +294,21 @@ export default class Cart extends BaseComponent {
     this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx), this.callback);
     if (this.currentPage === 1) {
       if (this.leftArrowBtn) {
-        this.deactivateLeftButton();
+        this.deactivatePrevPageBtn();
       }
     }
   };
 
   // колбэк для смены количества айтемов на странице
-  private itemsNumberInputCallback = (e: Event): void => {
-    e.preventDefault();
-    if (this.itemsPerPageElement && e.target instanceof HTMLInputElement && e.target.value !== '0') {
+  private itemsNumberInputCallback = (value: string | undefined): void => {
+    if (this.itemsPerPageElement && value && value !== '0') {
       // проверка, нужно ли реактивировать кнопки
       this.activateBothButtons();
-      this.itemsPerPageElement.textContent = e.target.value;
-      this.itemsPerPage = Number(e.target.value);
+      this.itemsPerPageElement.textContent = value;
+      this.itemsPerPage = Number(value);
       this.updatePaginationAfterChange();
       // проверить, единственная ли у нас страница
-      // eslint-disable-next-line max-len
-      if (this.itemsPerPage === this.addedItems.length || Number(e.target.value) > this.addedItems.length) {
+      if (this.itemsPerPage === this.addedItems.length || Number(value) > this.addedItems.length) {
         this.currentPage = 1;
         this.deactivateBothButtons();
         setQueryParams('page', `${this.currentPage}`);
@@ -322,36 +318,29 @@ export default class Cart extends BaseComponent {
   };
 
   // колбэк для ввода промокода
-  private promocodeInputCallback = (e: Event): void => {
-    e.preventDefault();
-    if (this.currentPromosElement && e.target instanceof HTMLInputElement) {
-      const { value } = e.target;
+  private promocodeInputCallback = (): void => {
+    if (this.currentPromosElement && this.promoInputElement) {
+      const { value } = this.promoInputElement;
       this.currentPromoName = value;
       if (this.promoApplyWrapper) {
         this.deletePromoApplyBlock();
       }
       if (value === PromoInputs.behappy || value === PromoInputs.smile) {
         const key: number = this.choosePromoValue(value);
-        this.createApplyBlock(value, key);
+        this.createApplyOrDropPromoBlock(value, key);
       }
     }
   };
 
   // выбрать нужное значение промокода
   public choosePromoValue(value: string): number {
-    let result: number;
-    if (value === PromoInputs.behappy) {
-      this.currentPromoValue = PromoValues.behappy;
-      result = this.currentPromoValue;
-    } else {
-      this.currentPromoValue = PromoValues.smile;
-      result = this.currentPromoValue;
-    }
-    return result;
+    // eslint-disable-next-line max-len
+    this.currentPromoValue = value === PromoInputs.behappy ? PromoValues.behappy : PromoValues.smile;
+    return this.currentPromoValue;
   }
 
   // подвешивание блок apply, с кнопкой и без
-  private createApplyBlock(value: string, key: number): void {
+  private createApplyOrDropPromoBlock(value: string, key: number): void {
     this.promoApplyWrapper = this.createAplyOrDropPromoBlock(value, key, 'apply');
     if (this.currentPromosElement && this.currentPromosElement.parentNode) {
       const parent: ParentNode | null = this.currentPromosElement.parentNode;
@@ -385,8 +374,7 @@ export default class Cart extends BaseComponent {
   }
 
   // колбэк при применении промокода
-  private applyPromoCallback = (e: Event): void => {
-    e.preventDefault();
+  private applyPromoCallback = (): void => {
     this.deletePromoApplyBlock();
     // данные для создания блока с drop
     const value: string | null = this.currentPromoName ? this.currentPromoName : '';
@@ -396,7 +384,7 @@ export default class Cart extends BaseComponent {
     setDataToLocalStorage(this.appliedPromos, 'appliedPromo');
     // оставляем описание промо под input, но без кнопки
     if (value && key) {
-      this.createApplyBlock(value, key);
+      this.createApplyOrDropPromoBlock(value, key);
       this.afterPromoPrice = this.calculateNewPrice();
       this.createElementsForAppliedPromo(value, key);
     }
@@ -439,23 +427,22 @@ export default class Cart extends BaseComponent {
   }
 
   // колбэк при удаления промокода
-  private dropPromoCallback = (e: Event): void => {
-    e.preventDefault();
+  private dropPromoCallback = (): void => {
     // удаляем промо из массива с примененными промо
-    if (e.target instanceof HTMLButtonElement) {
-      const promo: string | null = e.target.hasAttribute('name') ? e.target.getAttribute('name') : '';
+    if (this.dropPromoBtn) {
+      const promo: string | null = this.dropPromoBtn.getAttribute('name');
       if (promo) {
-        const idx: number = this.appliedPromos.indexOf(promo);
-        this.appliedPromos.splice(idx, 1);
+        const index: number = this.appliedPromos.indexOf(promo);
+        this.appliedPromos.splice(index, 1);
         setDataToLocalStorage(this.appliedPromos, 'appliedPromo');
       }
       // пересчитываем цену и удаляем блок с экрана
-      if (this.appliedPromos.length !== 0) {
+      if (this.appliedPromos.length) {
         this.afterPromoPrice = this.calculateNewPrice();
         if (this.newPriceElement) {
           this.newPriceElement.textContent = `$ ${this.afterPromoPrice.toLocaleString('en-US')}`;
         }
-        const elementToRemove: ParentNode | null = e.target.parentNode;
+        const elementToRemove: ParentNode | null = this.dropPromoBtn.parentNode;
         if (this.appliedPromosElement && elementToRemove) {
           this.appliedPromosElement.removeChild(elementToRemove);
         }
@@ -472,7 +459,7 @@ export default class Cart extends BaseComponent {
         if (promo && this.promoInputElement.value === promo) {
           this.deletePromoApplyBlock();
           const key: number = this.choosePromoValue(promo);
-          this.createApplyBlock(promo, key);
+          this.createApplyOrDropPromoBlock(promo, key);
         }
       }
     }
@@ -491,13 +478,13 @@ export default class Cart extends BaseComponent {
   public calculateNewPrice(): number {
     const promoValues: number[] = [];
     let result: number = 0;
-    if (this.appliedPromos.length !== 0) {
+    if (this.appliedPromos.length) {
       this.appliedPromos.forEach((promo) => {
         const value: number = this.choosePromoValue(promo);
         promoValues.push(value);
       });
-      const temp: number = promoValues.reduce((a, v) => a + v, 0);
-      result = this.totalPrice - (this.totalPrice * temp) / 100;
+      this.totalDiscount = promoValues.reduce((a, v) => a + v, 0);
+      result = this.totalPrice - (this.totalPrice * this.totalDiscount) / 100;
     }
     return result;
   }
@@ -515,13 +502,13 @@ export default class Cart extends BaseComponent {
       this.startIdx = 0;
       this.endIdx = this.startIdx + this.itemsPerPage;
       this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx), this.callback);
-      this.deactivateLeftButton();
+      this.deactivatePrevPageBtn();
       if (this.pagesNumber === 1) {
-        this.deactivateRightButton();
+        this.deactivateNextPageBtn();
       }
     } else if (this.currentPage === this.pagesNumber) {
       this.createItemsCards(this.addedItems.slice(this.startIdx), this.callback);
-      this.deactivateRightButton();
+      this.deactivateNextPageBtn();
     } else {
       this.createItemsCards(this.addedItems.slice(this.startIdx, this.endIdx), this.callback);
     }
@@ -536,7 +523,7 @@ export default class Cart extends BaseComponent {
         this.currentPageElement.textContent = `${this.pagesNumber}`;
         setQueryParams('page', `${this.currentPage}`);
         if (this.rightArrowBtn) {
-          this.deactivateRightButton();
+          this.deactivateNextPageBtn();
         }
       } else {
         this.currentPageElement.textContent = `${this.currentPage}`;
@@ -546,50 +533,46 @@ export default class Cart extends BaseComponent {
 
   // разные функции активации и деактивации кнопок
   private deactivateBothButtons(): void {
-    this.deactivateLeftButton();
-    this.deactivateRightButton();
+    this.deactivatePrevPageBtn();
+    this.deactivateNextPageBtn();
   }
 
-  private deactivateLeftButton(): void {
+  private deactivatePrevPageBtn(): void {
     if (this.leftArrowBtn && !this.leftArrowBtn.classList.contains('disabled')) {
       this.updateBtnState(this.leftArrowBtn);
-      this.leftArrowBtn.removeEventListener('click', this.leftBtnCallback);
+      this.leftArrowBtn.removeEventListener('click', this.prevPageBtnCallback);
     }
   }
 
-  private deactivateRightButton(): void {
+  private deactivateNextPageBtn(): void {
     if (this.rightArrowBtn && !this.rightArrowBtn.classList.contains('disabled')) {
       this.updateBtnState(this.rightArrowBtn);
-      this.rightArrowBtn.removeEventListener('click', this.rightBtnCallback);
+      this.rightArrowBtn.removeEventListener('click', this.nextPageBtnCallback);
     }
   }
 
   private activateBothButtons(): void {
-    this.activateLeftButton();
-    this.activateRightButton();
+    this.activatePrevPageBtn();
+    this.activateNextPageBtn();
   }
 
-  private activateLeftButton(): void {
+  private activatePrevPageBtn(): void {
     if (this.leftArrowBtn && this.leftArrowBtn.classList.contains('disabled')) {
       this.updateBtnState(this.leftArrowBtn);
-      this.leftArrowBtn.addEventListener('click', this.leftBtnCallback);
+      this.leftArrowBtn.addEventListener('click', this.prevPageBtnCallback);
     }
   }
 
-  private activateRightButton(): void {
+  private activateNextPageBtn(): void {
     if (this.rightArrowBtn && this.rightArrowBtn.classList.contains('disabled')) {
       this.updateBtnState(this.rightArrowBtn);
-      this.rightArrowBtn.addEventListener('click', this.rightBtnCallback);
+      this.rightArrowBtn.addEventListener('click', this.nextPageBtnCallback);
     }
   }
 
   // активируем и деактивирем кнопки (класс)
   private updateBtnState(btn: HTMLElement): void {
-    if (btn && btn.classList.contains('disabled')) {
-      btn.classList.remove('disabled');
-    } else if (btn && !btn.classList.contains('disabled')) {
-      btn.classList.add('disabled');
-    }
+    btn.classList.toggle('disabled');
   }
 
   // удаление детей (карточек)
@@ -609,39 +592,35 @@ export default class Cart extends BaseComponent {
   public update(subject: ObservedSubject, e?: Event): void {
     if (subject instanceof CartCard) {
       if (subject.plus === true && subject.itemAmount <= subject.stock) {
-        this.totalPrice += subject.price;
-        this.cartItems += 1;
-        this.updateSummaryContent();
-        this.updatePromoPrice();
-        for (let i: number = 0; i < this.addedItems.length; i += 1) {
-          if (this.addedItems[i].id === subject.id) {
-            this.addedItems[i].quantity += 1;
-          }
-        }
-        setDataToLocalStorage(this.addedItems, 'addedPosters');
+        this.updateCartInfoForObserver(subject, subject.plus);
       } else if (subject.minus === true && subject.itemAmount >= 0) {
-        this.totalPrice -= subject.price;
-        this.cartItems -= 1;
-        this.updateSummaryContent();
-        this.updatePromoPrice();
-        for (let i: number = 0; i < this.addedItems.length; i += 1) {
-          if (this.addedItems[i].id === subject.id) {
-            this.addedItems[i].quantity -= 1;
-          }
-        }
-        setDataToLocalStorage(this.addedItems, 'addedPosters'); // обновляю инфу о добавленных в корзину
+        this.updateCartInfoForObserver(subject);
         this.checkIfZero(subject);
       }
     }
     if (subject instanceof ModalWindow) {
       if (e) {
-        this.showThankYouMessage(e);
+        this.showThankYouMessage();
       }
       this.cartContainer?.remove();
       this.summaryContainer?.remove();
       localStorage.removeItem('addedPosters');
       localStorage.removeItem('appliedPromo');
     }
+  }
+
+  private updateCartInfoForObserver(subject: CartCard, isAdding?: boolean): void {
+    const modifier = isAdding ? 1 : -1;
+    this.totalPrice += modifier * subject.price;
+    this.cartItems += modifier;
+    this.updateSummaryContent();
+    this.updatePromoPrice();
+    for (let i: number = 0; i < this.addedItems.length; i += 1) {
+      if (this.addedItems[i].id === subject.id) {
+        this.addedItems[i].quantity += modifier;
+      }
+    }
+    setDataToLocalStorage(this.addedItems, 'addedPosters');
   }
 
   private updateSummaryContent(): void {
@@ -658,7 +637,7 @@ export default class Cart extends BaseComponent {
     }
   }
 
-  private showThankYouMessage(e: Event): void {
+  private showThankYouMessage(): void {
     let count: number = 3;
     const background: HTMLElement = rendered('div', this.element, 'redirect-message-container');
     rendered('h2', background, 'redirect-message-container__thank-you-text', 'Thank you for your order!');
@@ -674,8 +653,8 @@ export default class Cart extends BaseComponent {
 
       if (count === 0) {
         clearInterval(interval);
-        window.history.pushState({}, '', '/');
-        this.callback(e);
+        window.history.pushState({}, '', Routes.Home);
+        this.callback();
       }
     }, 1000);
   }
@@ -684,8 +663,7 @@ export default class Cart extends BaseComponent {
   и последующее удаление */
   private checkIfZero(subject: ObservedSubject): void {
     if (subject instanceof CartCard && subject.itemAmount === 0) {
-      const index = this.addedItems.findIndex((i) => i.id === subject.id);
-      this.addedItems.splice(index, 1);
+      this.addedItems = this.addedItems.filter((i) => i.id !== subject.id);
       if (this.addedItems.length > 0) {
         setDataToLocalStorage(this.addedItems, 'addedPosters');
         this.updatePaginationAfterChange();
