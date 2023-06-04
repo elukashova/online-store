@@ -355,21 +355,12 @@ export default class ModalWindow extends BaseComponent {
 
   // три метода, нужные для обсервера
   public attachObserver(observer: Observer): void {
-    const isExist = this.observers.includes(observer);
-    if (isExist) {
-      console.log('Subject: Observer has been attached already.');
-    }
     this.observers.push(observer);
   }
 
   public removeObserver(observer: Observer): void {
-    const observerIndex = this.observers.indexOf(observer);
-    if (observerIndex === -1) {
-      console.log('Subject: Nonexistent observer.');
-    }
-
+    const observerIndex: number = this.observers.indexOf(observer);
     this.observers.splice(observerIndex, 1);
-    console.log('Subject: Detached an observer.');
   }
 
   public notifyObserver(e?: Event): void {

@@ -1,4 +1,4 @@
-import Cart from '../components/shopping-cart/shopping-cart';
+import ShoppingCart from '../components/shopping-cart/shopping-cart';
 import App from '../components/app/app';
 import Header from '../components/header/header';
 import { Callback } from '../components/shopping-cart/shopping-cart.types';
@@ -6,7 +6,7 @@ import { Callback } from '../components/shopping-cart/shopping-cart.types';
 const app: App = new App(document.body);
 const callback: Callback = app.route;
 const header: Header = new Header(callback);
-const cart: Cart = new Cart(header, callback);
+const cart: ShoppingCart = new ShoppingCart(header, callback);
 
 describe('Cart class', () => {
   const validInput: string = 'SMILE';

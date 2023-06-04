@@ -8,6 +8,7 @@ import { RangeFilters, RangeSettings, RangeTypeToSetting } from './enums.filter'
 import Card from '../card/card';
 import findCountOfCurrentProducts from '../cards-field/utils/find.current.count';
 import { CountForFilter, FilterNames } from '../cards-field/cards-field.types';
+import Routes from '../app/routes.types';
 
 export default class Filter {
   public checkboxes: HTMLElement[] = [];
@@ -85,7 +86,7 @@ export default class Filter {
       id: `${filter}`,
     });
     this.allCountsFrom.push(this.countFrom);
-    rendered('span', countWrapper, `${this.filterName}__slash-${index + 1}`, '/');
+    rendered('span', countWrapper, `${this.filterName}__slash-${index + 1}`, Routes.Home);
     this.countTo = rendered('span', countWrapper, `${this.filterName}__out-from-to-${index + 1}-to`, '0', {
       id: `${filter}-to`,
     });
