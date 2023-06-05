@@ -1,0 +1,146 @@
+.cards__item {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.1rem;
+  box-shadow: rgba(60, 64, 67, 0.15) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
+
+.card__img-holder {
+  overflow: hidden;
+}
+
+.card__img {
+  width: 100%;
+  cursor: pointer;
+  transition: transform 0.5s;
+}
+
+.card__img:hover {
+  transform: scale(1.1);
+}
+
+.card__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.3rem;
+  padding: 0.3rem;
+}
+
+.card__info_wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0.1rem;
+}
+
+.card__name {
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: calc(0.25em + 0.8vw);
+}
+
+.card__category {
+  font-weight: 400;
+  color: #65635f;
+  font-size: calc(0.25em + 0.8vw);
+}
+
+.card__size {
+  margin-top: 5px;
+}
+
+.card__size,
+.card__stock,
+.card__rating {
+  color: #65635f;
+  font-weight: 300;
+  font-size: calc(0.2em + 0.7vw);
+}
+
+.card__rating {
+  margin-bottom: 5px;
+}
+
+.card__price {
+  font-weight: 500;
+  font-size: calc(0.3em + 0.8vw);
+}
+
+.card__discount-btns-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card__discount {
+  width: 6em;
+  color: #fff;
+  text-align: center;
+  line-height: 1.4em;
+  font-size: calc(0.3em + 0.8vw);
+  background-color: #ff7d15;
+  border-radius: 8px;
+}
+
+.card__btns {
+  align-self: flex-end;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 4.5em;
+  height: calc(1em + 1vw);
+}
+
+.card__btn_buy,
+.card__btn_open-card {
+  height: 95%;
+  border-radius: 0.15em;
+  cursor: pointer;
+  transition: border-radius 0.4s, box-shadow 0.4s;
+}
+
+.card__btn_buy:hover,
+.card__btn_open-card:hover {
+  border-radius: 50%;
+}
+
+.card__description {
+  display: none;
+  margin-right: 5%;
+  font-size: calc(0.25em + 0.8vw);
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  height: max-content;
+}
+
+@media screen and (max-width: 1100px) {
+  .card__btns {
+    width: 3.8em;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .card__discount-btns-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    align-items: flex-start;
+    gap: 5%;
+  }
+}
+
+@media screen and (max-width: 780px) {
+  .card__btns {
+    width: 3.5em;
+  }
+}

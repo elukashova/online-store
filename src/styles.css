@@ -1,0 +1,24 @@
+html,
+.root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+.root {
+  min-height: 100vh;
+}
+
+@media screen and (max-width: 640px) {
+  .root {
+    height: 100%;
+}
+}
